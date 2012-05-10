@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.buddycloud.mediaserver</groupId>
-  <artifactId>buddycloud-media-server</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+	<groupId>com.buddycloud.mediaserver</groupId>
+	<artifactId>buddycloud-media-server</artifactId>
+	<version>0.1</version>
+	<packaging>war</packaging>
 	<name>buddycloud-media-server</name>
 
 	<dependencies>
@@ -30,14 +30,19 @@
 			<artifactId>org.restlet.ext.simple</artifactId>
 			<version>${restlet-version}</version>
 		</dependency>
-		
-	    <!--  Gson: Java to Json conversion -->
-	    <dependency>
-	      <groupId>com.google.code.gson</groupId>
-	      <artifactId>gson</artifactId>
-	      <version>2.2</version>
-	      <scope>compile</scope>
-	    </dependency>
+		<dependency>
+			<groupId>org.restlet.jee</groupId>
+			<artifactId>org.restlet.ext.servlet</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+
+		<!-- Gson: Java to Json conversion -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2</version>
+			<scope>compile</scope>
+		</dependency>
 
 	</dependencies>
 	<build>
@@ -67,10 +72,27 @@
 					<mainClass>com.buddycloud.mediaserver.Main</mainClass>
 				</configuration>
 			</plugin>
+			
+			<!-- Tomcat
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>tomcat-maven-plugin</artifactId>
+				<configuration>
+					<warFile>${project.build.directory}/${project.build.finalName}.war</warFile>
+				</configuration>
+			</plugin>
+			 -->
+			 
+			<!-- Jetty -->
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>8.1.3.v20120416</version>
+			</plugin>
 		</plugins>
 	</build>
 	<properties>
-		<restlet-version>2.0.0</restlet-version>
+		<restlet-version>2.0.13</restlet-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>

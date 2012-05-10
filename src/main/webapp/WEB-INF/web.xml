@@ -4,12 +4,12 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
             xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee  
                  http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">  
-    <display-name>RESTful Java Web Services - Restlet</display-name>  
+    <display-name>com.buddycloud.mediaserver</display-name>  
     <!-- Application class name -->  
     <context-param>  
        <param-name>org.restlet.application</param-name>  
        <param-value>  
-          com.buddycloud.mediaserver.MediaServerApplcation  
+          com.buddycloud.mediaserver.MediaServerApplication  
        </param-value>  
     </context-param>  
    

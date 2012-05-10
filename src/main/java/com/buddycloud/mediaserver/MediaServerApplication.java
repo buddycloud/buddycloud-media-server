@@ -4,6 +4,8 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
+import com.buddycloud.mediaserver.resource.MediaResource;
+
 
 public class MediaServerApplication extends Application {
 	
@@ -25,7 +27,7 @@ public class MediaServerApplication extends Application {
 	public synchronized Restlet createRoot() {
 		Router router = new Router(getContext());
 		
-		//router.attach("/media", MediaResource.class);
+		router.attach("/media/{channel}/{id}", MediaResource.class);
 
 		return router;
 	}
