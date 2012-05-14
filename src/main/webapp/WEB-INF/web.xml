@@ -9,7 +9,7 @@
     <context-param>  
        <param-name>org.restlet.application</param-name>  
        <param-value>  
-          com.buddycloud.mediaserver.MediaServerApplication  
+          com.buddycloud.mediaserver.web.MediaServerApplication  
        </param-value>  
     </context-param>  
    

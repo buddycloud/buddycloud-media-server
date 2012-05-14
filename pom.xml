@@ -9,6 +9,12 @@
 	<name>buddycloud-media-server</name>
 
 	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+		</dependency>
+
 		<!-- RESTLET -->
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
@@ -27,13 +33,32 @@
 		</dependency>
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
-			<artifactId>org.restlet.ext.simple</artifactId>
+			<artifactId>org.restlet.ext.jetty</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.html</artifactId>
 			<version>${restlet-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.restlet.jee</groupId>
 			<artifactId>org.restlet.ext.servlet</artifactId>
 			<version>${restlet-version}</version>
+		</dependency>
+		
+		<!-- Java Servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
+		</dependency>
+
+		<!-- Postgres -->
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901.jdbc4</version>
 		</dependency>
 
 		<!-- Gson: Java to Json conversion -->
@@ -42,6 +67,26 @@
 			<artifactId>gson</artifactId>
 			<version>2.2</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<!-- log4j -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.16</version>
+		</dependency>
+
+		<!-- c3p0 -->
+		<dependency>
+			<groupId>c3p0</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.1.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.3.2</version>
 		</dependency>
 
 	</dependencies>
@@ -72,17 +117,11 @@
 					<mainClass>com.buddycloud.mediaserver.Main</mainClass>
 				</configuration>
 			</plugin>
-			
-			<!-- Tomcat
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>tomcat-maven-plugin</artifactId>
-				<configuration>
-					<warFile>${project.build.directory}/${project.build.finalName}.war</warFile>
-				</configuration>
-			</plugin>
-			 -->
-			 
+
+			<!-- Tomcat <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>tomcat-maven-plugin</artifactId> 
+				<configuration> <warFile>${project.build.directory}/${project.build.finalName}.war</warFile> 
+				</configuration> </plugin> -->
+
 			<!-- Jetty -->
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
@@ -92,7 +131,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<restlet-version>2.0.13</restlet-version>
+		<restlet-version>2.1-SNAPSHOT</restlet-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>
