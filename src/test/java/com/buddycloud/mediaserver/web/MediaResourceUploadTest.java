@@ -18,7 +18,7 @@ import com.buddycloud.mediaserver.commons.Constants;
 
 public class MediaResourceUploadTest {
 	
-	private static final String URL = "http://localhost:8080/media/channel@domain/" + UUID.randomUUID();
+	private static final String URL = "http://localhost:8080/channel/channel@domain/media/" + UUID.randomUUID();
 	private static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
 	private static final String TESTFILE_NAME = "testimage.jpg";
 	
@@ -29,7 +29,7 @@ public class MediaResourceUploadTest {
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach("/media", new MediaServerApplication(context));
+		component.getDefaultHost().attach("/channel/{channel_id}/", new MediaServerApplication(context));
 		
 	    component.start();  
 	}

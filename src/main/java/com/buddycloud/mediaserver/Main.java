@@ -17,7 +17,6 @@ public class Main {
 			startXMPPComponent();
 		} catch (Exception e) {
 			LOGGER.fatal(e.getMessage(), e);
-		} finally {
 			System.exit(1);
 		}
 	} 
@@ -28,7 +27,7 @@ public class Main {
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach("/media", new MediaServerApplication(context));
+		component.getDefaultHost().attach("/channel/{channel_id}", new MediaServerApplication(context));
 		
 	    component.start(); 
 	}
