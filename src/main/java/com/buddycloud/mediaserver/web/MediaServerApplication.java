@@ -17,9 +17,7 @@ public class MediaServerApplication extends Application {
 	@Override
 	public synchronized Restlet createInboundRoot() {
 		Router router = new Router(getContext());
-		
-		router.attach("/{domain}/{channel}", UploadMediaResource.class);
-		router.attach("/{domain}/{channel}/{id}", UploadMediaResource.class);
+		router.attach("/{channel_id}/{media_id}", MediaResource.class);
 
 		return router;
 	}

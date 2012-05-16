@@ -7,24 +7,25 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
-import org.restlet.resource.Post;
+import org.restlet.resource.Get;
+import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
 import com.buddycloud.mediaserver.business.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
 
 
-public class UploadMediaResource extends ServerResource {
+public class MediaResource extends ServerResource {
 
-	@Post
+	@Put
 	public Representation postMedia(Representation entity) {
 		String channel = (String) getRequest().getAttributes().get(Constants.CHANNEL_ARG);
-		String domain = (String) getRequest().getAttributes().get(Constants.DOMAIN_ARG);
+		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				try {
-					return new StringRepresentation(MediaDAO.gestInstance().addFile(domain, channel, getRequest()), 
+					return new StringRepresentation(MediaDAO.gestInstance().addFile(channel, mediaId, getRequest()), 
 								MediaType.APPLICATION_JSON);
 				} catch (FileNotFoundException e) {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
@@ -39,9 +40,17 @@ public class UploadMediaResource extends ServerResource {
 			}
 		}
 		
-		// POST request with no entity.
+		// PUT request with no entity.
 		setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-		return new StringRepresentation("POST request with no entity", MediaType.TEXT_PLAIN);
+		return new StringRepresentation("PUT request with no entity", MediaType.TEXT_PLAIN);
+	}
+	
+	@Get
+	public Representation getMedia(Representation entity) {
+		String channel = (String) getRequest().getAttributes().get(Constants.CHANNEL_ARG);
+		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
+
+		return new StringRepresentation("GET: " + channel + "/" + mediaId);
 	}
 
 

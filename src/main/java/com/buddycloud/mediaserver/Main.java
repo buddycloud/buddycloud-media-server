@@ -1,5 +1,6 @@
 package com.buddycloud.mediaserver;
 
+import org.apache.log4j.Logger;
 import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
@@ -7,17 +8,33 @@ import org.restlet.data.Protocol;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 
 public class Main {
-	public static void main(String[] args) throws Exception {  
-	    // Create a new Restlet component and add a HTTP server connector to it  
+	private static Logger LOGGER = Logger.getLogger(Main.class);
+	
+	
+	public static void main(String[] args) {  
+		try {
+			startRestletComponent();
+			startXMPPComponent();
+		} catch (Exception e) {
+			LOGGER.fatal(e.getMessage(), e);
+		} finally {
+			System.exit(1);
+		}
+	} 
+	
+	
+	private static void startRestletComponent() throws Exception {
 	    Component component = new Component();  
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
-	    // Then attach it to the local host  
 	    Context context = component.getContext().createChildContext();
 		component.getDefaultHost().attach("/media", new MediaServerApplication(context));
 		
-	    // Now, let's start the component!  
-	    // Note that the HTTP server connector is also automatically started.  
 	    component.start(); 
-	} 
+	}
+
+	private static void startXMPPComponent() {
+		// TODO Auto-generated method stub
+		
+	}
 }

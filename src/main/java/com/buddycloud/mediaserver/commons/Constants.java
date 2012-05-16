@@ -5,9 +5,8 @@ public class Constants {
 	private Constants() {}
 	
 	//URL arguments
-	public static final String CHANNEL_ARG = "channel";
-	public static final String DOMAIN_ARG = "domain";
-	public static final String ID_ARG = "id";
+	public static final String CHANNEL_ARG = "channel_id";
+	public static final String MEDIA_ARG = "media_id";
 	
 	//Storage constants
 	public static final String FILE_FIELD = "file";

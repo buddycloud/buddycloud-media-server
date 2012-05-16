@@ -5,7 +5,8 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import java.util.UUID;
+
+import javax.activation.MimetypesFileTypeMap;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -72,7 +73,7 @@ public class MediaDAO implements DAO {
 		return directory.mkdir();
 	}
 
-	public String addFile(String domain, String channel, Request request) 
+	public String addFile(String channel, String mediaId, Request request) 
 			throws FileNotFoundException, FileUploadException, SQLException {
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(Constants.SIZE_THRESHOLD);
@@ -86,21 +87,15 @@ public class MediaDAO implements DAO {
 		}
 
 		boolean found = false;
-		String uuid = UUID.randomUUID().toString();
 
 		for (FileItem item : items) {
 			if (item.getFieldName().equals(Constants.FILE_FIELD)) {
 				found = true;
 
-				String fullDirectoryPath = Constants.FILE_ROOT + File.separator + domain + File.separator + channel;
+				String fullDirectoryPath = Constants.FILE_ROOT + File.separator + channel;
 				mkdir(fullDirectoryPath);
 
-				File file = new File(fullDirectoryPath + File.separator + uuid);
-
-				while (file.exists()) {
-					uuid = UUID.randomUUID().toString();
-					file = new File(fullDirectoryPath + File.separator + uuid);
-				}
+				File file = new File(fullDirectoryPath + File.separator + mediaId);
 
 				try {
 					item.write(file);
@@ -108,7 +103,7 @@ public class MediaDAO implements DAO {
 					throw new FileUploadException("Error while writing the file");
 				}
 
-				insertMetadata(uuid, fileName, file);
+				insertMetadata(mediaId, fileName, file);
 
 				break;
 			}
@@ -118,12 +113,11 @@ public class MediaDAO implements DAO {
 			throw new FileNotFoundException();
 		}
 
-		return JsonUtil.toJson(uuid); 
+		return JsonUtil.toJson(mediaId); 
 	}
 
 	private String getMediaType(File file) {
-		int dot = file.getName().lastIndexOf(".");
-		return dot == -1 ? "" : file.getName().substring(dot + 1);
+		return new MimetypesFileTypeMap().getContentType(file);
 	}
 
 }
