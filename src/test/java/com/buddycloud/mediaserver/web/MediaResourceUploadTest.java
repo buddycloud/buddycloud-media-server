@@ -1,5 +1,7 @@
 package com.buddycloud.mediaserver.web;
 
+import java.util.UUID;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.restlet.Component;
@@ -9,16 +11,16 @@ import org.restlet.data.Protocol;
 import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.FileRepresentation;
-import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.commons.Constants;
 
-public class UploadMediaResourceTest {
+public class MediaResourceUploadTest {
 	
-	private static final String URL = "http://localhost:8080/media/testdomain/testchannel";
-	private static final String TESTFILE = "resources/tests/testimage.jpg";
+	private static final String URL = "http://localhost:8080/media/channel@domain/" + UUID.randomUUID();
+	private static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
+	private static final String TESTFILE_NAME = "testimage.jpg";
 	
 	
 	@Before
@@ -39,11 +41,11 @@ public class UploadMediaResourceTest {
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
 		form.getEntries().add(new FormData(Constants.NAME_FIELD, 
-				new StringRepresentation("testfile")));
+				new StringRepresentation(TESTFILE_NAME)));
 		form.getEntries().add(new FormData(Constants.FILE_FIELD, 
-				new FileRepresentation(TESTFILE, MediaType.APPLICATION_ALL)));
+				new FileRepresentation(TESTFILE_PATH, MediaType.IMAGE_JPEG)));
 		
-		Representation result = client.post(form);
+		client.put(form);
 	}
 
 }
