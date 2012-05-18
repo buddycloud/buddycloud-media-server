@@ -1,4 +1,4 @@
-package com.buddycloud.mediaserver.business.db;
+package com.buddycloud.mediaserver.business.jdbc.schema;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -9,6 +9,8 @@ import java.sql.Statement;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+
+import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
 
 public abstract class AbstractRunSchemaScript {
 	

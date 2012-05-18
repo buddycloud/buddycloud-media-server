@@ -27,7 +27,7 @@ public class Main {
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach("/channel/{channel_id}", new MediaServerApplication(context));
+		component.getDefaultHost().attach("/channel/{channelId}", new MediaServerApplication(context));
 		
 	    component.start(); 
 	}

@@ -19,7 +19,7 @@ public class MediaServerApplication extends Application {
 		Router router = new Router(getContext());
 		
 		///channel/<name@domain.com>/media/<mediaID>
-		router.attach("/media/{media_id}", MediaResource.class);
+		router.attach("/media/{mediaId}", MediaResource.class);
 
 		return router;
 	}

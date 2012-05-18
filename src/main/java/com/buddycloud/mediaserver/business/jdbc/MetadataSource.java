@@ -1,4 +1,4 @@
-package com.buddycloud.mediaserver.business.db;
+package com.buddycloud.mediaserver.business.jdbc;
 
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
@@ -9,6 +9,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+import com.buddycloud.mediaserver.business.model.Media;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class MetadataSource {
@@ -28,8 +29,8 @@ public class MetadataSource {
 		return dataSource.getConnection().createStatement();
 	}
 	
-	public PreparedStatement prepareStatement(String statement, Object... args) throws SQLException {
-		PreparedStatement prepareStatement = dataSource.getConnection().prepareStatement(statement);
+	public PreparedStatement prepareStatement(String sql, Object... args) throws SQLException {
+		PreparedStatement prepareStatement = dataSource.getConnection().prepareStatement(sql);
 		for (int i = 1; i <= args.length; i++) {
 			prepareStatement.setObject(i, args[i-1]);
 		}
@@ -62,5 +63,15 @@ public class MetadataSource {
 		this.dataSource = new ComboPooledDataSource();
 		dataSource.setDriverClass("org.postgresql.Driver");
 		dataSource.setJdbcUrl(configuration.getProperty("postgres.jdbc.url"));
+	}
+	
+	public void storeMetadata(Media media) throws SQLException {
+		PreparedStatement statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(), 
+				media.getUploader(), media.getTitle(), media.getMimeType(), media.getDownloadUrl(), 
+				media.getFileExtension(), media.getMd5Checksum(), media.getFileSize(), 
+				media.getLength(), media.getResolution());
+		
+		statement.execute();
+		statement.close();
 	}
 }

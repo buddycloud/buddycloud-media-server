@@ -1,51 +1,34 @@
 package com.buddycloud.mediaserver.web;
 
-import java.util.UUID;
-
-import org.junit.Before;
 import org.junit.Test;
-import org.restlet.Component;
-import org.restlet.Context;
 import org.restlet.data.MediaType;
-import org.restlet.data.Protocol;
 import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
+import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.FileRepresentation;
-import org.restlet.representation.StringRepresentation;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
+import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
 
-public class MediaResourceUploadTest {
-	
-	private static final String URL = "http://localhost:8080/channel/channel@domain/media/" + UUID.randomUUID();
-	private static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
-	private static final String TESTFILE_NAME = "testimage.jpg";
-	
-	
-	@Before
-	public void setUp() throws Exception {
-		Component component = new Component();  
-	    component.getServers().add(Protocol.HTTP, 8080);  
-	    
-	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach("/channel/{channel_id}/", new MediaServerApplication(context));
-		
-	    component.start();  
-	}
+public class MediaResourceUploadTest extends MediaResourceTest {
 	
 	@Test
-	public void anonymousSuccessfulUpload() {
-		ClientResource client = new ClientResource(URL);
+	public void anonymousSuccessfulUpload() throws Exception {
+		Media media = buildValidTestMedia();
+		ClientResource client = new ClientResource(URL + media.getId());
 		
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
-		form.getEntries().add(new FormData(Constants.NAME_FIELD, 
-				new StringRepresentation(TESTFILE_NAME)));
+		form.getEntries().add(new FormData(Constants.BODY_FIELD, 
+				new JsonRepresentation(media)));
 		form.getEntries().add(new FormData(Constants.FILE_FIELD, 
 				new FileRepresentation(TESTFILE_PATH, MediaType.IMAGE_JPEG)));
 		
-		client.put(form);
+		
+		Representation result = client.put(form);
+		System.out.println(result.getText());
 	}
 
 }

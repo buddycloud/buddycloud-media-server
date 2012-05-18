@@ -1,9 +1,10 @@
-package com.buddycloud.mediaserver.business.db;
+package com.buddycloud.mediaserver.business.jdbc.schema;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
 import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 
 public class DropSchema extends AbstractRunSchemaScript {

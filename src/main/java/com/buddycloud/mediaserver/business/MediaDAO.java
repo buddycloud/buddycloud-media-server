@@ -3,10 +3,8 @@ package com.buddycloud.mediaserver.business;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
-
-import javax.activation.MimetypesFileTypeMap;
+import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -15,23 +13,28 @@ import org.apache.log4j.Logger;
 import org.restlet.Request;
 import org.restlet.ext.fileupload.RestletFileUpload;
 
-import com.buddycloud.mediaserver.business.db.MetadataSource;
+import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
+import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.JsonUtil;
+import com.google.gson.Gson;
 
 public class MediaDAO implements DAO {
 
 	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
 	private MetadataSource dataSource;
+	private Properties configuration;
+	private Gson gson;
 
-
+	
 	private static final MediaDAO instance = new MediaDAO();
 
 
 	private MediaDAO() {
 		try {
-			this.dataSource = new MetadataSource(ConfigurationUtils.loadConfiguration());
+			this.configuration = ConfigurationUtils.loadConfiguration();
+			this.dataSource = new MetadataSource(configuration);
+			this.gson = new Gson();
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			throw new RuntimeException(e);
@@ -44,33 +47,32 @@ public class MediaDAO implements DAO {
 	}
 
 
-	private String getFileName(List<FileItem> items) {
-		String fileName = null;
+	private Media getMedia(List<FileItem> items) {
+		Media media = null;
 
 		for (int i = 0; i < items.size(); i++) {
 			FileItem item = items.get(i);
-			if (item.getFieldName().equals(Constants.NAME_FIELD)) {
-				fileName = item.getString();
+			if (item.getFieldName().equals(Constants.BODY_FIELD)) {
+				media = gson.fromJson(item.getString(), Media.class);
 				items.remove(i);
+				
 				break;
 			}
 		}
 
-		return fileName;
-	}
-
-	private void insertMetadata(String uuid, String fileName, File file) throws SQLException {
-		Statement statement = dataSource.createStatement();
-		statement.execute("INSERT INTO media(media_id, media_path, media_name, media_type) " +
-				" VALUES('" + uuid + "', '" + file.getParentFile().getAbsolutePath() + "', '" +
-				fileName + "', '" + getMediaType(file) + "');");
-		
-		MetadataSource.close(statement);
+		return media;
 	}
 
 	private boolean mkdir(String fullDirectoryPath) {
 		File directory = new File(fullDirectoryPath);
 		return directory.mkdir();
+	}
+	
+	private void storeMetadata(Media media) throws SQLException {
+		//TODO
+		//media.setDownloadUrl();
+		
+		dataSource.storeMetadata(media);
 	}
 
 	public String addFile(String channel, String mediaId, Request request) 
@@ -81,18 +83,20 @@ public class MediaDAO implements DAO {
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
 
-		String fileName = getFileName(items);
-		if (fileName == null) {
-
+		Media media = getMedia(items);
+		
+		if (media == null) {
+			//TODO throw Exception();
 		}
-
+		
 		boolean found = false;
 
 		for (FileItem item : items) {
 			if (item.getFieldName().equals(Constants.FILE_FIELD)) {
 				found = true;
 
-				String fullDirectoryPath = Constants.FILE_ROOT + File.separator + channel;
+				String fullDirectoryPath = configuration.getProperty("media.storage.root") +
+						File.separator + channel;
 				mkdir(fullDirectoryPath);
 
 				File file = new File(fullDirectoryPath + File.separator + mediaId);
@@ -102,8 +106,11 @@ public class MediaDAO implements DAO {
 				} catch (Exception e) {
 					throw new FileUploadException("Error while writing the file");
 				}
+				
+				//verify md5
 
-				insertMetadata(mediaId, fileName, file);
+				// Only stores if the file were successfully saved				
+				storeMetadata(media);
 
 				break;
 			}
@@ -112,12 +119,7 @@ public class MediaDAO implements DAO {
 		if (!found) {
 			throw new FileNotFoundException();
 		}
-
-		return JsonUtil.toJson(mediaId); 
+		
+		return gson.toJson(media); 
 	}
-
-	private String getMediaType(File file) {
-		return new MimetypesFileTypeMap().getContentType(file);
-	}
-
 }
