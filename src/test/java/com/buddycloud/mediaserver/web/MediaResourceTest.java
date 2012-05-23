@@ -21,11 +21,12 @@ import com.buddycloud.mediaserver.commons.Constants;
 
 public abstract class MediaResourceTest {
 	
+	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
+	protected static final String TESTFILE_ID = "43RqWwxzxamkKebaATCA";
+	protected static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
+
 	protected static final String BASE_CHANNEL = "channel@domain";
 	protected static final String BASE_URL = "http://localhost:8080/channel/" + BASE_CHANNEL + "/media";
-	protected static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
-	protected static final String TESTFILE_ID = "43RqWwxzxamkKebaATCA";
-	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
 	
 	
 	protected Properties configuration;
