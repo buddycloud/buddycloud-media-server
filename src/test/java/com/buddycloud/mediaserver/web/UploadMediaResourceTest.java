@@ -1,5 +1,9 @@
 package com.buddycloud.mediaserver.web;
 
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.ext.html.FormData;
@@ -12,12 +16,15 @@ import org.restlet.resource.ClientResource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
 
-public class MediaResourceUploadTest extends MediaResourceTest {
+public class UploadMediaResourceTest extends MediaResourceTest {
+	
+	@Override
+	protected void testSetUp() throws Exception {}
 	
 	@Test
 	public void anonymousSuccessfulUpload() throws Exception {
 		Media media = buildValidTestMedia();
-		ClientResource client = new ClientResource(URL + media.getId());
+		ClientResource client = new ClientResource(BASE_URL);
 		
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
@@ -27,8 +34,15 @@ public class MediaResourceUploadTest extends MediaResourceTest {
 				new FileRepresentation(TESTFILE_PATH, MediaType.IMAGE_JPEG)));
 		
 		
-		Representation result = client.put(form);
+		Representation result = client.post(form);
 		System.out.println(result.getText());
 	}
-
+	
+	@After
+	public void tearDown() throws Exception {
+		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
+				File.separator + BASE_CHANNEL));
+		
+		dataSource.deleteMetadata(TESTFILE_ID);
+	}
 }

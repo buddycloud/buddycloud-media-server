@@ -4,6 +4,8 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
+import com.buddycloud.mediaserver.commons.Constants;
+
 
 public class MediaServerApplication extends Application {
 	
@@ -18,9 +20,12 @@ public class MediaServerApplication extends Application {
 	public synchronized Restlet createInboundRoot() {
 		Router router = new Router(getContext());
 		
-		///channel/<name@domain.com>/media/<mediaID>
-		router.attach("/media/{mediaId}", MediaResource.class);
-
+		// GET /channel/<name@domain.com>/media/<mediaID>
+		router.attach("/media/{" + Constants.MEDIA_ARG + "}", DownloadMediaResource.class);
+		
+		// POST /channel/<name@domain.com>/media
+		router.attach("/media", UploadMediaResource.class);
+		
 		return router;
 	}
 }

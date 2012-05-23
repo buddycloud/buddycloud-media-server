@@ -5,6 +5,7 @@ import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
 
+import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 
 public class Main {
@@ -27,7 +28,7 @@ public class Main {
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach("/channel/{channelId}", new MediaServerApplication(context));
+		component.getDefaultHost().attach("/channel/{" + Constants.CHANNEL_ARG + "}", new MediaServerApplication(context));
 		
 	    component.start(); 
 	}

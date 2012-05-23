@@ -3,6 +3,7 @@ package com.buddycloud.mediaserver.business.jdbc;
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
@@ -10,6 +11,9 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.exception.CreateDataSourceError;
+import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 public class MetadataSource {
@@ -20,9 +24,15 @@ public class MetadataSource {
 	private Properties configuration;
 	
 
-	public MetadataSource(Properties configuration) throws PropertyVetoException {
+	public MetadataSource(Properties configuration) {
 		this.configuration = configuration;
-		createDataSource();
+		
+		try {
+			createDataSource();
+		} catch (PropertyVetoException e) {
+			LOGGER.fatal("Error during data source creation: " + e.getMessage(), e);
+			throw new CreateDataSourceError(e.getMessage(), e);
+		}
 	}
 
 	public Statement createStatement() throws SQLException {
@@ -61,17 +71,69 @@ public class MetadataSource {
 
 	private void createDataSource() throws PropertyVetoException {
 		this.dataSource = new ComboPooledDataSource();
-		dataSource.setDriverClass("org.postgresql.Driver");
-		dataSource.setJdbcUrl(configuration.getProperty("postgres.jdbc.url"));
+		dataSource.setDriverClass(configuration.getProperty(Constants.JDBC_DRIVER_CLASS_PROPERTY));
+		dataSource.setJdbcUrl(configuration.getProperty(Constants.JDBC_DB_URL_PROPERTY));
 	}
 	
-	public void storeMetadata(Media media) throws SQLException {
-		PreparedStatement statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(), 
-				media.getUploader(), media.getTitle(), media.getMimeType(), media.getDownloadUrl(), 
-				media.getFileExtension(), media.getMd5Checksum(), media.getFileSize(), 
-				media.getLength(), media.getResolution());
+	public void storeMetadata(Media media) throws MediaMetadataSourceException {
+		LOGGER.debug("Store media metadata. Media ID: " + media.getId());
 		
-		statement.execute();
-		statement.close();
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(), 
+					media.getUploader(), media.getTitle(), media.getMimeType(), media.getDownloadUrl(), 
+					media.getFileExtension(), media.getMd5Checksum(), media.getFileSize(), 
+					media.getLength(), media.getResolution());
+
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Media metadata successfully stored. Media ID: " + media.getId());
+		} catch (SQLException e) {
+			LOGGER.error("Error while saving media metadata: " + e.getMessage(), e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
+	public void deleteMetadata(String mediaId) throws MediaMetadataSourceException {
+		LOGGER.debug("Deleting media metadata. Media ID: " + mediaId);
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.DELETE_MEDIA, mediaId);
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Media metadata successfully deleted. Media ID: " + mediaId);
+		} catch (SQLException e) {
+			LOGGER.error("Error while deleting media metadata: " + e.getMessage(), e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
+	public String getMediaMimeType(String mediaId) throws MediaMetadataSourceException {
+		LOGGER.debug("Getting media type. Media ID: " + mediaId);
+		
+		String mimeType = null;
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.GET_MEDIA_MIME_TYPE, mediaId);
+
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				mimeType = result.getString(1); 
+				LOGGER.debug("Media metadata successfully fetched. Media ID: " + mediaId);
+			} else {
+				LOGGER.debug("No metadata found. Media ID: " + mediaId);
+			}
+
+			statement.close();
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+		
+		return mimeType;
 	}
 }

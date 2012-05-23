@@ -31,7 +31,7 @@ public class Media {
 	private String md5Checksum;
 	private Long fileSize;
 	private Long length = null; //for videos
-	private String resolution = null; //for photos and videos
+	private String resolution = null; //for images and videos
 	
 	
 	public String getId() {
