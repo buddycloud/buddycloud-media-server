@@ -22,10 +22,10 @@ import com.buddycloud.mediaserver.commons.Constants;
 public abstract class MediaResourceTest {
 	
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
-	protected static final String TESTFILE_ID = "43RqWwxzxamkKebaATCA";
 	protected static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
+	protected static final String TESTFILE_ID = "testFileId";
 
-	protected static final String BASE_CHANNEL = "channel@domain";
+	protected static final String BASE_CHANNEL = "channel@topics.domain.com";
 	protected static final String BASE_URL = "http://localhost:8080/channel/" + BASE_CHANNEL + "/media";
 	
 	
@@ -62,7 +62,7 @@ public abstract class MediaResourceTest {
 		
 		media.setId(mediaId);
 		media.setDescription("a description");
-		media.setFileExtension(".jpg");
+		media.setFileExtension("jpg");
 
 		File file = new File(TESTFILE_PATH);
 		media.setFileSize(file.length());
@@ -73,8 +73,8 @@ public abstract class MediaResourceTest {
 		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
 		media.setTitle("testimage.jpg");
 		media.setUploader("user@domain.com");
-		media.setHeight(250);
-		media.setWidth(250);
+		media.setHeight(312);
+		media.setWidth(312);
 		
 		return media;
 	}

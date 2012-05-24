@@ -10,14 +10,14 @@ import org.restlet.resource.ServerResource;
 import com.buddycloud.mediaserver.business.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
-import com.buddycloud.mediaserver.commons.exception.NotMatchingChecksumException;
 import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.NotMatchingChecksumException;
 
 
 public class UploadMediaResource extends ServerResource {
 
 	@Post
-	public Representation putMedia(Representation entity) {
+	public Representation postMedia(Representation entity) {
 		String channel = (String) getRequest().getAttributes().get(Constants.CHANNEL_ARG);
 
 		if (entity != null) {

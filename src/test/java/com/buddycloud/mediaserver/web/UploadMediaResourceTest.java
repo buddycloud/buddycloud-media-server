@@ -41,7 +41,6 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 		form.getEntries().add(new FormData(Constants.FILE_FIELD, 
 				new FileRepresentation(TESTFILE_PATH, MediaType.IMAGE_JPEG)));
 		
-		
 		Representation result = client.post(form);
 		System.out.println(result.getText());
 	}

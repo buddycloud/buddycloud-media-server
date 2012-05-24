@@ -5,8 +5,8 @@ public class Queries {
 	
 	// Insert
 	public static final String SAVE_MEDIA = "INSERT INTO media" +
-			" (id, uploader, title, mimeType, downloadUrl, fileExtension, md5Checksum, fileSize, length, resolution)" +
-			" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			" (id, uploader, title, mimeType, downloadUrl, fileExtension, md5Checksum, fileSize, length, height, width)" +
+			" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	
 	// Select
 	public static final String GET_MEDIA = "SELECT * FROM media WHERE id = ?";

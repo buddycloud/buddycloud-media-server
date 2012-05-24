@@ -12,6 +12,10 @@ public class ConfigurationUtils {
 	
 	private static final String CONFIGURATION_FILE = "mediaserver.properties";
 	private static Logger LOGGER = Logger.getLogger(ConfigurationUtils.class);
+
+	
+	private ConfigurationUtils() {}
+
 	
 	public static Properties loadConfiguration() {
 		Properties configuration = new Properties();
