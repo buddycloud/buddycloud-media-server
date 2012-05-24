@@ -15,4 +15,7 @@ public class Queries {
 
 	// Delete
 	public static final String DELETE_MEDIA = "DELETE FROM media WHERE id = ?";
+	
+	// Update
+	public static final String UPDATE_MEDIA_LAST_VIEWED = "UPDATE media SET lastViewedDate = ? WHERE id = ?";
 }

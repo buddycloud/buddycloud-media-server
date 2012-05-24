@@ -19,6 +19,7 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
+import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.NotMatchingChecksumException;
 import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
 import com.google.gson.Gson;
@@ -50,19 +51,30 @@ public class MediaDAO {
 	 * @param channel
 	 * @param mediaId
 	 * @return
+	 * @throws MediaMetadataSourceException 
+	 * @throws MediaNotFoundException 
 	 */
-	public File getMedia(String channelId, String mediaId) {
+	public File getMedia(String channelId, String mediaId) throws MediaMetadataSourceException, MediaNotFoundException {
 		String fullDirectoryPath = getMediaDirectory(channelId);
 		
 		File media = new File(fullDirectoryPath + File.separator + mediaId);
 		
 		if (!media.exists()) {
-			//TODO throw new Exception();
+			throw new MediaNotFoundException(mediaId, channelId);
 		}
+		
+		// Update last viewed date
+		dataSource.updateMediaLastViewed(mediaId);
 		
 		return media;
 	}
 	
+	/**
+	 * 
+	 * @param mediaId
+	 * @return
+	 * @throws MediaMetadataSourceException
+	 */
 	public String getMediaType(String mediaId) throws MediaMetadataSourceException {
 		return dataSource.getMediaMimeType(mediaId);
 	}
@@ -79,13 +91,14 @@ public class MediaDAO {
 	 */
 	public String insertMedia(String channelId, Request request) throws FileUploadException, 
 			MediaMetadataSourceException, FormMissingFieldException, NotMatchingChecksumException {
+		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(Constants.MEDIA_SIZE_LIMIT_PROPERTY)));
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
 
-		Media media = getFormBody(items);
+		Media media = getFormBodyField(items);
 		
 		if (media == null) {
 			final FormMissingFieldException e = new FormMissingFieldException(Constants.BODY_FIELD);
@@ -104,6 +117,7 @@ public class MediaDAO {
 	
 	private void storeBinary(List<FileItem> items, Media media, String channelId) throws FileUploadException, MediaMetadataSourceException, 
 			FormMissingFieldException, NotMatchingChecksumException {
+		
 		boolean found = false;
 
 		for (FileItem item : items) {
@@ -158,13 +172,13 @@ public class MediaDAO {
 		try {
 			return DigestUtils.md5Hex(FileUtils.openInputStream(file));
 		} catch (IOException e) {
-			LOGGER.error("Error during media MD5 checksum verification.", e);
+			LOGGER.error("Error during media MD5 checksum generation.", e);
 		}
 		
 		return null;
 	}
 	
-	private Media getFormBody(List<FileItem> items) {
+	private Media getFormBodyField(List<FileItem> items) {
 		Media media = null;
 
 		for (int i = 0; i < items.size(); i++) {

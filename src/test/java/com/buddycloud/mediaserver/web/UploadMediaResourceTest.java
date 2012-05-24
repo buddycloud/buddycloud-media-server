@@ -18,6 +18,14 @@ import com.buddycloud.mediaserver.commons.Constants;
 
 public class UploadMediaResourceTest extends MediaResourceTest {
 	
+	@After
+	public void tearDown() throws Exception {
+		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
+				File.separator + BASE_CHANNEL));
+		
+		dataSource.deleteMetadata(TESTFILE_ID);
+	}
+	
 	@Override
 	protected void testSetUp() throws Exception {}
 	
@@ -37,12 +45,5 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 		Representation result = client.post(form);
 		System.out.println(result.getText());
 	}
-	
-	@After
-	public void tearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
-				File.separator + BASE_CHANNEL));
-		
-		dataSource.deleteMetadata(TESTFILE_ID);
-	}
+
 }

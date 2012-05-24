@@ -6,13 +6,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.CreateDataSourceError;
+import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -31,7 +33,7 @@ public class MetadataSource {
 			createDataSource();
 		} catch (PropertyVetoException e) {
 			LOGGER.fatal("Error during data source creation: " + e.getMessage(), e);
-			throw new CreateDataSourceError(e.getMessage(), e);
+			throw new CreateDataSourceException(e.getMessage(), e);
 		}
 	}
 
@@ -125,7 +127,7 @@ public class MetadataSource {
 				mimeType = result.getString(1); 
 				LOGGER.debug("Media metadata successfully fetched. Media ID: " + mediaId);
 			} else {
-				LOGGER.debug("No metadata found. Media ID: " + mediaId);
+				LOGGER.debug("No media with id '" + mediaId + "' found.");
 			}
 
 			statement.close();
@@ -135,5 +137,23 @@ public class MetadataSource {
 		}
 		
 		return mimeType;
+	}
+	
+	public void updateMediaLastViewed(String mediaId) throws MediaMetadataSourceException {
+		LOGGER.debug("Updating last viewed date. Media ID: " + mediaId);
+		
+		PreparedStatement statement;
+		try {
+			Timestamp now = new Timestamp((new Date()).getTime());
+
+			statement = prepareStatement(Queries.UPDATE_MEDIA_LAST_VIEWED, now, mediaId);
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Media last viewed date successfully updated. Media ID: " + mediaId);
+		} catch (SQLException e) {
+			LOGGER.error("Error while updating media last viewed date: " + e.getMessage(), e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
 	}
 }
