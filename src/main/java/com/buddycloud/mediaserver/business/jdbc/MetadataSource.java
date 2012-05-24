@@ -85,7 +85,7 @@ public class MetadataSource {
 			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(), 
 					media.getUploader(), media.getTitle(), media.getMimeType(), media.getDownloadUrl(), 
 					media.getFileExtension(), media.getMd5Checksum(), media.getFileSize(), 
-					media.getLength(), media.getResolution());
+					media.getLength(), media.getHeight(), media.getWidth());
 
 			statement.execute();
 			statement.close();

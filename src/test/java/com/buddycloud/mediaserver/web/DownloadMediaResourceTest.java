@@ -57,5 +57,6 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 		
 		// Delete downloaded file
 		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
+		outputStream.close();
 	}
 }

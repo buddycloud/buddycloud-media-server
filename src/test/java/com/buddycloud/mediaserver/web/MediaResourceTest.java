@@ -71,9 +71,10 @@ public abstract class MediaResourceTest {
 		media.setMd5Checksum(md5);
 		
 		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
-		media.setResolution("500x100");
 		media.setTitle("testimage.jpg");
 		media.setUploader("user@domain.com");
+		media.setHeight(250);
+		media.setWidth(250);
 		
 		return media;
 	}

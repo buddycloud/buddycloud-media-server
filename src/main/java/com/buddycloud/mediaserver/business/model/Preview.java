@@ -6,16 +6,18 @@ public class Preview {
 //		  "downloadUrl": string,
 //		  "md5Checksum": string,
 //		  "mediaId": string,
-//		  "length": long,
-//		  "resolution": string
+//		  "fileSize": long,
+//		  "height": int,
+//		  "width": int
 //	}
 	
 	private String id;
 	private String downloadUrl;
 	private String md5Checksum;
-	private Long length;
-	private String resolution;
+	private Long fileSize;
 	private String mediaId;
+	private Integer height;
+	private Integer width;
 	
 	
 	public String getId() {
@@ -42,27 +44,35 @@ public class Preview {
 		this.md5Checksum = md5Checksum;
 	}
 	
-	public Long getLength() {
-		return length;
-	}
-	
-	public void setLength(Long length) {
-		this.length = length;
-	}
-	
-	public String getResolution() {
-		return resolution;
-	}
-	
-	public void setResolution(String resolution) {
-		this.resolution = resolution;
-	}
-	
 	public String getMediaId() {
 		return mediaId;
 	}
 
 	public void setMediaId(String mediaId) {
 		this.mediaId = mediaId;
+	}
+
+	public Long getFileSize() {
+		return fileSize;
+	}
+
+	public void setFileSize(Long fileSize) {
+		this.fileSize = fileSize;
+	}
+
+	public Integer getHeight() {
+		return height;
+	}
+
+	public void setHeight(Integer height) {
+		this.height = height;
+	}
+
+	public Integer getWidth() {
+		return width;
+	}
+
+	public void setWidth(Integer width) {
+		this.width = width;
 	}
 }

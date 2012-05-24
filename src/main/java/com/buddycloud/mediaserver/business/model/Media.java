@@ -16,7 +16,8 @@ public class Media {
 //		  "md5Checksum": string,
 //		  "fileSize": long,
 //		  "length": long,
-//		  "resolution": string
+//	  	  "height": int,
+//	      "width": int
 //	}
 	
 	private String id;
@@ -31,7 +32,8 @@ public class Media {
 	private String md5Checksum;
 	private Long fileSize;
 	private Long length = null; //for videos
-	private String resolution = null; //for images and videos
+	private Integer height = null; //for videos and images
+	private Integer width = null; //for videos and images
 	
 	
 	public String getId() {
@@ -130,11 +132,19 @@ public class Media {
 		this.length = length;
 	}
 	
-	public String getResolution() {
-		return resolution;
+	public Integer getHeight() {
+		return height;
 	}
-	
-	public void setResolution(String resolution) {
-		this.resolution = resolution;
+
+	public void setHeight(Integer height) {
+		this.height = height;
+	}
+
+	public Integer getWidth() {
+		return width;
+	}
+
+	public void setWidth(Integer width) {
+		this.width = width;
 	}
 }
