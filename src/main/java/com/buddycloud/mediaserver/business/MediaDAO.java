@@ -20,7 +20,7 @@ import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
-import com.buddycloud.mediaserver.commons.exception.NotMatchingChecksumException;
+import com.buddycloud.mediaserver.commons.exception.ChecksumNotMatchingException;
 import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
 import com.google.gson.Gson;
 
@@ -46,6 +46,38 @@ public class MediaDAO {
 		return instance;
 	}
 	
+	
+	public File getUserAvatar(String userId) throws MediaMetadataSourceException, MediaNotFoundException {
+		String fullDirectoryPath = getUserMediaDirectory(userId);
+		
+		File avatar = new File(fullDirectoryPath + File.separator + Constants.AVATAR_ID);
+		
+		if (!avatar.exists()) {
+			throw new MediaNotFoundException(Constants.AVATAR_ID, userId);
+		}
+		
+		// Update last viewed date
+		dataSource.updateMediaLastViewed(Constants.AVATAR_ID);
+		
+		return avatar;
+	}
+	
+	
+	public File getChannelAvatar(String channelId) throws MediaMetadataSourceException, MediaNotFoundException {
+		String fullDirectoryPath = getChannelMediaDirectory(channelId);
+		
+		File avatar = new File(fullDirectoryPath + File.separator + Constants.AVATAR_ID);
+		
+		if (!avatar.exists()) {
+			throw new MediaNotFoundException(Constants.AVATAR_ID, channelId);
+		}
+		
+		// Update last viewed date
+		dataSource.updateMediaLastViewed(Constants.AVATAR_ID);
+		
+		return avatar;
+	}
+	
 	/**
 	 * 
 	 * @param channel
@@ -55,7 +87,7 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException 
 	 */
 	public File getMedia(String channelId, String mediaId) throws MediaMetadataSourceException, MediaNotFoundException {
-		String fullDirectoryPath = getMediaDirectory(channelId);
+		String fullDirectoryPath = getChannelMediaDirectory(channelId);
 		
 		File media = new File(fullDirectoryPath + File.separator + mediaId);
 		
@@ -87,10 +119,10 @@ public class MediaDAO {
 	 * @throws FileUploadException
 	 * @throws MediaMetadataSourceException
 	 * @throws FormMissingFieldException
-	 * @throws NotMatchingChecksumException 
+	 * @throws ChecksumNotMatchingException 
 	 */
 	public String insertMedia(String channelId, Request request) throws FileUploadException, 
-			MediaMetadataSourceException, FormMissingFieldException, NotMatchingChecksumException {
+			MediaMetadataSourceException, FormMissingFieldException, ChecksumNotMatchingException {
 		
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(Constants.MEDIA_SIZE_LIMIT_PROPERTY)));
@@ -108,15 +140,15 @@ public class MediaDAO {
 		}
 		
 		// Tries to receive and store the media file binary
-		storeBinary(items, media, channelId);
+		receiveAndStoreBinary(items, media, channelId);
 		
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 		
 		return gson.toJson(media); 
 	}
 	
-	private void storeBinary(List<FileItem> items, Media media, String channelId) throws FileUploadException, MediaMetadataSourceException, 
-			FormMissingFieldException, NotMatchingChecksumException {
+	private void receiveAndStoreBinary(List<FileItem> items, Media media, String channelId) throws FileUploadException, MediaMetadataSourceException, 
+			FormMissingFieldException, ChecksumNotMatchingException {
 		
 		boolean found = false;
 
@@ -125,7 +157,7 @@ public class MediaDAO {
 				found = true;
 
 				// Create directory to store the file (if doesn't exist yet)
-				String fullDirectoryPath = getMediaDirectory(channelId);
+				String fullDirectoryPath = getChannelMediaDirectory(channelId);
 				mkdir(fullDirectoryPath);
 
 				File file = new File(fullDirectoryPath + File.separator + media.getId());
@@ -147,14 +179,17 @@ public class MediaDAO {
 						//remove file
 						file.delete();
 						
-						throw new NotMatchingChecksumException(media.getMd5Checksum(), md5);
+						throw new ChecksumNotMatchingException(media.getMd5Checksum(), md5);
 					}
 				}
 				
 				//TODO verify fileSize
 
+				// /channel/{channelId}/media/{mediaId}
+				media.setDownloadUrl(getChannelMediaDirectory(channelId) + "/" + media.getId());
+				
 				// Only stores if the file were successfully saved				
-				storeMetadata(media);
+				dataSource.storeMetadata(media);
 
 				break;
 			}
@@ -199,15 +234,13 @@ public class MediaDAO {
 		return directory.mkdir();
 	}
 	
-	private String getMediaDirectory(String channelId) {
-		return configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) +
+	private String getChannelMediaDirectory(String channelId) {
+		return configuration.getProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY) +
 				File.separator + channelId;
 	}
 	
-	private void storeMetadata(Media media) throws MediaMetadataSourceException {
-		//TODO
-		//media.setDownloadUrl();
-		
-		dataSource.storeMetadata(media);
+	private String getUserMediaDirectory(String userId) {
+		return configuration.getProperty(Constants.MEDIA_USER_ROOT_PROPERTY) +
+				File.separator + userId;
 	}
 }

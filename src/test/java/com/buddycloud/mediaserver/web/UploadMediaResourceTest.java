@@ -20,7 +20,7 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 	
 	@After
 	public void tearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
+		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 		
 		dataSource.deleteMetadata(TESTFILE_ID);
@@ -32,7 +32,7 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 	@Test
 	public void anonymousSuccessfulUpload() throws Exception {
 		Media media = buildValidTestMedia();
-		ClientResource client = new ClientResource(BASE_URL);
+		ClientResource client = new ClientResource(BASE_URL + Constants.POST_MEDIA_URL);
 		
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);

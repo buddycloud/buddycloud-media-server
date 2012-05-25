@@ -26,7 +26,7 @@ public abstract class MediaResourceTest {
 	protected static final String TESTFILE_ID = "testFileId";
 
 	protected static final String BASE_CHANNEL = "channel@topics.domain.com";
-	protected static final String BASE_URL = "http://localhost:8080/channel/" + BASE_CHANNEL + "/media";
+	protected static final String BASE_URL = "http://localhost:8080";
 	
 	
 	protected Properties configuration;
@@ -35,7 +35,7 @@ public abstract class MediaResourceTest {
 	@Before
 	public void setUp() throws Exception {
 		configuration = ConfigurationUtils.loadConfiguration();
-		configuration.setProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
+		configuration.setProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
 		
 		dataSource = new MetadataSource(configuration);
 		
@@ -48,7 +48,7 @@ public abstract class MediaResourceTest {
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach("/channel/{" + Constants.CHANNEL_ARG + "}", new MediaServerApplication(context));
+		component.getDefaultHost().attach(new MediaServerApplication(context));
 		
 	    component.start();  
 	}

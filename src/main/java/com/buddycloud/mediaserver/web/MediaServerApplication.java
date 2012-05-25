@@ -21,10 +21,22 @@ public class MediaServerApplication extends Application {
 		Router router = new Router(getContext());
 		
 		// GET /channel/<name@domain.com>/media/<mediaID>
-		router.attach("/media/{" + Constants.MEDIA_ARG + "}", DownloadMediaResource.class);
+		router.attach(Constants.GET_MEDIA_URL, DownloadMediaResource.class);
 		
 		// POST /channel/<name@domain.com>/media
-		router.attach("/media", UploadMediaResource.class);
+		router.attach(Constants.POST_MEDIA_URL, UploadMediaResource.class);
+		
+		// GET /channel/<name@domain.com>/media/avatar/1
+		router.attach(Constants.GET_CHANNEL_AVATAR_URL, ChannelAvatarResource.class);
+		
+		// PUT /channel/<name@domain.com>/media/avatar/1
+		router.attach(Constants.PUT_CHANNEL_AVATAR_URL, ChannelAvatarResource.class);
+		
+		// GET /user/<name@domain.com>/media/avatar/1
+		router.attach(Constants.GET_USER_AVATAR_URL, UserAvatarResource.class);
+		
+		// PUT /user/<name@domain.com>/media/avatar/1
+		router.attach(Constants.PUT_USER_AVATAR_URL, UserAvatarResource.class);
 		
 		return router;
 	}
