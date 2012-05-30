@@ -31,7 +31,7 @@ public class MediaDAO {
 	private Properties configuration;
 	private Gson gson;
 
-	
+
 	private static final MediaDAO instance = new MediaDAO();
 
 
@@ -45,78 +45,55 @@ public class MediaDAO {
 	public static MediaDAO gestInstance() {
 		return instance;
 	}
-	
-	
-	public File getUserAvatar(String userId) throws MediaMetadataSourceException, MediaNotFoundException {
-		String fullDirectoryPath = getUserMediaDirectory(userId);
-		return getAvatar(userId, fullDirectoryPath);
-	}
-	
-	
-	public File getChannelAvatar(String channelId) throws MediaMetadataSourceException, MediaNotFoundException {
-		String fullDirectoryPath = getChannelMediaDirectory(channelId);
-		return getAvatar(channelId, fullDirectoryPath);
-	}
-	
-	private File getAvatar(String id, String directoryPath) throws MediaNotFoundException, MediaMetadataSourceException {
-		File avatar = new File(directoryPath + File.separator + Constants.AVATAR_ID);
-		
-		if (!avatar.exists()) {
-			throw new MediaNotFoundException(Constants.AVATAR_ID, id);
-		}
-		
-		// Update last viewed date
-		dataSource.updateMediaLastViewed(Constants.AVATAR_ID);
-		
-		return avatar;
-	}
-	
-	/**
-	 * 
-	 * @param channel
-	 * @param mediaId
-	 * @return
-	 * @throws MediaMetadataSourceException 
-	 * @throws MediaNotFoundException 
-	 */
-	public File getMedia(String channelId, String mediaId) throws MediaMetadataSourceException, MediaNotFoundException {
-		String fullDirectoryPath = getChannelMediaDirectory(channelId);
-		
+
+
+	public File getAvatar(String id, String mediaId) throws MediaNotFoundException, MediaMetadataSourceException {
+		String fullDirectoryPath = getAvatarDirectory(id);
+
 		File media = new File(fullDirectoryPath + File.separator + mediaId);
-		
+
 		if (!media.exists()) {
-			throw new MediaNotFoundException(mediaId, channelId);
+			throw new MediaNotFoundException(mediaId, id);
 		}
-		
+
 		// Update last viewed date
 		dataSource.updateMediaLastViewed(mediaId);
-		
+
 		return media;
 	}
-	
-	/**
-	 * 
-	 * @param mediaId
-	 * @return
-	 * @throws MediaMetadataSourceException
-	 */
+
+
+	public String updateAvatar(String entityId, String mediaId, Request request) throws FileUploadException, 
+		MediaMetadataSourceException, FormMissingFieldException, ChecksumNotMatchingException {
+		
+		String result = insertMedia(entityId, request, true);
+		dataSource.updateEntityAvatar(entityId, mediaId);
+		
+		return result;
+	}
+
+	public File getMedia(String entityId, String mediaId) throws MediaMetadataSourceException, MediaNotFoundException {
+		String fullDirectoryPath = getMediaDirectory(entityId);
+
+		File media = new File(fullDirectoryPath + File.separator + mediaId);
+
+		if (!media.exists()) {
+			throw new MediaNotFoundException(mediaId, entityId);
+		}
+
+		// Update last viewed date
+		dataSource.updateMediaLastViewed(mediaId);
+
+		return media;
+	}
+
 	public String getMediaType(String mediaId) throws MediaMetadataSourceException {
 		return dataSource.getMediaMimeType(mediaId);
 	}
 
-	/**
-	 * 
-	 * @param channelId
-	 * @param request
-	 * @return
-	 * @throws FileUploadException
-	 * @throws MediaMetadataSourceException
-	 * @throws FormMissingFieldException
-	 * @throws ChecksumNotMatchingException 
-	 */
-	public String insertMedia(String channelId, Request request) throws FileUploadException, 
-			MediaMetadataSourceException, FormMissingFieldException, ChecksumNotMatchingException {
-		
+	public String insertMedia(String entityId, Request request, boolean isAvatar) throws FileUploadException, 
+	MediaMetadataSourceException, FormMissingFieldException, ChecksumNotMatchingException {
+
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(Constants.MEDIA_SIZE_LIMIT_PROPERTY)));
 
@@ -124,25 +101,25 @@ public class MediaDAO {
 		List<FileItem> items = upload.parseRequest(request);
 
 		Media media = getFormBodyField(items);
-		
+
 		if (media == null) {
 			final FormMissingFieldException e = new FormMissingFieldException(Constants.BODY_FIELD);
 			LOGGER.warn(e.getMessage());
-			
+
 			throw e;
 		}
-		
+
 		// Tries to receive and store the media file binary
-		receiveAndStoreBinary(items, media, channelId);
-		
+		receiveAndStoreBinary(items, media, entityId, isAvatar);
+
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
-		
+
 		return gson.toJson(media); 
 	}
-	
-	private void receiveAndStoreBinary(List<FileItem> items, Media media, String channelId) throws FileUploadException, MediaMetadataSourceException, 
-			FormMissingFieldException, ChecksumNotMatchingException {
-		
+
+	private void receiveAndStoreBinary(List<FileItem> items, Media media, String entityId, boolean isAvatar) throws FileUploadException, MediaMetadataSourceException, 
+	FormMissingFieldException, ChecksumNotMatchingException {
+
 		boolean found = false;
 
 		for (FileItem item : items) {
@@ -150,39 +127,39 @@ public class MediaDAO {
 				found = true;
 
 				// Create directory to store the file (if doesn't exist yet)
-				String fullDirectoryPath = getChannelMediaDirectory(channelId);
+				String fullDirectoryPath = isAvatar ? getAvatarDirectory(entityId) : getMediaDirectory(entityId);
 				mkdir(fullDirectoryPath);
 
 				File file = new File(fullDirectoryPath + File.separator + media.getId());
 
 				LOGGER.debug("Adding new media: " + file.getAbsolutePath());
-				
+
 				try {
 					item.write(file);
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage(), e);
-					
+
 					throw new FileUploadException("Error while writing the file");
 				}
-				
+
 				String md5 = getFileMD5Checksum(file);
-				
+
 				if (md5 != null) {
 					if (!md5.equals(media.getMd5Checksum())) {
 						//remove file
 						file.delete();
-						
+
 						throw new ChecksumNotMatchingException(media.getMd5Checksum(), md5);
 					}
 				}
-				
+
 				//TODO verify fileSize
 
-				// /channel/{channelId}/media/{mediaId}
-				media.setDownloadUrl(getChannelMediaDirectory(channelId) + "/" + media.getId());
-				
+				// /media/<name@domain.com>/<mediaId>
+				//TODO set downloadUrl
+
 				// Only stores if the file were successfully saved				
-				dataSource.storeMetadata(media);
+				dataSource.storeMedia(media);
 
 				break;
 			}
@@ -191,21 +168,21 @@ public class MediaDAO {
 		if (!found) {
 			final FormMissingFieldException e = new FormMissingFieldException(Constants.FILE_FIELD);
 			LOGGER.warn(e.getMessage());
-			
+
 			throw e;
 		}
 	}
-	
+
 	private String getFileMD5Checksum(File file) {
 		try {
 			return DigestUtils.md5Hex(FileUtils.openInputStream(file));
 		} catch (IOException e) {
 			LOGGER.error("Error during media MD5 checksum generation.", e);
 		}
-		
+
 		return null;
 	}
-	
+
 	private Media getFormBodyField(List<FileItem> items) {
 		Media media = null;
 
@@ -214,7 +191,7 @@ public class MediaDAO {
 			if (item.getFieldName().equals(Constants.BODY_FIELD)) {
 				media = gson.fromJson(item.getString(), Media.class);
 				items.remove(i);
-				
+
 				break;
 			}
 		}
@@ -226,14 +203,14 @@ public class MediaDAO {
 		File directory = new File(fullDirectoryPath);
 		return directory.mkdir();
 	}
-	
-	private String getChannelMediaDirectory(String channelId) {
-		return configuration.getProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY) +
-				File.separator + channelId;
+
+	private String getMediaDirectory(String entityId) {
+		return configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) +
+				File.separator + entityId;
 	}
 	
-	private String getUserMediaDirectory(String userId) {
-		return configuration.getProperty(Constants.MEDIA_USER_ROOT_PROPERTY) +
-				File.separator + userId;
+	private String getAvatarDirectory(String entityId) {
+		return configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) +
+				File.separator + "avatars" + File.separator + entityId;
 	}
 }

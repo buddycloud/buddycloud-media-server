@@ -19,11 +19,11 @@ public class DownloadMediaResource extends ServerResource {
 
 	@Get
 	public Representation getMedia() {
-		String channelId = (String) getRequest().getAttributes().get(Constants.CHANNEL_ARG);
+		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 		try {
-			File media = MediaDAO.gestInstance().getMedia(channelId, mediaId);
+			File media = MediaDAO.gestInstance().getMedia(entityId, mediaId);
 			return new FileRepresentation(media, new MediaType(MediaDAO.gestInstance().getMediaType(mediaId)));
 		} catch (MediaMetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);

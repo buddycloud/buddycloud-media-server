@@ -35,7 +35,7 @@ public abstract class MediaResourceTest {
 	@Before
 	public void setUp() throws Exception {
 		configuration = ConfigurationUtils.loadConfiguration();
-		configuration.setProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
+		configuration.setProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
 		
 		dataSource = new MetadataSource(configuration);
 		
@@ -54,10 +54,10 @@ public abstract class MediaResourceTest {
 	}
 	
 	public Media buildValidTestMedia() throws IOException {
-		return buildValidTestMedia(TESTFILE_ID);
+		return buildValidTestMedia(TESTFILE_ID, BASE_CHANNEL);
 	}
 	
-	public Media buildValidTestMedia(String mediaId) throws IOException {
+	public Media buildValidTestMedia(String mediaId, String entityId) throws IOException {
 		Media media = new Media();
 		
 		media.setId(mediaId);

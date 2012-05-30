@@ -18,13 +18,13 @@ public class UploadMediaResource extends ServerResource {
 
 	@Post
 	public Representation postMedia(Representation entity) {
-		String channel = (String) getRequest().getAttributes().get(Constants.CHANNEL_ARG);
+		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
 
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				
 				try {
-					return new StringRepresentation(MediaDAO.gestInstance().insertMedia(channel, getRequest()), 
+					return new StringRepresentation(MediaDAO.gestInstance().insertMedia(entityId, getRequest(), false), 
 									MediaType.APPLICATION_JSON);
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);

@@ -21,15 +21,15 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 	
 	@After
 	public void tearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY) + 
+		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 		
-		dataSource.deleteMetadata(TESTFILE_ID);
+		dataSource.deleteMedia(TESTFILE_ID);
 	}
 	
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration.getProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
+		File destDir = new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
@@ -39,7 +39,7 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 		Media media = buildValidTestMedia();
 		
 		try {
-			dataSource.storeMetadata(media);
+			dataSource.storeMedia(media);
 		} catch (MediaMetadataSourceException e) {
 			//do nothing
 		}
@@ -47,7 +47,7 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 	
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + Constants.CHANNEL_URL_PREFIX + "/media/" + TESTFILE_ID);
+		ClientResource client = new ClientResource(BASE_URL + Constants.GET_MEDIA_URL + "/" + TESTFILE_ID);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);

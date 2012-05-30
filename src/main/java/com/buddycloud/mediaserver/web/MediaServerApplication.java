@@ -20,23 +20,17 @@ public class MediaServerApplication extends Application {
 	public synchronized Restlet createInboundRoot() {
 		Router router = new Router(getContext());
 		
-		// GET /channel/<name@domain.com>/media/<mediaID>
+		// GET /media/<name@domain.com>/<mediaID>
 		router.attach(Constants.GET_MEDIA_URL, DownloadMediaResource.class);
 		
-		// POST /channel/<name@domain.com>/media
+		// POST /media/<name@domain.com>
 		router.attach(Constants.POST_MEDIA_URL, UploadMediaResource.class);
 		
-		// GET /channel/<name@domain.com>/media/avatar/1
-		router.attach(Constants.GET_CHANNEL_AVATAR_URL, ChannelAvatarResource.class);
+		// GET /media/avatar/<name@domain.com>/<mediaID>
+		router.attach(Constants.GET_AVATAR_URL, AvatarResource.class);
 		
-		// PUT /channel/<name@domain.com>/media/avatar/1
-		router.attach(Constants.PUT_CHANNEL_AVATAR_URL, ChannelAvatarResource.class);
-		
-		// GET /user/<name@domain.com>/media/avatar/1
-		router.attach(Constants.GET_USER_AVATAR_URL, UserAvatarResource.class);
-		
-		// PUT /user/<name@domain.com>/media/avatar/1
-		router.attach(Constants.PUT_USER_AVATAR_URL, UserAvatarResource.class);
+		// PUT /media/avatar/<name@domain.com>/<mediaID>
+		router.attach(Constants.PUT_AVATAR_URL, AvatarResource.class);
 		
 		return router;
 	}

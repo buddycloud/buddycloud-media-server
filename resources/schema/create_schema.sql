@@ -17,6 +17,7 @@
 
 CREATE TABLE media(
 	id TEXT,
+	entityId TEXT REFERENCES entities(id),
 	uploader TEXT NOT NULL,
 	title TEXT NOT NULL,
 	mimeType TEXT NOT NULL,
@@ -50,5 +51,12 @@ CREATE TABLE previews(
 	fileSize BIGINT,
 	height INT,
 	width INT,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE avatar(
+	id TEXT,
+	mediaId TEXT REFERENCES media(id),
+	ownerId TEXT,
 	PRIMARY KEY(id)
 );

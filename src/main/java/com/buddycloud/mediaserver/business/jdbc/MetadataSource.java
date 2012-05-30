@@ -77,12 +77,12 @@ public class MetadataSource {
 		dataSource.setJdbcUrl(configuration.getProperty(Constants.JDBC_DB_URL_PROPERTY));
 	}
 	
-	public void storeMetadata(Media media) throws MediaMetadataSourceException {
+	public void storeMedia(Media media) throws MediaMetadataSourceException {
 		LOGGER.debug("Store media metadata. Media ID: " + media.getId());
 		
 		PreparedStatement statement;
 		try {
-			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(), 
+			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(),
 					media.getUploader(), media.getTitle(), media.getMimeType(), media.getDownloadUrl(), 
 					media.getFileExtension(), media.getMd5Checksum(), media.getFileSize(), 
 					media.getLength(), media.getHeight(), media.getWidth());
@@ -97,7 +97,24 @@ public class MetadataSource {
 		}
 	}
 	
-	public void deleteMetadata(String mediaId) throws MediaMetadataSourceException {
+	public void storeAvatar(String entityId, String mediaId) throws MediaMetadataSourceException {
+		LOGGER.debug("Store " + entityId + " avatar. Media ID: " + mediaId);
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.SAVE_AVATAR, entityId, mediaId);
+
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Avatar successfully stored. Media ID: " + mediaId);
+		} catch (SQLException e) {
+			LOGGER.error("Error while saving avatar", e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
+	public void deleteMedia(String mediaId) throws MediaMetadataSourceException {
 		LOGGER.debug("Deleting media metadata. Media ID: " + mediaId);
 		
 		PreparedStatement statement;
@@ -152,7 +169,23 @@ public class MetadataSource {
 			
 			LOGGER.debug("Media last viewed date successfully updated. Media ID: " + mediaId);
 		} catch (SQLException e) {
-			LOGGER.error("Error while updating media last viewed date: " + e.getMessage(), e);
+			LOGGER.error("Error while updating media last viewed date", e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
+	public void updateEntityAvatar(String entityId, String mediaId) throws MediaMetadataSourceException {
+		LOGGER.debug("Updating " + entityId + " avatar");
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.UPDATE_AVATAR, mediaId, entityId);
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Entity avatar successfully updated. Entity ID: " + entityId + ". Media ID: " + mediaId);
+		} catch (SQLException e) {
+			LOGGER.error("Error while updating entity avatar", e);
 			throw new MediaMetadataSourceException(e.getMessage(), e);
 		}
 	}

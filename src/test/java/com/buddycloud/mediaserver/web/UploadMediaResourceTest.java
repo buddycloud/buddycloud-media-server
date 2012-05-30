@@ -20,10 +20,10 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 	
 	@After
 	public void tearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_CHANNEL_ROOT_PROPERTY) + 
+		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 		
-		dataSource.deleteMetadata(TESTFILE_ID);
+		dataSource.deleteMedia(TESTFILE_ID);
 	}
 	
 	@Override

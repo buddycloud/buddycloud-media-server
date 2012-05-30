@@ -7,6 +7,9 @@ public class Queries {
 	public static final String SAVE_MEDIA = "INSERT INTO media" +
 			" (id, uploader, title, mimeType, downloadUrl, fileExtension, md5Checksum, fileSize, length, height, width)" +
 			" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	public static final String SAVE_AVATAR = "INSERT INTO avatar" +
+			" (mediaId, ownerId)" +
+			" VALUES(?, ?)";
 	
 	// Select
 	public static final String GET_MEDIA = "SELECT * FROM media WHERE id = ?";
@@ -18,4 +21,5 @@ public class Queries {
 	
 	// Update
 	public static final String UPDATE_MEDIA_LAST_VIEWED = "UPDATE media SET lastViewedDate = ? WHERE id = ?";
+	public static final String UPDATE_AVATAR = "UPDATE avatar SET mediaId = ? WHERE id = ?";
 }

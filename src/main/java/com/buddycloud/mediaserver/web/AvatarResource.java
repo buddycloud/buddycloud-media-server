@@ -16,22 +16,24 @@ import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 
 
-public class ChannelAvatarResource extends ServerResource {
+public class AvatarResource extends ServerResource {
 	
 	@Put
 	public Representation putAvatar() {
-		String channelId = (String) getRequest().getAttributes().get(Constants.CHANNEL_ARG);
+		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+		String mediaId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
 
-		return new StringRepresentation("PUT /channel/" + channelId + "/media/avatar/1");
+		return new StringRepresentation("PUT /media/avatar/" + entityId + "/" + mediaId);
 	}
 
 	@Get
 	public Representation getAvatar() {
-		String channelId = (String) getRequest().getAttributes().get(Constants.CHANNEL_ARG);
+		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 		try {
-			File media = MediaDAO.gestInstance().getChannelAvatar(channelId);
-			return new FileRepresentation(media, new MediaType(MediaDAO.gestInstance().getMediaType(Constants.AVATAR_ID)));
+			File media = MediaDAO.gestInstance().getAvatar(entityId, mediaId);
+			return new FileRepresentation(media, new MediaType(MediaDAO.gestInstance().getMediaType(mediaId)));
 		} catch (MediaMetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
