@@ -49,27 +49,20 @@ public class MediaDAO {
 	
 	public File getUserAvatar(String userId) throws MediaMetadataSourceException, MediaNotFoundException {
 		String fullDirectoryPath = getUserMediaDirectory(userId);
-		
-		File avatar = new File(fullDirectoryPath + File.separator + Constants.AVATAR_ID);
-		
-		if (!avatar.exists()) {
-			throw new MediaNotFoundException(Constants.AVATAR_ID, userId);
-		}
-		
-		// Update last viewed date
-		dataSource.updateMediaLastViewed(Constants.AVATAR_ID);
-		
-		return avatar;
+		return getAvatar(userId, fullDirectoryPath);
 	}
 	
 	
 	public File getChannelAvatar(String channelId) throws MediaMetadataSourceException, MediaNotFoundException {
 		String fullDirectoryPath = getChannelMediaDirectory(channelId);
-		
-		File avatar = new File(fullDirectoryPath + File.separator + Constants.AVATAR_ID);
+		return getAvatar(channelId, fullDirectoryPath);
+	}
+	
+	private File getAvatar(String id, String directoryPath) throws MediaNotFoundException, MediaMetadataSourceException {
+		File avatar = new File(directoryPath + File.separator + Constants.AVATAR_ID);
 		
 		if (!avatar.exists()) {
-			throw new MediaNotFoundException(Constants.AVATAR_ID, channelId);
+			throw new MediaNotFoundException(Constants.AVATAR_ID, id);
 		}
 		
 		// Update last viewed date
