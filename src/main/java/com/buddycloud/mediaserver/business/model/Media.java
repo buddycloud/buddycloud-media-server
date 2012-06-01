@@ -5,13 +5,13 @@ import java.util.Date;
 public class Media {
 //	{
 //		  "id": string,
+//        "entityId": string,
 //		  "uploader": string,
 //		  "title": string,
 //		  "mimeType": string,
 //		  "description": string,
 //		  "uploadedDate": datetime,
 //		  "lastViewedDate": datetime,
-//		  "downloadUrl": string,
 //		  "fileExtension": string,
 //		  "md5Checksum": string,
 //		  "fileSize": long,
@@ -27,13 +27,13 @@ public class Media {
 	private String description;
 	private Date uploadedDate = null; 
 	private Date lastViewedDate = null; 
-	private String downloadUrl = null; 
 	private String fileExtension;
 	private String md5Checksum;
 	private Long fileSize;
 	private Long length = null; //for videos
 	private Integer height = null; //for videos and images
 	private Integer width = null; //for videos and images
+	private String entityId;
 	
 	
 	public String getId() {
@@ -92,14 +92,6 @@ public class Media {
 		this.lastViewedDate = lastViewedDate;
 	}
 	
-	public String getDownloadUrl() {
-		return downloadUrl;
-	}
-	
-	public void setDownloadUrl(String downloadUrl) {
-		this.downloadUrl = downloadUrl;
-	}
-	
 	public String getFileExtension() {
 		return fileExtension;
 	}
@@ -146,5 +138,13 @@ public class Media {
 
 	public void setWidth(Integer width) {
 		this.width = width;
+	}
+
+	public String getEntityId() {
+		return entityId;
+	}
+
+	public void setEntityId(String entityId) {
+		this.entityId = entityId;
 	}
 }

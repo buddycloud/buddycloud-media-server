@@ -53,6 +53,6 @@ CREATE TABLE previews(
 CREATE TABLE avatar(
 	id TEXT,
 	mediaId TEXT REFERENCES media(id),
-	ownerId TEXT,
+	entityId TEXT NOT NULL,
 	PRIMARY KEY(id)
 );

@@ -5,10 +5,10 @@ public class Queries {
 	
 	// Insert
 	public static final String SAVE_MEDIA = "INSERT INTO media" +
-			" (id, uploader, title, mimeType, downloadUrl, fileExtension, md5Checksum, fileSize, length, height, width)" +
+			" (id, entityId, uploader, title, mimeType, fileExtension, md5Checksum, fileSize, length, height, width)" +
 			" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	public static final String SAVE_AVATAR = "INSERT INTO avatar" +
-			" (mediaId, ownerId)" +
+			" (mediaId, entityId)" +
 			" VALUES(?, ?)";
 	public static final String SAVE_PREVIEW = "INSERT INTO avatar" +
 			" (mediaId, md5Checksum, fileSize, height, width)" +
