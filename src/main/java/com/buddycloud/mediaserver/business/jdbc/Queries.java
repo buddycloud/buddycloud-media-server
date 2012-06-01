@@ -10,11 +10,15 @@ public class Queries {
 	public static final String SAVE_AVATAR = "INSERT INTO avatar" +
 			" (mediaId, ownerId)" +
 			" VALUES(?, ?)";
+	public static final String SAVE_PREVIEW = "INSERT INTO avatar" +
+			" (mediaId, md5Checksum, fileSize, height, width)" +
+			" VALUES(?, ?, ?, ?, ?)";
 	
 	// Select
 	public static final String GET_MEDIA = "SELECT * FROM media WHERE id = ?";
-	
 	public static final String GET_MEDIA_MIME_TYPE = "SELECT mimeType FROM media WHERE id = ?";
+	public static final String GET_ENTITY_AVATAR_ID = "SELECT mediaId FROM avatar WHERE id = ?";
+	public static final String GET_MEDIA_PREVIEWS = "SELECT id FROM previews WHERE mediaId = ? AND height <= ? AND width <= ?";
 
 	// Delete
 	public static final String DELETE_MEDIA = "DELETE FROM media WHERE id = ?";

@@ -7,14 +7,16 @@ public class Constants {
 	//URL arguments
 	public static final String ENTITY_ARG = "entityId";
 	public static final String MEDIA_ARG = "mediaId";
+	
+	//URL queries
+	public static final String MAX_HEIGHT_QUERY = "maxheight";
+	public static final String MAX_WIDTH_QUERY = "maxwidth";
 
 	//URLs
 	public static final String POST_MEDIA_URL = "/media/{" + ENTITY_ARG + "}";
 	public static final String GET_MEDIA_URL = "/media/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
 	
-	public static final String POST_AVATAR_URL = "/media/avatar/{" + ENTITY_ARG + "}";
-	public static final String GET_AVATAR_URL = "/media/avatar/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
-	public static final String PUT_AVATAR_URL = "/media/avatar/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
+	public static final String AVATAR_URL = "/media/{" + ENTITY_ARG + "}/avatar";
 	
 	//Storage constants
 	public static final String FILE_FIELD = "binaryFile";

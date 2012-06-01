@@ -14,7 +14,7 @@ import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException
 import com.buddycloud.mediaserver.commons.exception.ChecksumNotMatchingException;
 
 
-public class UploadMediaResource extends ServerResource {
+public class MediasResource extends ServerResource {
 
 	@Post
 	public Representation postMedia(Representation entity) {

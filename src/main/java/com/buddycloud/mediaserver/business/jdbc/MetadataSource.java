@@ -114,6 +114,32 @@ public class MetadataSource {
 		}
 	}
 	
+	public String getEntityAvatarId(String entityId) throws MediaMetadataSourceException {
+		LOGGER.debug("Getting current avatar id from: " + entityId);
+		
+		String mediaId = null;
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.GET_ENTITY_AVATAR_ID, entityId);
+
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				mediaId = result.getString(1); 
+				LOGGER.debug("Entity avatar id successfully fetched. Media ID: " + mediaId);
+			} else {
+				LOGGER.debug("No avatar for '" + entityId + "' found.");
+			}
+
+			statement.close();
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching entity avatar", e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+		
+		return mediaId;
+	}
+	
 	public void deleteMedia(String mediaId) throws MediaMetadataSourceException {
 		LOGGER.debug("Deleting media metadata. Media ID: " + mediaId);
 		

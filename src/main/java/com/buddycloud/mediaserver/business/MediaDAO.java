@@ -47,33 +47,39 @@ public class MediaDAO {
 	}
 
 
-	public File getAvatar(String id, String mediaId) throws MediaNotFoundException, MediaMetadataSourceException {
-		String fullDirectoryPath = getAvatarDirectory(id);
+	public File getAvatar(String entityId, String maxHeight, String maxWidth) throws MediaNotFoundException, MediaMetadataSourceException {
+		String mediaId = dataSource.getEntityAvatarId(entityId);
+
+		String fullDirectoryPath = null;
+
+		if (maxHeight != null && maxWidth != null) {
+			//TODO return a preview
+		} else {
+			fullDirectoryPath = getAvatarDirectory(entityId);
+		}
 
 		File media = new File(fullDirectoryPath + File.separator + mediaId);
 
 		if (!media.exists()) {
-			throw new MediaNotFoundException(mediaId, id);
+			dataSource.deleteMedia(mediaId);
+			throw new MediaNotFoundException(mediaId, entityId);
 		}
-
+		
 		// Update last viewed date
 		dataSource.updateMediaLastViewed(mediaId);
-
+		
 		return media;
 	}
 
 
-	public String updateAvatar(String entityId, String mediaId, Request request) throws FileUploadException, 
-		MediaMetadataSourceException, FormMissingFieldException, ChecksumNotMatchingException {
-		
-		String result = insertMedia(entityId, request, true);
-		dataSource.updateEntityAvatar(entityId, mediaId);
-		
-		return result;
-	}
+	public File getMedia(String entityId, String mediaId, String maxHeight, String maxWidth) throws MediaMetadataSourceException, MediaNotFoundException {
+		String fullDirectoryPath = null;
 
-	public File getMedia(String entityId, String mediaId) throws MediaMetadataSourceException, MediaNotFoundException {
-		String fullDirectoryPath = getMediaDirectory(entityId);
+		if (maxHeight != null && maxWidth != null) {
+			//TODO return a preview
+		} else {
+			fullDirectoryPath = getAvatarDirectory(entityId);
+		}
 
 		File media = new File(fullDirectoryPath + File.separator + mediaId);
 

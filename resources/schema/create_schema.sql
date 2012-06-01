@@ -6,7 +6,6 @@
 --  "description": string,
 --  "uploadedDate": datetime,
 --  "lastViewedDate": datetime,
---  "downloadUrl": string,
 --  "fileExtension": string,
 --  "md5Checksum": string,
 --  "fileSize": long,
@@ -23,7 +22,6 @@ CREATE TABLE media(
 	mimeType TEXT NOT NULL,
 	uploadedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	lastViewedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	downloadUrl TEXT,
 	fileExtension TEXT,
 	md5Checksum TEXT,
 	fileSize BIGINT,
@@ -35,7 +33,6 @@ CREATE TABLE media(
 
 -- {
 --   "id": string,
---   "downloadUrl": string,
 --   "md5Checksum": string,
 --   "mediaId": string,
 --	 "fileSize": long,
@@ -45,7 +42,6 @@ CREATE TABLE media(
 
 CREATE TABLE previews(
 	id TEXT,
-	downloadUrl TEXT,
 	md5Checksum TEXT,
 	mediaId TEXT REFERENCES media(id),
 	fileSize BIGINT,
