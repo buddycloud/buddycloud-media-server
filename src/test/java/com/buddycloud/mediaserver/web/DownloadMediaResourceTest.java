@@ -12,11 +12,12 @@ import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
 
 public class DownloadMediaResourceTest extends MediaResourceTest {
 	
 	private static final String TEST_OUTPUT_DIR = "test";
+	private static final String MEDIA_ID = generateRandomString();
+	
 
 	
 	@After
@@ -24,7 +25,7 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 		
-		dataSource.deleteMedia(TESTFILE_ID);
+		dataSource.deleteMedia(MEDIA_ID);
 	}
 	
 	@Override
@@ -34,20 +35,15 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 			FileUtils.cleanDirectory(destDir);
 		}
 		
-		FileUtils.copyFile(new File(TESTFILE_PATH), new File(destDir + File.separator + TESTFILE_ID));
+		FileUtils.copyFile(new File(TESTFILE_PATH), new File(destDir + File.separator + MEDIA_ID));
 		
-		Media media = buildValidTestMedia();
-		
-		try {
-			dataSource.storeMedia(media);
-		} catch (MediaMetadataSourceException e) {
-			//do nothing
-		}
+		Media media = buildMedia(MEDIA_ID);
+		dataSource.storeMedia(media);
 	}
 	
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + Constants.GET_MEDIA_URL + "/" + TESTFILE_ID);
+		ClientResource client = new ClientResource(BASE_URL + Constants.GET_MEDIA_URL + "/" + MEDIA_ID);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);

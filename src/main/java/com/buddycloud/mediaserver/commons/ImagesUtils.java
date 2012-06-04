@@ -9,29 +9,32 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
 
-public class PreviewUtils {
+public class ImagesUtils {
 
-	private PreviewUtils() {}
+	private static final String[] imageFormats = ImageIO.getReaderFormatNames();
+	
+	private ImagesUtils() {}
 
-	/**
-	 * 
-	 * @param image
-	 * @param width
-	 * @param height
-	 * @param imageFormat
-	 * @param pathToStore
-	 * @return
-	 * @throws IOException
-	 */
+	
 	public static File getImagePreview(File image, int width, int height, String imageFormat,
 			String pathToStore) throws IOException {
 		// Resize image
 		BufferedImage resize = Scalr.resize(ImageIO.read(image), width, height);
-
+		
 		// Store into provided path
 		File output = new File(pathToStore);
 		ImageIO.write(resize, imageFormat, FileUtils.openOutputStream(output));
 		
 		return output;
+	}
+	
+	public static boolean isImage(String extension) {
+		for (String format : imageFormats) {
+			if (format.equals(extension)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 }

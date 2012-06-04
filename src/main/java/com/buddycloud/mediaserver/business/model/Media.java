@@ -5,11 +5,12 @@ import java.util.Date;
 public class Media {
 //	{
 //		  "id": string,
+//		  "fileName": string;
 //        "entityId": string,
 //		  "uploader": string,
 //		  "title": string,
-//		  "mimeType": string,
 //		  "description": string,
+//		  "mimeType": string,
 //		  "uploadedDate": datetime,
 //		  "lastViewedDate": datetime,
 //		  "fileExtension": string,
@@ -21,6 +22,7 @@ public class Media {
 //	}
 	
 	private String id;
+	private String fileName;
 	private String uploader;
 	private String title;
 	private String mimeType;
@@ -146,5 +148,13 @@ public class Media {
 
 	public void setEntityId(String entityId) {
 		this.entityId = entityId;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
 	}
 }

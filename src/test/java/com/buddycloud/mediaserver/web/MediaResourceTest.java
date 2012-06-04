@@ -1,10 +1,12 @@
 package com.buddycloud.mediaserver.web;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
 
 import javax.activation.MimetypesFileTypeMap;
+import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -18,19 +20,23 @@ import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 import com.buddycloud.mediaserver.commons.Constants;
+import com.google.gson.Gson;
 
 public abstract class MediaResourceTest {
 	
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
 	protected static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
-	protected static final String TESTFILE_ID = "testFileId";
+	protected static final String TESTFILE_NAME = "testimage.jpg";
 
 	protected static final String BASE_CHANNEL = "channel@topics.domain.com";
+	protected static final String BASE_USER = "user@domain.com";
 	protected static final String BASE_URL = "http://localhost:8080";
 	
 	
 	protected Properties configuration;
 	protected MetadataSource dataSource;
+	protected Gson gson;
+	
 	
 	@Before
 	public void setUp() throws Exception {
@@ -38,6 +44,7 @@ public abstract class MediaResourceTest {
 		configuration.setProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
 		
 		dataSource = new MetadataSource(configuration);
+		gson = new Gson();
 		
 		setupComponent();
 	    testSetUp();
@@ -53,30 +60,30 @@ public abstract class MediaResourceTest {
 	    component.start();  
 	}
 	
-	public Media buildValidTestMedia() throws IOException {
-		return buildValidTestMedia(TESTFILE_ID, BASE_CHANNEL);
-	}
-	
-	public Media buildValidTestMedia(String mediaId, String entityId) throws IOException {
-		Media media = new Media();
-		
-		media.setId(mediaId);
-		media.setDescription("a description");
-		media.setFileExtension("jpg");
-
+	protected Media buildMedia(String mediaId) throws Exception{
 		File file = new File(TESTFILE_PATH);
+		
+		Media media = new Media();
+		media.setId(mediaId);
+		media.setFileName(TESTFILE_NAME);
+		media.setEntityId(BASE_CHANNEL);
+		media.setUploader(BASE_USER);
+		media.setDescription("A description");
+		media.setTitle("A title");
 		media.setFileSize(file.length());
-		
-		String md5 = DigestUtils.md5Hex(FileUtils.openInputStream(file));
-		media.setMd5Checksum(md5);
-		
+		media.setMd5Checksum(getFileMD5Checksum(file));
+		media.setFileExtension("jpg");
 		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
-		media.setTitle("testimage.jpg");
-		media.setUploader("user@domain.com");
-		media.setHeight(312);
-		media.setWidth(312);
+		
+		BufferedImage img = ImageIO.read(file);
+		media.setHeight(img.getHeight());
+		media.setWidth(img.getWidth());
 		
 		return media;
+	}
+	
+	private String getFileMD5Checksum(File file) throws IOException {
+		return DigestUtils.md5Hex(FileUtils.openInputStream(file));
 	}
 	
 	protected static String generateRandomString() {

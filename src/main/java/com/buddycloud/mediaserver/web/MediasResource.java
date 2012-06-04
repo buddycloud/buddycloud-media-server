@@ -11,7 +11,6 @@ import com.buddycloud.mediaserver.business.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
-import com.buddycloud.mediaserver.commons.exception.ChecksumNotMatchingException;
 
 
 public class MediasResource extends ServerResource {
@@ -34,9 +33,6 @@ public class MediasResource extends ServerResource {
 					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
 				} catch (FormMissingFieldException e) {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
-				} catch (ChecksumNotMatchingException e) {
-					setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
 					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
 				}
 			}
