@@ -26,7 +26,7 @@ public class Constants {
 	public static final String DESC_FIELD = "description"; //optional
 	
 	//Properties file constants
-	public static final String MEDIA_STORAGE_ROOT_PROPERTY = "media.channel.root";
+	public static final String MEDIA_STORAGE_ROOT_PROPERTY = "media.storage.root";
 	public static final String MEDIA_SIZE_LIMIT_PROPERTY = "media.sizelimit";
 	
 	public static final String JDBC_DRIVER_CLASS_PROPERTY = "jdbc.driver.class";

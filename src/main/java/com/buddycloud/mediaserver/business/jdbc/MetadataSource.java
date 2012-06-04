@@ -82,8 +82,8 @@ public class MetadataSource {
 		
 		PreparedStatement statement;
 		try {
-			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(),
-					media.getUploader(), media.getTitle(), media.getMimeType(), 
+			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(), media.getFileName(),
+					media.getEntityId(), media.getUploader(), media.getTitle(), media.getDescription(), media.getMimeType(), 
 					media.getFileExtension(), media.getMd5Checksum(), media.getFileSize(), 
 					media.getLength(), media.getHeight(), media.getWidth());
 

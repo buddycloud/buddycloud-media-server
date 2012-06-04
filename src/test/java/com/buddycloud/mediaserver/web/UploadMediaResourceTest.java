@@ -36,7 +36,7 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 		String title = "Test Image";
 		String description = "My Test Image";
 		
-		ClientResource client = new ClientResource(BASE_URL + Constants.POST_MEDIA_URL);
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL);
 		
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);

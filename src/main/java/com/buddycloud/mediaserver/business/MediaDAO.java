@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Properties;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -84,7 +85,7 @@ public class MediaDAO {
 		if (maxHeight != null && maxWidth != null) {
 			//TODO return a preview
 		} else {
-			fullDirectoryPath = getAvatarDirectory(entityId);
+			fullDirectoryPath = getMediaDirectory(entityId);
 		}
 
 		File media = new File(fullDirectoryPath + File.separator + mediaId);
@@ -232,10 +233,10 @@ public class MediaDAO {
 		media.setTitle(title);
 		media.setFileSize(file.length());
 		media.setMd5Checksum(getFileMD5Checksum(file));
+		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
 		
 		String fileExtension = getFileExtension(fileName);
 		media.setFileExtension(fileExtension);
-		//TODO media.setMimeType(mimeType);
 		//TODO if is a video, set length media.setLength(null);
 		
 		//XXX adds a lot of delay to the server side, maybe the client should send those information

@@ -17,7 +17,6 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 	
 	private static final String TEST_OUTPUT_DIR = "test";
 	private static final String MEDIA_ID = generateRandomString();
-	
 
 	
 	@After
@@ -43,7 +42,7 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 	
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + Constants.GET_MEDIA_URL + "/" + MEDIA_ID);
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);

@@ -1,5 +1,6 @@
 --{
 --  "id": string,
+--  "fileName": string,
 --  "uploader": string,
 --  "title": string,
 --  "mimeType": string,
@@ -16,15 +17,17 @@
 
 CREATE TABLE media(
 	id TEXT,
-	entityId TEXT REFERENCES entities(id),
+	fileName TEXT NOT NULL,
+	entityId TEXT NOT NULL,
 	uploader TEXT NOT NULL,
 	title TEXT NOT NULL,
+	description TEXT NOT NULL,
 	mimeType TEXT NOT NULL,
 	uploadedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	lastViewedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	fileExtension TEXT,
-	md5Checksum TEXT,
-	fileSize BIGINT,
+	fileExtension TEXT NOT NULL,
+	md5Checksum TEXT NOT NULL,
+	fileSize BIGINT NOT NULL,
 	length BIGINT,
 	height INT,
 	width INT,
