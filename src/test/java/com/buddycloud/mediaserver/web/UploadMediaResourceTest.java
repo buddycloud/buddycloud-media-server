@@ -32,7 +32,6 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 	@Test
 	public void anonymousSuccessfulUpload() throws Exception {
 		// file fields
-		String fileName = "testimage.jpg";
 		String title = "Test Image";
 		String description = "My Test Image";
 		
@@ -41,7 +40,7 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
 		form.getEntries().add(new FormData(Constants.NAME_FIELD, 
-				new StringRepresentation(fileName)));
+				new StringRepresentation(TESTFILE_NAME)));
 		form.getEntries().add(new FormData(Constants.TITLE_FIELD, 
 				new StringRepresentation(title)));	
 		form.getEntries().add(new FormData(Constants.DESC_FIELD, 
@@ -56,9 +55,10 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 		Media media = gson.fromJson(result.getText(), Media.class);
 		
 		// verify if resultant media has the passed attributes
-		assertEquals(fileName, media.getFileName());
+		assertEquals(TESTFILE_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
+		assertEquals(BASE_USER, media.getUploader());
 		
 		// delete metadata
 		dataSource.deleteMedia(media.getId());

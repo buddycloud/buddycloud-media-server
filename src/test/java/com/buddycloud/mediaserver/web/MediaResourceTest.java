@@ -60,7 +60,7 @@ public abstract class MediaResourceTest {
 	    component.start();  
 	}
 	
-	protected Media buildMedia(String mediaId) throws Exception{
+	protected Media buildMedia(String mediaId) throws Exception {
 		File file = new File(TESTFILE_PATH);
 		
 		Media media = new Media();
@@ -71,7 +71,7 @@ public abstract class MediaResourceTest {
 		media.setDescription("A description");
 		media.setTitle("A title");
 		media.setFileSize(file.length());
-		media.setMd5Checksum(getFileMD5Checksum(file));
+		media.setShaChecksum(getFileShaChecksum(file));
 		media.setFileExtension("jpg");
 		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
 		
@@ -82,8 +82,8 @@ public abstract class MediaResourceTest {
 		return media;
 	}
 	
-	private String getFileMD5Checksum(File file) throws IOException {
-		return DigestUtils.md5Hex(FileUtils.openInputStream(file));
+	private String getFileShaChecksum(File file) throws IOException {
+		return DigestUtils.shaHex(FileUtils.openInputStream(file));
 	}
 	
 	protected static String generateRandomString() {

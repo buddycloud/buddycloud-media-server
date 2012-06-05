@@ -14,7 +14,7 @@ public class Media {
 //		  "uploadedDate": datetime,
 //		  "lastViewedDate": datetime,
 //		  "fileExtension": string,
-//		  "md5Checksum": string,
+//		  "shaChecksum": string,
 //		  "fileSize": long,
 //		  "length": long,
 //	  	  "height": int,
@@ -30,7 +30,7 @@ public class Media {
 	private Date uploadedDate = null; 
 	private Date lastViewedDate = null; 
 	private String fileExtension;
-	private String md5Checksum;
+	private String shaChecksum;
 	private Long fileSize;
 	private Long length = null; //for videos
 	private Integer height = null; //for videos and images
@@ -102,14 +102,6 @@ public class Media {
 		this.fileExtension = fileExtension;
 	}
 	
-	public String getMd5Checksum() {
-		return md5Checksum;
-	}
-	
-	public void setMd5Checksum(String md5Checksum) {
-		this.md5Checksum = md5Checksum;
-	}
-	
 	public Long getFileSize() {
 		return fileSize;
 	}
@@ -156,5 +148,13 @@ public class Media {
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
+	}
+
+	public String getShaChecksum() {
+		return shaChecksum;
+	}
+
+	public void setShaChecksum(String shaChecksum) {
+		this.shaChecksum = shaChecksum;
 	}
 }

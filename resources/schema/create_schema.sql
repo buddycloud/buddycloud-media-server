@@ -26,7 +26,7 @@ CREATE TABLE media(
 	uploadedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	lastViewedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	fileExtension TEXT NOT NULL,
-	md5Checksum TEXT NOT NULL,
+	shaChecksum TEXT NOT NULL,
 	fileSize BIGINT NOT NULL,
 	length BIGINT,
 	height INT,

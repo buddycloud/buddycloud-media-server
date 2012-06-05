@@ -103,7 +103,6 @@ public class MediaDAO {
 	public String getMediaType(String mediaId) throws MediaMetadataSourceException {
 		return dataSource.getMediaMimeType(mediaId);
 	}
-	
 
 	public String insertMedia(String entityId, Request request, boolean isAvatar) throws FileUploadException, 
 		MediaMetadataSourceException, FormMissingFieldException {
@@ -232,7 +231,7 @@ public class MediaDAO {
 		media.setDescription(description);
 		media.setTitle(title);
 		media.setFileSize(file.length());
-		media.setMd5Checksum(getFileMD5Checksum(file));
+		media.setShaChecksum(getFileShaChecksum(file));
 		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
 		
 		String fileExtension = getFileExtension(fileName);
@@ -257,9 +256,9 @@ public class MediaDAO {
 		return fileName.substring(fileName.lastIndexOf("."));
 	}
 	
-	private String getFileMD5Checksum(File file) {
+	private String getFileShaChecksum(File file) {
 		try {
-			return DigestUtils.md5Hex(FileUtils.openInputStream(file));
+			return DigestUtils.shaHex(FileUtils.openInputStream(file));
 		} catch (IOException e) {
 			LOGGER.error("Error during media MD5 checksum generation.", e);
 		}

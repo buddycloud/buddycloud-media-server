@@ -5,7 +5,7 @@ public class Queries {
 	
 	// Insert
 	public static final String SAVE_MEDIA = "INSERT INTO media" +
-			" (id, fileName, entityId, uploader, title, description, mimeType, fileExtension, md5Checksum, fileSize, length, height, width)" +
+			" (id, fileName, entityId, uploader, title, description, mimeType, fileExtension, shaChecksum, fileSize, length, height, width)" +
 			" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	public static final String SAVE_AVATAR = "INSERT INTO avatar" +
 			" (mediaId, entityId)" +

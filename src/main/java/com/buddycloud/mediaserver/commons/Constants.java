@@ -15,7 +15,6 @@ public class Constants {
 	//URLs
 	public static final String POST_MEDIA_URL = "/media/{" + ENTITY_ARG + "}";
 	public static final String GET_MEDIA_URL = "/media/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
-	
 	public static final String AVATAR_URL = "/media/{" + ENTITY_ARG + "}/avatar";
 	
 	//Storage constants
