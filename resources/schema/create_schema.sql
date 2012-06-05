@@ -1,7 +1,7 @@
 --{
 --  "id": string,
 --  "fileName": string,
---  "uploader": string,
+--  "author": string,
 --  "title": string,
 --  "mimeType": string,
 --  "description": string,
@@ -15,11 +15,11 @@
 --  "width": int
 --}
 
-CREATE TABLE media(
+CREATE TABLE medias(
 	id TEXT,
 	fileName TEXT NOT NULL,
 	entityId TEXT NOT NULL,
-	uploader TEXT NOT NULL,
+	author TEXT NOT NULL,
 	title TEXT NOT NULL,
 	description TEXT NOT NULL,
 	mimeType TEXT NOT NULL,
@@ -46,16 +46,16 @@ CREATE TABLE media(
 CREATE TABLE previews(
 	id TEXT,
 	shaChecksum TEXT,
-	mediaId TEXT REFERENCES media(id),
+	mediaId TEXT REFERENCES medias(id),
 	fileSize BIGINT,
 	height INT,
 	width INT,
 	PRIMARY KEY(id)
 );
 
-CREATE TABLE avatar(
+CREATE TABLE avatars(
 	id TEXT,
-	mediaId TEXT REFERENCES media(id),
+	mediaId TEXT REFERENCES medias(id),
 	entityId TEXT NOT NULL,
 	PRIMARY KEY(id)
 );

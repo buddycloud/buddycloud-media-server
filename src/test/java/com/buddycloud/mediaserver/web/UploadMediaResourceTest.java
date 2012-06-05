@@ -45,7 +45,7 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 				new StringRepresentation(title)));	
 		form.getEntries().add(new FormData(Constants.DESC_FIELD, 
 				new StringRepresentation(description)));
-		form.getEntries().add(new FormData(Constants.UPLOADER_FIELD, 
+		form.getEntries().add(new FormData(Constants.AUTHOR_FIELD, 
 				new StringRepresentation(BASE_USER)));
 		
 		form.getEntries().add(new FormData(Constants.FILE_FIELD, 
@@ -58,7 +58,7 @@ public class UploadMediaResourceTest extends MediaResourceTest {
 		assertEquals(TESTFILE_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
-		assertEquals(BASE_USER, media.getUploader());
+		assertEquals(BASE_USER, media.getAuthor());
 		
 		// delete metadata
 		dataSource.deleteMedia(media.getId());

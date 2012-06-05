@@ -67,7 +67,7 @@ public abstract class MediaResourceTest {
 		media.setId(mediaId);
 		media.setFileName(TESTFILE_NAME);
 		media.setEntityId(BASE_CHANNEL);
-		media.setUploader(BASE_USER);
+		media.setAuthor(BASE_USER);
 		media.setDescription("A description");
 		media.setTitle("A title");
 		media.setFileSize(file.length());

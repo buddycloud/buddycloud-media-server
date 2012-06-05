@@ -116,10 +116,10 @@ public class MediaDAO {
 		String fileName = getFormField(items, Constants.NAME_FIELD);
 		String title = getFormField(items, Constants.TITLE_FIELD);
 		String description = getFormField(items, Constants.DESC_FIELD);
-		String uploader = getFormField(items, Constants.UPLOADER_FIELD);
+		String author = getFormField(items, Constants.AUTHOR_FIELD);
 		InputStream inputStream = getFileFormField(items);
 
-		Media media = storeMedia(fileName, title, description, uploader, entityId, inputStream, isAvatar);
+		Media media = storeMedia(fileName, title, description, author, entityId, inputStream, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 
@@ -170,7 +170,7 @@ public class MediaDAO {
 	}
 	
 
-	private Media storeMedia(String fileName, String title, String description, String uploader,
+	private Media storeMedia(String fileName, String title, String description, String author,
 			String entityId, InputStream inputStream, boolean isAvatar) throws FileUploadException {
 		
 		String directory = isAvatar ? getAvatarDirectory(entityId) : getMediaDirectory(entityId);
@@ -204,7 +204,7 @@ public class MediaDAO {
 		}
 		
 		final Media media = createMedia(mediaId, fileName, title, description, 
-				uploader, entityId, file);
+				author, entityId, file);
 		
 		// store media metadata
 		new Thread() {
@@ -222,12 +222,12 @@ public class MediaDAO {
 
 
 	private Media createMedia(String mediaId, String fileName, String title,
-			String description, String uploader, String entityId, File file) {
+			String description, String author, String entityId, File file) {
 		Media media = new Media();
 		media.setId(mediaId);
 		media.setFileName(fileName);
 		media.setEntityId(entityId);
-		media.setUploader(uploader);
+		media.setAuthor(author);
 		media.setDescription(description);
 		media.setTitle(title);
 		media.setFileSize(file.length());
@@ -253,7 +253,7 @@ public class MediaDAO {
 	}
 	
 	private String getFileExtension(String fileName) {
-		return fileName.substring(fileName.lastIndexOf("."));
+		return fileName.substring(fileName.lastIndexOf(".") + 1);
 	}
 	
 	private String getFileShaChecksum(File file) {

@@ -18,7 +18,7 @@ public class Constants {
 	public static final String AVATAR_URL = "/media/{" + ENTITY_ARG + "}/avatar";
 	
 	//Storage constants
-	public static final String UPLOADER_FIELD = "uploader";
+	public static final String AUTHOR_FIELD = "author";
 	public static final String TITLE_FIELD = "title"; //optional
 	public static final String FILE_FIELD = "binaryfile";
 	public static final String NAME_FIELD = "filename";

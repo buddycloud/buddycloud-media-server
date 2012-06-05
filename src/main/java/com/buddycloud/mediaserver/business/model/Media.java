@@ -7,7 +7,7 @@ public class Media {
 //		  "id": string,
 //		  "fileName": string;
 //        "entityId": string,
-//		  "uploader": string,
+//		  "author": string,
 //		  "title": string,
 //		  "description": string,
 //		  "mimeType": string,
@@ -23,7 +23,7 @@ public class Media {
 	
 	private String id;
 	private String fileName;
-	private String uploader;
+	private String author;
 	private String title;
 	private String mimeType;
 	private String description;
@@ -44,14 +44,6 @@ public class Media {
 	
 	public void setId(String id) {
 		this.id = id;
-	}
-	
-	public String getUploader() {
-		return uploader;
-	}
-	
-	public void setUploader(String uploader) {
-		this.uploader = uploader;
 	}
 	
 	public String getTitle() {
@@ -156,5 +148,13 @@ public class Media {
 
 	public void setShaChecksum(String shaChecksum) {
 		this.shaChecksum = shaChecksum;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
 	}
 }
