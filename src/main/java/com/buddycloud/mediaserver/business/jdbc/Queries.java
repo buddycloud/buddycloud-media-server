@@ -11,7 +11,7 @@ public class Queries {
 			" (mediaId, entityId)" +
 			" VALUES(?, ?)";
 	public static final String SAVE_PREVIEW = "INSERT INTO avatar" +
-			" (mediaId, md5Checksum, fileSize, height, width)" +
+			" (mediaId, shaChecksum, fileSize, height, width)" +
 			" VALUES(?, ?, ?, ?, ?)";
 	
 	// Select

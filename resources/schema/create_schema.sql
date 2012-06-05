@@ -45,7 +45,7 @@ CREATE TABLE media(
 
 CREATE TABLE previews(
 	id TEXT,
-	md5Checksum TEXT,
+	shaChecksum TEXT,
 	mediaId TEXT REFERENCES media(id),
 	fileSize BIGINT,
 	height INT,
