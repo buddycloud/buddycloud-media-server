@@ -8,7 +8,7 @@
 --  "uploadedDate": datetime,
 --  "lastViewedDate": datetime,
 --  "fileExtension": string,
---  "md5Checksum": string,
+--  "shaChecksum": string,
 --  "fileSize": long,
 --  "length": long,
 --  "height": int,
@@ -36,7 +36,7 @@ CREATE TABLE media(
 
 -- {
 --   "id": string,
---   "md5Checksum": string,
+--   "shaChecksum": string,
 --   "mediaId": string,
 --	 "fileSize": long,
 --   "height": int,

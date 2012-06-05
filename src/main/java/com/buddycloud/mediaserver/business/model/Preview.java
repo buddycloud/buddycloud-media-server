@@ -4,7 +4,7 @@ public class Preview {
 //	{
 //		  "id": string,
 //		  "downloadUrl": string,
-//		  "md5Checksum": string,
+//		  "shaChecksum": string,
 //		  "mediaId": string,
 //		  "fileSize": long,
 //		  "height": int,
@@ -13,7 +13,7 @@ public class Preview {
 	
 	private String id;
 	private String downloadUrl;
-	private String md5Checksum;
+	private String shaChecksum;
 	private Long fileSize;
 	private String mediaId;
 	private Integer height;
@@ -34,14 +34,6 @@ public class Preview {
 	
 	public void setDownloadUrl(String downloadUrl) {
 		this.downloadUrl = downloadUrl;
-	}
-	
-	public String getMd5Checksum() {
-		return md5Checksum;
-	}
-	
-	public void setMd5Checksum(String md5Checksum) {
-		this.md5Checksum = md5Checksum;
 	}
 	
 	public String getMediaId() {
@@ -74,5 +66,13 @@ public class Preview {
 
 	public void setWidth(Integer width) {
 		this.width = width;
+	}
+
+	public String getShaChecksum() {
+		return shaChecksum;
+	}
+
+	public void setShaChecksum(String shaChecksum) {
+		this.shaChecksum = shaChecksum;
 	}
 }
