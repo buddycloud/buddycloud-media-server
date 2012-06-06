@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
-import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 
 public class MediasDAO extends DAO {
@@ -23,7 +23,7 @@ public class MediasDAO extends DAO {
 
 	
 	public File getMedia(String entityId, String mediaId) 
-			throws MediaMetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 		//TODO authentication
 		
 		LOGGER.debug("Getting media. Media ID: " + mediaId);
@@ -42,7 +42,7 @@ public class MediasDAO extends DAO {
 	}
 
 	public byte[] getMediaPreview(String entityId, String mediaId, Integer maxHeight, Integer maxWidth) 
-			throws MediaMetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 		//TODO authentication
 		
 		LOGGER.debug("Getting media preview. Media ID: " + mediaId);
@@ -50,7 +50,7 @@ public class MediasDAO extends DAO {
 		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
 	}
 
-	public String getMediaType(String mediaId) throws MediaMetadataSourceException {
+	public String getMediaType(String mediaId) throws MetadataSourceException {
 		return dataSource.getMediaMimeType(mediaId);
 	}
 

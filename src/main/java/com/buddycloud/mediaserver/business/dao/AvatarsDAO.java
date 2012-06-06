@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
-import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 
 public class AvatarsDAO extends DAO {
@@ -23,7 +23,7 @@ public class AvatarsDAO extends DAO {
 
 
 	public File getAvatar(String entityId) 
-			throws MediaMetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 		
 		LOGGER.debug("Getting avatar. Entity ID: " + entityId);
@@ -43,7 +43,7 @@ public class AvatarsDAO extends DAO {
 	}
 
 	public byte[] getAvatarPreview(String entityId, Integer maxHeight, Integer maxWidth) 
-			throws MediaMetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar preview. Avatar ID: " + entityId);
@@ -51,7 +51,7 @@ public class AvatarsDAO extends DAO {
 		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
 	}
 	
-	public String getAvatarMediaType(String entityId) throws MediaMetadataSourceException {
+	public String getAvatarMediaType(String entityId) throws MetadataSourceException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 		
 		return dataSource.getMediaMimeType(mediaId);

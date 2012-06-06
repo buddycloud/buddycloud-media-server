@@ -11,6 +11,7 @@ import javax.imageio.ImageIO;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.restlet.Component;
 import org.restlet.Context;
@@ -32,7 +33,8 @@ public abstract class MediaResourceTest {
 	protected static final String BASE_USER = "user@domain.com";
 	protected static final String BASE_URL = "http://localhost:8080";
 	
-	
+
+	protected Component component;
 	protected Properties configuration;
 	protected MetadataSource dataSource;
 	protected Gson gson;
@@ -50,8 +52,15 @@ public abstract class MediaResourceTest {
 	    testSetUp();
 	}
 	
+	@After
+	public void tearDown() throws Exception {
+		component.stop();
+		
+		testTearDown();
+	}
+	
 	private void setupComponent() throws Exception {
-		Component component = new Component();  
+		component = new Component();  
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
@@ -91,4 +100,6 @@ public abstract class MediaResourceTest {
 	}
 	
 	protected abstract void testSetUp() throws Exception;
+	
+	protected abstract void testTearDown() throws Exception;
 }

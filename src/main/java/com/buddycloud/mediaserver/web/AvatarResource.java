@@ -16,7 +16,7 @@ import com.buddycloud.mediaserver.business.dao.AvatarsDAO;
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
-import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 
@@ -63,7 +63,7 @@ public class AvatarResource extends ServerResource {
 				
 			byte[] media = avatarDAO.getAvatarPreview(entityId, Integer.valueOf(maxHeight), Integer.valueOf(maxWidth));
 			return new DynamicFileRepresentation(mediaType, media);
-		} catch (MediaMetadataSourceException e) {
+		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
 		} catch (IOException e) {

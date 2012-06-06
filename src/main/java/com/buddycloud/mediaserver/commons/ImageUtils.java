@@ -10,12 +10,12 @@ import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
 
-public class ImagesUtils {
+public class ImageUtils {
 
 	private static final String[] imageFormats = ImageIO.getReaderFormatNames();
 	
 	
-	private ImagesUtils() {}
+	private ImageUtils() {}
 	
 	
 	public static File storeImageIntoFile(BufferedImage image, String imageFormat,

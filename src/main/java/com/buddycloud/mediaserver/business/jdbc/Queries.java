@@ -23,6 +23,7 @@ public class Queries {
 
 	// Delete
 	public static final String DELETE_MEDIA = "DELETE FROM medias WHERE id = ?";
+	public static final String DELETE_PREVIEW = "DELETE FROM previews WHERE id = ?";
 	
 	// Update
 	public static final String UPDATE_MEDIA_LAST_VIEWED = "UPDATE medias SET lastViewedDate = ? WHERE id = ?";

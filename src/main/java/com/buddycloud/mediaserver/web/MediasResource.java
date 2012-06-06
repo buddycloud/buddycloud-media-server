@@ -11,7 +11,7 @@ import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediasDAO;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
-import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 
 
 public class MediasResource extends ServerResource {
@@ -31,7 +31,7 @@ public class MediasResource extends ServerResource {
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
 					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
-				} catch (MediaMetadataSourceException e) {
+				} catch (MetadataSourceException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
 					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
 				} catch (FormMissingFieldException e) {

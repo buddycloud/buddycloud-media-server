@@ -1,11 +1,10 @@
 package com.buddycloud.mediaserver.web;
 
-import java.io.File;
-
 import static junit.framework.Assert.assertEquals;
 
+import java.io.File;
+
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.ext.html.FormData;
@@ -20,8 +19,7 @@ import com.buddycloud.mediaserver.commons.Constants;
 
 public class UploadMediaResourceTest extends MediaResourceTest {
 	
-	@After
-	public void tearDown() throws Exception {
+	public void testTearDown() throws Exception {
 		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 	}

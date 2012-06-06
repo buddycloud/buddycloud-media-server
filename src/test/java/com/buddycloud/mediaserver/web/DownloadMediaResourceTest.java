@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
 import org.junit.Test;
 import org.restlet.resource.ClientResource;
 
@@ -19,8 +18,7 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 	private static final String MEDIA_ID = generateRandomString();
 
 	
-	@After
-	public void tearDown() throws Exception {
+	public void testTearDown() throws Exception {
 		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 		
@@ -45,6 +43,25 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.jpg");
+		FileOutputStream outputStream = FileUtils.openOutputStream(file);
+		client.get().write(outputStream);
+
+		Assert.assertTrue(file.exists());
+		
+		// Delete downloaded file
+		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
+		outputStream.close();
+	}
+	
+	@Test
+	public void anonymousPreviewSuccessfulDownload() throws Exception {
+		int height = 50;
+		int width = 50;
+		String url = BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID + "?maxheight=" + height + "&maxwidth=" + width;
+		
+		ClientResource client = new ClientResource(url);
+		
+		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
 

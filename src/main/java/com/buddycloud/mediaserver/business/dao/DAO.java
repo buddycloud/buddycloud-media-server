@@ -26,10 +26,11 @@ import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.ImagesUtils;
+import com.buddycloud.mediaserver.commons.ImageUtils;
+import com.buddycloud.mediaserver.commons.VideoUtils;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
-import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.google.gson.Gson;
 
@@ -47,8 +48,9 @@ public abstract class DAO {
 		this.gson = new Gson();
 	}
 
+	
 	public String insertMedia(String entityId, Request request) 
-			throws FileUploadException, MediaMetadataSourceException, FormMissingFieldException {
+			throws FileUploadException, MetadataSourceException, FormMissingFieldException {
 		//TODO authentication
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -63,7 +65,7 @@ public abstract class DAO {
 		String author = getFormField(items, Constants.AUTHOR_FIELD);
 		InputStream inputStream = getFileFormField(items);
 
-		Media media = storeMedia(fileName, title, description, author, entityId, inputStream, getDirectory(entityId));
+		Media media = storeMedia(fileName, title, description, author, entityId, inputStream);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 
@@ -73,8 +75,9 @@ public abstract class DAO {
 	protected abstract String getDirectory(String entityId);
 
 	protected Media storeMedia(String fileName, String title, String description, String author,
-			String entityId, InputStream inputStream, String directory) throws FileUploadException {
+			String entityId, InputStream inputStream) throws FileUploadException {
 		
+		String directory = getDirectory(entityId);
 		mkdir(directory);
 
 		// TODO assert id uniqueness
@@ -111,7 +114,7 @@ public abstract class DAO {
 			public void start() {
 				try {
 					dataSource.storeMedia(media);
-				} catch (MediaMetadataSourceException e) {
+				} catch (MetadataSourceException e) {
 					// do nothing
 				}
 			}
@@ -121,7 +124,7 @@ public abstract class DAO {
 	}
 
 	protected byte[] getPreview(String entityId, String mediaId, Integer maxHeight, Integer maxWidth, String mediaDirectory)  
-			throws MediaMetadataSourceException, IOException, InvalidPreviewFormatException, MediaNotFoundException {
+			throws MetadataSourceException, IOException, InvalidPreviewFormatException, MediaNotFoundException {
 		File media = new File(mediaDirectory + File.separator + mediaId);
 
 		if (!media.exists()) {
@@ -134,7 +137,7 @@ public abstract class DAO {
 			File preview = new File(mediaDirectory + File.separator + previewId);
 			
 			if (!preview.exists()) {
-				//TODO delete entry at database
+				dataSource.deletePreview(previewId);
 			} else {
 				// Update last viewed date
 				dataSource.updateMediaLastViewed(mediaId);
@@ -150,8 +153,10 @@ public abstract class DAO {
 		BufferedImage previewImg = null;
 		
 		//TODO else if isVideo
-		if (ImagesUtils.isImage(extension)) {
-			previewImg = ImagesUtils.createImagePreview(media, maxWidth, maxHeight);
+		if (ImageUtils.isImage(extension)) {
+			previewImg = ImageUtils.createImagePreview(media, maxWidth, maxHeight);
+		} else if (VideoUtils.isVideo(extension)){
+			previewImg = VideoUtils.createVideoPreview(media, maxWidth, maxHeight);
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
@@ -161,7 +166,7 @@ public abstract class DAO {
 		
 		dataSource.updateMediaLastViewed(mediaId);
 		
-		return ImagesUtils.imageToBytes(previewImg, extension);
+		return ImageUtils.imageToBytes(previewImg, extension);
 	}
 
 	protected String getFormField(List<FileItem> items, String fieldName) throws FormMissingFieldException {
@@ -222,10 +227,9 @@ public abstract class DAO {
 		
 		String fileExtension = getFileExtension(fileName);
 		media.setFileExtension(fileExtension);
-		//TODO if is a video, set length media.setLength(null);
 		
 		//XXX adds a lot of delay to the server side, maybe the client should send those information
-		if (ImagesUtils.isImage(fileExtension)) {
+		if (ImageUtils.isImage(fileExtension)) {
 			try {
 				BufferedImage img = ImageIO.read(file);
 				media.setHeight(img.getHeight());
@@ -233,7 +237,9 @@ public abstract class DAO {
 			} catch (IOException e) {
 				LOGGER.error("Error while getting image height and size", e);
 			}
-		}
+		} else if (VideoUtils.isVideo(fileExtension)) {
+			media.setLength(VideoUtils.getVideoLength(file));
+		} //TODO else if AUDIO media.setLength()
 		
 		return media;
 	}
@@ -291,7 +297,7 @@ public abstract class DAO {
 		
 		public void start() {
 			try {
-				File previewFile = ImagesUtils.storeImageIntoFile(img, extension, 
+				File previewFile = ImageUtils.storeImageIntoFile(img, extension, 
 						directory + File.separator + previewId);
 				
 				Preview preview = createPreview(previewId, mediaId, height, width, previewFile);

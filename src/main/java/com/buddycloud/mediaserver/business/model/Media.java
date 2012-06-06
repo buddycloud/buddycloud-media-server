@@ -32,7 +32,7 @@ public class Media {
 	private String fileExtension;
 	private String shaChecksum;
 	private Long fileSize;
-	private Long length = null; //for videos
+	private Long length = null; //for audio and videos
 	private Integer height = null; //for videos and images
 	private Integer width = null; //for videos and images
 	private String entityId;
