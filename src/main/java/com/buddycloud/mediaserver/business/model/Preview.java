@@ -3,7 +3,6 @@ package com.buddycloud.mediaserver.business.model;
 public class Preview {
 //	{
 //		  "id": string,
-//		  "downloadUrl": string,
 //		  "shaChecksum": string,
 //		  "mediaId": string,
 //		  "fileSize": long,
@@ -12,7 +11,6 @@ public class Preview {
 //	}
 	
 	private String id;
-	private String downloadUrl;
 	private String shaChecksum;
 	private Long fileSize;
 	private String mediaId;
@@ -26,14 +24,6 @@ public class Preview {
 	
 	public void setId(String id) {
 		this.id = id;
-	}
-	
-	public String getDownloadUrl() {
-		return downloadUrl;
-	}
-	
-	public void setDownloadUrl(String downloadUrl) {
-		this.downloadUrl = downloadUrl;
 	}
 	
 	public String getMediaId() {

@@ -13,6 +13,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
@@ -92,7 +93,25 @@ public class MetadataSource {
 			
 			LOGGER.debug("Media metadata successfully stored. Media ID: " + media.getId());
 		} catch (SQLException e) {
-			LOGGER.error("Error while saving media metadata: " + e.getMessage(), e);
+			LOGGER.error("Error while saving media metadata", e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
+	public void storePreview(Preview preview) throws MediaMetadataSourceException {
+		LOGGER.debug("Store preview metadata. Preview ID: " + preview.getId());
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.SAVE_PREVIEW, preview.getId(), preview.getMediaId(), preview.getShaChecksum(),
+					preview.getFileSize(), preview.getHeight(), preview.getWidth());
+
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Preview metadata successfully stored. Preview ID: " + preview.getId());
+		} catch (SQLException e) {
+			LOGGER.error("Error while saving preview metadata", e);
 			throw new MediaMetadataSourceException(e.getMessage(), e);
 		}
 	}
@@ -112,6 +131,32 @@ public class MetadataSource {
 			LOGGER.error("Error while saving avatar", e);
 			throw new MediaMetadataSourceException(e.getMessage(), e);
 		}
+	}
+	
+	public String getPreview(String mediaId, int height, int width) throws MediaMetadataSourceException {
+		LOGGER.debug("Getting preview from media: " + mediaId);
+		
+		String previewId = null;
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.GET_MEDIA_PREVIEWS, mediaId, height, width);
+
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				previewId = result.getString(1); 
+				LOGGER.debug("Preview successfuly fetched. Preview ID: " + previewId);
+			} else {
+				LOGGER.debug("No previews for media '" + mediaId + "' found.");
+			}
+
+			statement.close();
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching entity avatar", e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+		
+		return previewId;
 	}
 	
 	public String getEntityAvatarId(String entityId) throws MediaMetadataSourceException {
@@ -158,6 +203,32 @@ public class MetadataSource {
 	
 	public String getMediaMimeType(String mediaId) throws MediaMetadataSourceException {
 		LOGGER.debug("Getting media type. Media ID: " + mediaId);
+		
+		String mimeType = null;
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.GET_MEDIA_MIME_TYPE, mediaId);
+
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				mimeType = result.getString(1); 
+				LOGGER.debug("Media metadata successfully fetched. Media ID: " + mediaId);
+			} else {
+				LOGGER.debug("No media with id '" + mediaId + "' found.");
+			}
+
+			statement.close();
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
+			throw new MediaMetadataSourceException(e.getMessage(), e);
+		}
+		
+		return mimeType;
+	}
+	
+	public String getMediaExtension(String mediaId) throws MediaMetadataSourceException {
+		LOGGER.debug("Getting media extension. Media ID: " + mediaId);
 		
 		String mimeType = null;
 		

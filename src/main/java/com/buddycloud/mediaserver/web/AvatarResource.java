@@ -1,5 +1,6 @@
 package com.buddycloud.mediaserver.web;
 import java.io.File;
+import java.io.IOException;
 
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -11,10 +12,13 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Put;
 import org.restlet.resource.ServerResource;
 
-import com.buddycloud.mediaserver.business.MediaDAO;
+import com.buddycloud.mediaserver.business.dao.AvatarsDAO;
+import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaMetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
+import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 
 
 public class AvatarResource extends ServerResource {
@@ -43,24 +47,33 @@ public class AvatarResource extends ServerResource {
 	@Get
 	public Representation getAvatar() {
 		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
-		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 		
 		String maxHeight = getQueryValue(Constants.MAX_HEIGHT_QUERY);
 		String maxWidth = getQueryValue(Constants.MAX_WIDTH_QUERY);
-
-		// both or none arguments must be present
-		if (maxHeight == null || maxWidth == null) {
-			maxHeight = maxWidth = null;
-		}
 		
+		AvatarsDAO avatarDAO = DAOFactory.getInstance().getAvatarDAO();
+
 		try {
-			File media = MediaDAO.gestInstance().getAvatar(entityId, maxHeight, maxWidth);
-			return new FileRepresentation(media, new MediaType(MediaDAO.gestInstance().getMediaType(mediaId)));
+			final MediaType mediaType = new MediaType(avatarDAO.getAvatarMediaType(entityId));
+
+			if (maxHeight == null || maxWidth == null) {
+				File media = avatarDAO.getAvatar(entityId);
+				return new FileRepresentation(media, mediaType);
+			}
+				
+			byte[] media = avatarDAO.getAvatarPreview(entityId, Integer.valueOf(maxHeight), Integer.valueOf(maxWidth));
+			return new DynamicFileRepresentation(mediaType, media);
 		} catch (MediaMetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+		} catch (IOException e) {
+			setStatus(Status.SERVER_ERROR_INTERNAL);
+			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);	
 		} catch (MediaNotFoundException e) {
 			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+		} catch (InvalidPreviewFormatException e) {
+			setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
 			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
 		}
 	}

@@ -1,6 +1,7 @@
 package com.buddycloud.mediaserver.commons;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 
@@ -13,19 +14,34 @@ public class ImagesUtils {
 
 	private static final String[] imageFormats = ImageIO.getReaderFormatNames();
 	
-	private ImagesUtils() {}
-
 	
-	public static File getImagePreview(File image, int width, int height, String imageFormat,
+	private ImagesUtils() {}
+	
+	
+	public static File storeImageIntoFile(BufferedImage image, String imageFormat,
 			String pathToStore) throws IOException {
-		// Resize image
-		BufferedImage resize = Scalr.resize(ImageIO.read(image), width, height);
 		
 		// Store into provided path
 		File output = new File(pathToStore);
-		ImageIO.write(resize, imageFormat, FileUtils.openOutputStream(output));
+		ImageIO.write(image, imageFormat, FileUtils.openOutputStream(output));
 		
 		return output;
+	}
+	
+	public static byte[] imageToBytes(BufferedImage image, String imageFormat) throws IOException {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(image, imageFormat, baos);
+		baos.flush();
+		
+		byte[] imageInByte = baos.toByteArray();
+		baos.close();
+		
+		return imageInByte;
+	}
+	
+	public static BufferedImage createImagePreview(File image, int width, int height) throws IOException {
+		// Resize image
+		return Scalr.resize(ImageIO.read(image), width, height);
 	}
 	
 	public static boolean isImage(String extension) {
