@@ -20,14 +20,11 @@ public class MediaServerApplication extends Application {
 	public synchronized Restlet createInboundRoot() {
 		Router router = new Router(getContext());
 		
-		// GET /media/<name@domain.com>/<mediaID>
+		// GET/PUT/DELETE /media/<name@domain.com>/<mediaID>
 		router.attach(Constants.GET_MEDIA_URL, MediaResource.class);
 		
 		// POST /media/<name@domain.com>
 		router.attach(Constants.POST_MEDIA_URL, MediasResource.class);
-		
-		// GET /media/avatar/<name@domain.com>/<mediaID>
-		router.attach(Constants.AVATAR_URL, AvatarResource.class);
 		
 		return router;
 	}

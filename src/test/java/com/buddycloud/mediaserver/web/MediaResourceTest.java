@@ -26,8 +26,9 @@ import com.google.gson.Gson;
 public abstract class MediaResourceTest {
 	
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
-	protected static final String TESTFILE_PATH = "resources/tests/testimage.jpg";
-	protected static final String TESTFILE_NAME = "testimage.jpg";
+	protected static final String TESTMEDIA_NAME = "testimage.jpg";
+	protected static final String TESTAVATAR_NAME = "testavatar.jpg";
+	protected static final String TESTFILE_PATH = "resources/tests/";
 
 	protected static final String BASE_CHANNEL = "channel@topics.domain.com";
 	protected static final String BASE_USER = "user@domain.com";
@@ -69,12 +70,12 @@ public abstract class MediaResourceTest {
 	    component.start();  
 	}
 	
-	protected Media buildMedia(String mediaId) throws Exception {
-		File file = new File(TESTFILE_PATH);
+	protected Media buildMedia(String mediaId, String filePath) throws Exception {
+		File file = new File(filePath);
 		
 		Media media = new Media();
 		media.setId(mediaId);
-		media.setFileName(TESTFILE_NAME);
+		media.setFileName(TESTMEDIA_NAME);
 		media.setEntityId(BASE_CHANNEL);
 		media.setAuthor(BASE_USER);
 		media.setDescription("A description");

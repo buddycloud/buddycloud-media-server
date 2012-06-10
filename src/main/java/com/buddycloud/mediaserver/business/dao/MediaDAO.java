@@ -12,12 +12,12 @@ import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatExceptio
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 
-public class MediasDAO extends DAO {
+public class MediaDAO extends AbstractDAO {
 
-	private static Logger LOGGER = Logger.getLogger(MediasDAO.class);
+	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
 
 
-	MediasDAO(MetadataSource dataSource, Properties configuration) {
+	MediaDAO(MetadataSource dataSource, Properties configuration) {
 		super(dataSource, configuration);
 	}
 
@@ -52,10 +52,5 @@ public class MediasDAO extends DAO {
 
 	public String getMediaType(String mediaId) throws MetadataSourceException {
 		return dataSource.getMediaMimeType(mediaId);
-	}
-
-	protected String getDirectory(String entityId) {
-		return configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) +
-				File.separator + entityId;
 	}
 }

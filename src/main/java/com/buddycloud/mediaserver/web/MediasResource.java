@@ -8,7 +8,7 @@ import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
-import com.buddycloud.mediaserver.business.dao.MediasDAO;
+import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -23,7 +23,7 @@ public class MediasResource extends ServerResource {
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				
-				MediasDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
+				MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
 				
 				try {
 					return new StringRepresentation(mediaDAO.insertMedia(entityId, getRequest()), 

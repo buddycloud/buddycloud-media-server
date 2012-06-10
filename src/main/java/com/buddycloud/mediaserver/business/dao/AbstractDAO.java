@@ -34,15 +34,15 @@ import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.google.gson.Gson;
 
-public abstract class DAO {
+public abstract class AbstractDAO {
 
-	private static Logger LOGGER = Logger.getLogger(DAO.class);
+	private static Logger LOGGER = Logger.getLogger(AbstractDAO.class);
 	protected MetadataSource dataSource;
 	protected Properties configuration;
 	protected Gson gson;
 
 
-	DAO(MetadataSource dataSource, Properties configuration) {
+	AbstractDAO(MetadataSource dataSource, Properties configuration) {
 		this.configuration = configuration;
 		this.dataSource = dataSource;
 		this.gson = new Gson();
@@ -72,7 +72,10 @@ public abstract class DAO {
 		return gson.toJson(media); 
 	}
 	
-	protected abstract String getDirectory(String entityId);
+	public String getDirectory(String entityId) {
+		return configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) +
+				File.separator + entityId;
+	}
 
 	protected Media storeMedia(String fileName, String title, String description, String author,
 			String entityId, InputStream inputStream) throws FileUploadException {
@@ -152,7 +155,6 @@ public abstract class DAO {
 		String extension = dataSource.getMediaExtension(mediaId);
 		BufferedImage previewImg = null;
 		
-		//TODO else if isVideo
 		if (ImageUtils.isImage(extension)) {
 			previewImg = ImageUtils.createImagePreview(media, maxWidth, maxHeight);
 		} else if (VideoUtils.isVideo(extension)){

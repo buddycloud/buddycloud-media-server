@@ -7,6 +7,7 @@ public class Constants {
 	//URL arguments
 	public static final String ENTITY_ARG = "entityId";
 	public static final String MEDIA_ARG = "mediaId";
+	public static final String AVATAR_ARG = "avatar";
 	
 	//URL queries
 	public static final String MAX_HEIGHT_QUERY = "maxheight";
@@ -15,7 +16,6 @@ public class Constants {
 	//URLs
 	public static final String POST_MEDIA_URL = "/media/{" + ENTITY_ARG + "}";
 	public static final String GET_MEDIA_URL = "/media/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
-	public static final String AVATAR_URL = "/media/{" + ENTITY_ARG + "}/avatar";
 	
 	//Storage constants
 	public static final String AUTHOR_FIELD = "author";

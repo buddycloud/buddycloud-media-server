@@ -10,7 +10,7 @@ public class Queries {
 	public static final String SAVE_AVATAR = "INSERT INTO avatars" +
 			" (mediaId, entityId)" +
 			" VALUES(?, ?)";
-	public static final String SAVE_PREVIEW = "INSERT INTO avatars" +
+	public static final String SAVE_PREVIEW = "INSERT INTO previews" +
 			" (id, mediaId, shaChecksum, fileSize, height, width)" +
 			" VALUES(?, ?, ?, ?, ?, ?)";
 	
