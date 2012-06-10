@@ -21,10 +21,10 @@ public class MediaServerApplication extends Application {
 		Router router = new Router(getContext());
 		
 		// GET/PUT/DELETE /media/<name@domain.com>/<mediaID>
-		router.attach(Constants.GET_MEDIA_URL, MediaResource.class);
+		router.attach(Constants.MEDIA_ID_URL, MediaResource.class);
 		
 		// POST /media/<name@domain.com>
-		router.attach(Constants.POST_MEDIA_URL, MediasResource.class);
+		router.attach(Constants.MEDIAS_URL, MediasResource.class);
 		
 		return router;
 	}

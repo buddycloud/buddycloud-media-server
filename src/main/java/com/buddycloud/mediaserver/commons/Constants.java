@@ -14,8 +14,8 @@ public class Constants {
 	public static final String MAX_WIDTH_QUERY = "maxwidth";
 
 	//URLs
-	public static final String POST_MEDIA_URL = "/media/{" + ENTITY_ARG + "}";
-	public static final String GET_MEDIA_URL = "/media/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
+	public static final String MEDIAS_URL = "/media/{" + ENTITY_ARG + "}";
+	public static final String MEDIA_ID_URL = "/media/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
 	
 	//Storage constants
 	public static final String AUTHOR_FIELD = "author";

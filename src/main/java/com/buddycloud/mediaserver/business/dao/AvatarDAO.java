@@ -7,10 +7,9 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
-import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
-import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 
 public class AvatarDAO extends AbstractDAO {
 
