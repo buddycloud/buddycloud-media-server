@@ -26,7 +26,7 @@ public class MediasResource extends ServerResource {
 				MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
 				
 				try {
-					return new StringRepresentation(mediaDAO.insertMedia(entityId, getRequest()), 
+					return new StringRepresentation(mediaDAO.insertMedia(entityId, getRequest(), false), 
 									MediaType.APPLICATION_JSON);
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);

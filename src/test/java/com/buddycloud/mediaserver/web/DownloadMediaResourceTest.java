@@ -70,5 +70,9 @@ public class DownloadMediaResourceTest extends MediaResourceTest {
 		// Delete downloaded file
 		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 		outputStream.close();
+		
+		// Delete previews table row
+		final String previewId = dataSource.getPreviewId(MEDIA_ID, height, width);
+		dataSource.deletePreview(previewId);
 	}
 }

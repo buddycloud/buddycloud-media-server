@@ -170,6 +170,22 @@ public class MetadataSource {
 		}
 	}
 	
+	public void updateMediaFields(Media media) throws MetadataSourceException {
+		LOGGER.debug("Updating media fields. Media ID: " + media.getId());
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.UPDATE_MEDIA_FIELDS, media.getFileName(), media.getTitle(), media.getDescription(), media.getId());
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Media fields updated. Media ID: " + media.getId());
+		} catch (SQLException e) {
+			LOGGER.error("Error while updating media fields", e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
 	public void deleteMedia(String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Deleting media metadata. Media ID: " + mediaId);
 		
@@ -185,6 +201,12 @@ public class MetadataSource {
 			throw new MetadataSourceException(e.getMessage(), e);
 		}
 	}
+	
+	public Media getMedia(String mediaId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 	// Previews
 	
@@ -206,7 +228,7 @@ public class MetadataSource {
 		}
 	}
 	
-	public String getPreview(String mediaId, int height, int width) throws MetadataSourceException {
+	public String getPreviewId(String mediaId, int height, int width) throws MetadataSourceException {
 		LOGGER.debug("Getting preview from media: " + mediaId);
 		
 		String previewId = null;
@@ -250,17 +272,17 @@ public class MetadataSource {
 	
 	// Avatars
 	
-	public void storeAvatar(String entityId, String mediaId) throws MetadataSourceException {
-		LOGGER.debug("Store " + entityId + " avatar. Media ID: " + mediaId);
+	public void storeAvatar(Media media) throws MetadataSourceException {
+		LOGGER.debug("Store " + media.getEntityId() + " avatar. Media ID: " + media.getId());
 		
 		PreparedStatement statement;
 		try {
-			statement = prepareStatement(Queries.SAVE_AVATAR, entityId, mediaId);
+			statement = prepareStatement(Queries.SAVE_AVATAR, media.getEntityId(), media.getId());
 
 			statement.execute();
 			statement.close();
 			
-			LOGGER.debug("Avatar successfully stored. Media ID: " + mediaId);
+			LOGGER.debug("Avatar successfully stored. Media ID: " + media.getId());
 		} catch (SQLException e) {
 			LOGGER.error("Error while saving avatar", e);
 			throw new MetadataSourceException(e.getMessage(), e);
@@ -306,6 +328,22 @@ public class MetadataSource {
 			LOGGER.debug("Entity avatar successfully updated. Entity ID: " + entityId + ". Media ID: " + mediaId);
 		} catch (SQLException e) {
 			LOGGER.error("Error while updating entity avatar", e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
+	public void deleteEntityAvatar(String entityId) throws MetadataSourceException {
+		LOGGER.debug("Deleting avatar from '" + entityId + "' avatar");
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.DELETE_ENTITY_AVATAR, entityId);
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Avatar from '" + entityId + "' successfully deleted");
+		} catch (SQLException e) {
+			LOGGER.error("Error while deleting avatar", e);
 			throw new MetadataSourceException(e.getMessage(), e);
 		}
 	}

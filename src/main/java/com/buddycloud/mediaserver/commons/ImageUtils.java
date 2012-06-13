@@ -39,9 +39,20 @@ public class ImageUtils {
 		return imageInByte;
 	}
 	
+	public static BufferedImage createImagePreview(File image, int size) throws IOException {
+		final BufferedImage img = ImageIO.read(image);
+		final BufferedImage thumbnail = Scalr.resize(img, size);
+		img.flush();
+		
+		return thumbnail;
+	}
+	
 	public static BufferedImage createImagePreview(File image, int width, int height) throws IOException {
-		// Resize image
-		return Scalr.resize(ImageIO.read(image), width, height);
+		final BufferedImage img = ImageIO.read(image);
+		final BufferedImage thumbnail = Scalr.resize(img, width, height);
+		img.flush();
+		
+		return thumbnail;
 	}
 	
 	public static boolean isImage(String extension) {

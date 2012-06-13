@@ -24,8 +24,10 @@ public class Queries {
 	// Delete
 	public static final String DELETE_MEDIA = "DELETE FROM medias WHERE id = ?";
 	public static final String DELETE_PREVIEW = "DELETE FROM previews WHERE id = ?";
+	public static final String DELETE_ENTITY_AVATAR = "DELETE FROM avatars WHERE entityId = ?";
 	
 	// Update
 	public static final String UPDATE_MEDIA_LAST_VIEWED = "UPDATE medias SET lastViewedDate = ? WHERE id = ?";
-	public static final String UPDATE_AVATAR = "UPDATE avatars SET mediaId = ? WHERE id = ?";
+	public static final String UPDATE_MEDIA_FIELDS = "UPDATE medias SET fileName = ?, title = ?, description = ? WHERE id = ?";
+	public static final String UPDATE_AVATAR = "UPDATE avatars SET mediaId = ? WHERE entityId = ?";
 }

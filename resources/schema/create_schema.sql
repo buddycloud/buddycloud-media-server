@@ -59,3 +59,5 @@ CREATE TABLE avatars(
 	entityId TEXT NOT NULL,
 	PRIMARY KEY(id)
 );
+
+CREATE UNIQUE INDEX entity_idx ON avatars (entityId);

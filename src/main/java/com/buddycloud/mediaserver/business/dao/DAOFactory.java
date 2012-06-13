@@ -8,7 +8,6 @@ import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 public class DAOFactory {
 	
 	private MediaDAO mediaDAO;
-	private AvatarDAO avatarDAO;
 	
 	
 	private MetadataSource dataSource;
@@ -36,13 +35,4 @@ public class DAOFactory {
 		
 		return mediaDAO;
 	}
-	
-	public AvatarDAO getAvatarDAO() {
-		if (this.avatarDAO == null) {
-			avatarDAO = new AvatarDAO(dataSource, configuration);
-		}
-		
-		return avatarDAO;
-	}
-	
 }
