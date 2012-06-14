@@ -143,8 +143,6 @@ public class MediaDAO {
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 
 		if (isAvatar(mediaId)) {
-			
-			
 			return getAvatarPreview(entityId, maxHeight, maxWidth);
 		}
 
@@ -331,7 +329,7 @@ public class MediaDAO {
 		}
 
 		// store preview in another flow
-		new StorePreviewThread(previewId, mediaId, maxHeight, maxWidth, extension, previewImg).start();
+		new StorePreviewThread(previewId, mediaDirectory, mediaId, maxHeight, maxWidth, extension, previewImg).start();
 
 		dataSource.updateMediaLastViewed(mediaId);
 
@@ -463,9 +461,10 @@ public class MediaDAO {
 		private BufferedImage img;
 
 
-		StorePreviewThread(String previewId, String mediaId, Integer height, Integer width, 
+		StorePreviewThread(String previewId, String directory, String mediaId, Integer height, Integer width, 
 				String extension, BufferedImage img) {
 			this.previewId = previewId;
+			this.directory = directory;
 			this.mediaId = mediaId;
 			this.height = height;
 			this.width = width;
@@ -473,6 +472,7 @@ public class MediaDAO {
 			this.img = img;
 		}
 
+		
 		public void start() {
 			try {
 				File previewFile = ImageUtils.storeImageIntoFile(img, extension, 

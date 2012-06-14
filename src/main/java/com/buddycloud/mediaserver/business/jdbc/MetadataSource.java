@@ -277,7 +277,7 @@ public class MetadataSource {
 		
 		PreparedStatement statement;
 		try {
-			statement = prepareStatement(Queries.SAVE_AVATAR, media.getEntityId(), media.getId());
+			statement = prepareStatement(Queries.SAVE_AVATAR, media.getId(), media.getEntityId());
 
 			statement.execute();
 			statement.close();
@@ -288,7 +288,6 @@ public class MetadataSource {
 			throw new MetadataSourceException(e.getMessage(), e);
 		}
 	}
-	
 	
 	public String getEntityAvatarId(String entityId) throws MetadataSourceException {
 		LOGGER.debug("Getting current avatar id from: " + entityId);

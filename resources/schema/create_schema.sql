@@ -53,11 +53,11 @@ CREATE TABLE previews(
 	PRIMARY KEY(id)
 );
 
+CREATE SEQUENCE avatars_id_seq;
 CREATE TABLE avatars(
-	id TEXT,
+	id TEXT PRIMARY KEY DEFAULT nextval('avatars_id_seq'),
 	mediaId TEXT REFERENCES medias(id),
-	entityId TEXT NOT NULL,
-	PRIMARY KEY(id)
+	entityId TEXT NOT NULL
 );
 
 CREATE UNIQUE INDEX entity_idx ON avatars (entityId);
