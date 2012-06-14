@@ -162,7 +162,11 @@ public class MediaDAO {
 		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
 	}
 
-	public String getMediaType(String mediaId) throws MetadataSourceException {
+	public String getMediaType(String entityId, String mediaId) throws MetadataSourceException {
+		if (isAvatar(mediaId)) {
+			mediaId = dataSource.getEntityAvatarId(entityId);
+		}
+		
 		return dataSource.getMediaMimeType(mediaId);
 	}
 	

@@ -121,7 +121,7 @@ public class MediaResource extends ServerResource {
 		MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
 
 		try {
-			final MediaType mediaType = new MediaType(mediaDAO.getMediaType(mediaId));
+			final MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
 
 			if (maxHeight == null && maxWidth == null) {
 				File media = mediaDAO.getMedia(entityId, mediaId);

@@ -18,7 +18,7 @@ public class Queries {
 	public static final String GET_MEDIA = "SELECT * FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_MIME_TYPE = "SELECT mimeType FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_EXTENSION = "SELECT fileExtension FROM medias WHERE id = ?";
-	public static final String GET_ENTITY_AVATAR_ID = "SELECT mediaId FROM avatars WHERE id = ?";
+	public static final String GET_ENTITY_AVATAR_ID = "SELECT mediaId FROM avatars WHERE entityId = ?";
 	public static final String GET_MEDIA_PREVIEWS = "SELECT id FROM previews WHERE mediaId = ? AND height = ? AND width = ?";
 
 	// Delete
