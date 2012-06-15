@@ -6,7 +6,7 @@ public class FormMissingFieldException extends Exception {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = -1501256336773866438L;
+	private static final long serialVersionUID = -3440806143900550595L;
 	private String missingField;
 
 	
@@ -19,14 +19,12 @@ public class FormMissingFieldException extends Exception {
 		super(message, cause);
 	}
 
-
+	
 	public String getMissingField() {
 		return missingField;
 	}
 
-
-	public void setMissingField(String missingField) {
+	public void setSetMissingField(String missingField) {
 		this.missingField = missingField;
 	}
-	
 }

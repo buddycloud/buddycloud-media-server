@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,11 +29,13 @@ import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.ImageUtils;
 import com.buddycloud.mediaserver.commons.VideoUtils;
+import com.buddycloud.mediaserver.commons.exception.FormInvalidFieldException;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
-import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class MediaDAO {
 
@@ -45,7 +48,7 @@ public class MediaDAO {
 	MediaDAO(MetadataSource dataSource, Properties configuration) {
 		this.configuration = configuration;
 		this.dataSource = dataSource;
-		this.gson = new Gson();
+		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 	}
 	
 	public void deleteMedia(String entityId, String mediaId) 
@@ -171,7 +174,7 @@ public class MediaDAO {
 	}
 	
 	public String updateMedia(String entityId, String mediaId, Request request) 
-			throws FileUploadException, MetadataSourceException, FormMissingFieldException {
+			throws FileUploadException, MetadataSourceException, FormInvalidFieldException, MediaNotFoundException {
 		
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
@@ -192,6 +195,10 @@ public class MediaDAO {
 		
 		Media media = dataSource.getMedia(mediaId);
 		
+		if (media == null) {
+			throw new MediaNotFoundException(mediaId, entityId);
+		}
+		
 		for (FileItem item : items) {
 			final String fieldName = item.getFieldName();
 			
@@ -201,6 +208,8 @@ public class MediaDAO {
 				media.setTitle(item.getString());
 			} else if (fieldName.equals(Constants.DESC_FIELD)) {
 				media.setDescription(item.getString());
+			} else {
+				throw new FormInvalidFieldException(fieldName);
 			}
 		}
 		

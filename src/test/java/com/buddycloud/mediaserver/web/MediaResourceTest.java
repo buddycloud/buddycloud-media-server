@@ -3,6 +3,7 @@ package com.buddycloud.mediaserver.web;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.Properties;
 
 import javax.activation.MimetypesFileTypeMap;
@@ -22,6 +23,7 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public abstract class MediaResourceTest {
 	
@@ -29,6 +31,9 @@ public abstract class MediaResourceTest {
 	protected static final String TESTMEDIA_NAME = "testimage.jpg";
 	protected static final String TESTAVATAR_NAME = "testavatar.jpg";
 	protected static final String TESTFILE_PATH = "resources/tests/";
+	
+	protected static final String TEST_OUTPUT_DIR = "test";
+	protected static final String MEDIA_ID = generateRandomString();
 
 	protected static final String BASE_CHANNEL = "channel@topics.domain.com";
 	protected static final String BASE_USER = "user@domain.com";
@@ -47,10 +52,12 @@ public abstract class MediaResourceTest {
 		configuration.setProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
 		
 		dataSource = new MetadataSource(configuration);
-		gson = new Gson();
+		gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 		
 		setupComponent();
 	    testSetUp();
+	    
+	    Thread.sleep(1000);
 	}
 	
 	@After

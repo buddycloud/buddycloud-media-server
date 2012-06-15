@@ -100,6 +100,48 @@ public class MetadataSource {
 		}
 	}
 	
+	public Media getMedia(String mediaId) throws MetadataSourceException {
+		LOGGER.debug("Getting media. Media ID: " + mediaId);
+		
+		Media media = null;
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.GET_MEDIA, mediaId);
+
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				media = new Media();
+				media.setId(result.getString(1));
+				media.setFileName(result.getString(2));
+				media.setEntityId(result.getString(3));
+				media.setAuthor(result.getString(4));
+				media.setTitle(result.getString(5));
+				media.setDescription(result.getString(6));
+				media.setMimeType(result.getString(7));
+				media.setUploadedDate(result.getDate(8));
+				media.setLastViewedDate(result.getDate(9));
+				media.setFileExtension(result.getString(10));
+				media.setShaChecksum(result.getString(11));
+				media.setFileSize(result.getLong(12));
+				media.setLength(result.getLong(13));
+				media.setHeight(result.getInt(14));
+				media.setWidth(result.getInt(15));
+				
+				LOGGER.debug("Media metadata successfully fetched. Media ID: " + mediaId);
+			} else {
+				LOGGER.debug("No media with id '" + mediaId + "' found.");
+			}
+
+			statement.close();
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		}
+		
+		return media;
+	}
+	
 	public String getMediaMimeType(String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Getting media type. Media ID: " + mediaId);
 		
@@ -201,12 +243,6 @@ public class MetadataSource {
 			throw new MetadataSourceException(e.getMessage(), e);
 		}
 	}
-	
-	public Media getMedia(String mediaId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	
 	// Previews
 	
