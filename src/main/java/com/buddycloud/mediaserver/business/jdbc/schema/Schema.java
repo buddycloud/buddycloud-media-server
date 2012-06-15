@@ -11,14 +11,17 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
+import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 
-public abstract class AbstractRunSchemaScript {
+public class Schema {
 	
-	protected static final String SQL_DELIMITER = ";";
-
+	private static final String SQL_DELIMITER = ";";
+	private static final String SQL_CREATE_SCHEMA_FILE = "resources/schema/create_schema.sql";
+	private static final String SQL_DROP_SCHEMA_FILE = "resources/schema/drop_schema.sql";
+	
 	
 	@SuppressWarnings("unchecked")
-	protected static void runScript(MetadataSource dataSource, String sqlFile)
+	public void runScript(MetadataSource dataSource, String sqlFile)
 			throws IOException, FileNotFoundException, SQLException {
 		List<String> readLines = IOUtils.readLines(
 				new FileInputStream(sqlFile));
@@ -38,5 +41,18 @@ public abstract class AbstractRunSchemaScript {
 
 		connection.close();
 	}
+	
+	public void create() throws FileNotFoundException, IOException, SQLException {
+		MetadataSource dataSource = new MetadataSource(
+				ConfigurationUtils.loadConfiguration());
 
+		runScript(dataSource, SQL_CREATE_SCHEMA_FILE);
+	}
+	
+	public void drop() throws FileNotFoundException, IOException, SQLException {
+		MetadataSource dataSource = new MetadataSource(
+				ConfigurationUtils.loadConfiguration());
+
+		runScript(dataSource, SQL_DROP_SCHEMA_FILE);
+	}
 }
