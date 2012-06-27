@@ -115,7 +115,7 @@
 			<version>2.1.1e</version>
 		</dependency>
 
-		<!-- Smack -->
+		<!-- XMPP -->
 		<dependency>
 			<groupId>jivesoftware</groupId>
 			<artifactId>smack</artifactId>
@@ -126,7 +126,17 @@
 			<artifactId>smackx</artifactId>
 			<version>3.2.2</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>tinder</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.wave-protocol</groupId>
+			<artifactId>whack</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<plugins>
@@ -181,6 +191,10 @@
 		<repository>
 			<id>maven-teabot</id>
 			<url>http://maven.teabot.org</url>
+		</repository>
+		<repository>
+			<id>maven-kune</id>
+			<url>http://kune.ourproject.org/mavenrepo/</url>
 		</repository>
 	</repositories>
 </project>

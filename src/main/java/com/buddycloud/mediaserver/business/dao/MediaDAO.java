@@ -51,6 +51,7 @@ public class MediaDAO {
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 	}
 	
+	
 	public void deleteMedia(String entityId, String mediaId) 
 			throws MetadataSourceException, MediaNotFoundException {
 
