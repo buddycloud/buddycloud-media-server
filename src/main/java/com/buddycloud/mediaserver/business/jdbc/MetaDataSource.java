@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -19,15 +21,15 @@ import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-public class MetadataSource {
-	private static Logger LOGGER = Logger.getLogger(MetadataSource.class);
+public class MetaDataSource {
+	private static Logger LOGGER = Logger.getLogger(MetaDataSource.class);
 	
 	
 	private ComboPooledDataSource dataSource;
 	private Properties configuration;
 	
 
-	public MetadataSource(Properties configuration) {
+	public MetaDataSource(Properties configuration) {
 		this.configuration = configuration;
 		
 		try {
@@ -264,6 +266,33 @@ public class MetadataSource {
 		}
 	}
 	
+	public List<String> getPreviewsFromMedia(String mediaId) throws MetadataSourceException {
+		LOGGER.debug("Getting all previews from media: " + mediaId);
+		
+		List<String> previews = new LinkedList<String>();
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.GET_MEDIA_PREVIEWS, mediaId);
+
+			ResultSet result = statement.executeQuery();
+			
+			while (result.next()) {
+				String previewId = result.getString(1);
+				
+				previews.add(previewId);
+				LOGGER.debug("Preview successfuly fetched. Preview ID: " + previewId);
+			}
+
+			statement.close();
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching media previews", e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		}
+		
+		return previews;
+	}
+	
 	public String getPreviewId(String mediaId, int height, int width) throws MetadataSourceException {
 		LOGGER.debug("Getting preview from media: " + mediaId);
 		
@@ -271,7 +300,7 @@ public class MetadataSource {
 		
 		PreparedStatement statement;
 		try {
-			statement = prepareStatement(Queries.GET_MEDIA_PREVIEWS, mediaId, height, width);
+			statement = prepareStatement(Queries.GET_MEDIA_PREVIEW, mediaId, height, width);
 
 			ResultSet result = statement.executeQuery();
 			if (result.next()) {
@@ -283,7 +312,7 @@ public class MetadataSource {
 
 			statement.close();
 		} catch (SQLException e) {
-			LOGGER.error("Error while fetching entity avatar", e);
+			LOGGER.error("Error while fetching media preview", e);
 			throw new MetadataSourceException(e.getMessage(), e);
 		}
 		
@@ -302,6 +331,22 @@ public class MetadataSource {
 			LOGGER.debug("Preview metadata successfully deleted. Preview ID: " + previewId);
 		} catch (SQLException e) {
 			LOGGER.error("Error while deleting preview metadata", e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		}
+	}
+	
+	public void deletePreviewsFromMedia(String mediaId) throws MetadataSourceException {
+		LOGGER.debug("Deleting previews. Media ID: " + mediaId);
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.DELETE_PREVIEWS_FROM_MEDIA, mediaId);
+			statement.execute();
+			statement.close();
+			
+			LOGGER.debug("Previews metadata successfully deleted. Media ID: " + mediaId);
+		} catch (SQLException e) {
+			LOGGER.error("Error while deleting previews metadata", e);
 			throw new MetadataSourceException(e.getMessage(), e);
 		}
 	}

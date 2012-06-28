@@ -3,12 +3,6 @@ package com.buddycloud.mediaserver;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.restlet.Component;
 import org.restlet.Context;

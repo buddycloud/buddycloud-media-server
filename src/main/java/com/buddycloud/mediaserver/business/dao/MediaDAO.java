@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.restlet.Request;
 import org.restlet.ext.fileupload.RestletFileUpload;
 
-import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
+import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.commons.Constants;
@@ -40,12 +40,12 @@ import com.google.gson.GsonBuilder;
 public class MediaDAO {
 
 	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
-	private MetadataSource dataSource;
+	private MetaDataSource dataSource;
 	private Properties configuration;
 	private Gson gson;
 
 
-	MediaDAO(MetadataSource dataSource, Properties configuration) {
+	MediaDAO(MetaDataSource dataSource, Properties configuration) {
 		this.configuration = configuration;
 		this.dataSource = dataSource;
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
@@ -80,13 +80,29 @@ public class MediaDAO {
 			// delete avatars table entry
 			dataSource.deleteEntityAvatar(entityId);
 		}
+		
+		// delete existent previews from media
+		deletePreviews(mediaId, fullDirectoryPath);
+
 		// delete file and metadata
 		media.delete();
 		dataSource.deleteMedia(mediaId);
 
 		//TODO delete previews
 	}
-
+	
+	private void deletePreviews(String mediaId, String dirPath) throws MetadataSourceException {
+		List<String> previews = dataSource.getPreviewsFromMedia(mediaId);
+		
+		if (!previews.isEmpty()) {
+			for (String previewId : previews) {
+				File preview = new File(dirPath + File.separator + previewId);
+				preview.delete();
+			}
+			
+			dataSource.deletePreviewsFromMedia(mediaId);
+		}
+	}
 
 	public File getMedia(String entityId, String mediaId) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {

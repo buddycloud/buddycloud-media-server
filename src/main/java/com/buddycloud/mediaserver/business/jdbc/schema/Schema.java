@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 
-import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
+import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 
 public class Schema {
@@ -21,7 +21,7 @@ public class Schema {
 	
 	
 	@SuppressWarnings("unchecked")
-	public void runScript(MetadataSource dataSource, String sqlFile)
+	public void runScript(MetaDataSource dataSource, String sqlFile)
 			throws IOException, FileNotFoundException, SQLException {
 		List<String> readLines = IOUtils.readLines(
 				new FileInputStream(sqlFile));
@@ -43,14 +43,14 @@ public class Schema {
 	}
 	
 	public void create() throws FileNotFoundException, IOException, SQLException {
-		MetadataSource dataSource = new MetadataSource(
+		MetaDataSource dataSource = new MetaDataSource(
 				ConfigurationUtils.loadConfiguration());
 
 		runScript(dataSource, SQL_CREATE_SCHEMA_FILE);
 	}
 	
 	public void drop() throws FileNotFoundException, IOException, SQLException {
-		MetadataSource dataSource = new MetadataSource(
+		MetaDataSource dataSource = new MetaDataSource(
 				ConfigurationUtils.loadConfiguration());
 
 		runScript(dataSource, SQL_DROP_SCHEMA_FILE);

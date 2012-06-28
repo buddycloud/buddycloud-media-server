@@ -18,7 +18,7 @@ import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
 
-import com.buddycloud.mediaserver.business.jdbc.MetadataSource;
+import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 import com.buddycloud.mediaserver.commons.Constants;
@@ -42,7 +42,7 @@ public abstract class MediaResourceTest {
 
 	protected Component component;
 	protected Properties configuration;
-	protected MetadataSource dataSource;
+	protected MetaDataSource dataSource;
 	protected Gson gson;
 	
 	
@@ -51,7 +51,7 @@ public abstract class MediaResourceTest {
 		configuration = ConfigurationUtils.loadConfiguration();
 		configuration.setProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
 		
-		dataSource = new MetadataSource(configuration);
+		dataSource = new MetaDataSource(configuration);
 		gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 		
 		setupComponent();

@@ -19,12 +19,14 @@ public class Queries {
 	public static final String GET_MEDIA_MIME_TYPE = "SELECT mimeType FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_EXTENSION = "SELECT fileExtension FROM medias WHERE id = ?";
 	public static final String GET_ENTITY_AVATAR_ID = "SELECT mediaId FROM avatars WHERE entityId = ?";
-	public static final String GET_MEDIA_PREVIEWS = "SELECT id FROM previews WHERE mediaId = ? AND height = ? AND width = ?";
+	public static final String GET_MEDIA_PREVIEW = "SELECT id FROM previews WHERE mediaId = ? AND height = ? AND width = ?";
+	public static final String GET_MEDIA_PREVIEWS = "SELECT id FROM previews WHERE mediaId = ?";
 
 	// Delete
 	public static final String DELETE_MEDIA = "DELETE FROM medias WHERE id = ?";
 	public static final String DELETE_PREVIEW = "DELETE FROM previews WHERE id = ?";
 	public static final String DELETE_ENTITY_AVATAR = "DELETE FROM avatars WHERE entityId = ?";
+	public static final String DELETE_PREVIEWS_FROM_MEDIA = "DELETE FROM previews WHERE mediaId = ?";
 	
 	// Update
 	public static final String UPDATE_MEDIA_LAST_VIEWED = "UPDATE medias SET lastViewedDate = ? WHERE id = ?";
