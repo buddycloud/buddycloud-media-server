@@ -72,7 +72,7 @@ public abstract class MediaResourceTest {
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new MediaServerApplication(context));
+		component.getDefaultHost().attach(new TestMediaServerApplication(context));
 		
 	    component.start();  
 	}
