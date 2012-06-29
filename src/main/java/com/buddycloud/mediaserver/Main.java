@@ -6,10 +6,11 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.restlet.Component;
 import org.restlet.Context;
+import org.restlet.Server;
 import org.restlet.data.Protocol;
 import org.xmpp.component.ComponentException;
 
-import com.buddycloud.mediaserver.commons.ConfigurationUtils;
+import com.buddycloud.mediaserver.commons.ConfigurationContext;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServer;
 
@@ -18,9 +19,11 @@ public class Main {
 	
 	
 	public static void main(String[] args) {  
+		Properties configuration = ConfigurationContext.getInstance().getConfiguration();
+		
 		try {
-			startRestletComponent();
-			startXMPPComponent();
+			startRestletComponent(configuration);
+			//startXMPPComponent(configuration);
 		} catch (Exception e) {
 			LOGGER.fatal(e.getMessage(), e);
 			System.exit(1);
@@ -28,9 +31,15 @@ public class Main {
 	} 
 	
 	
-	private static void startRestletComponent() throws Exception {
+	private static void startRestletComponent(Properties configuration) throws Exception {
 	    Component component = new Component();  
-	    component.getServers().add(Protocol.HTTP, 8080);  
+	    
+	    Server server = component.getServers().add(Protocol.HTTPS, 8443);
+	    server.getContext().getParameters().add("sslContextFactory","org.restlet.ext.ssl.PkixSslContextFactory");
+	    server.getContext().getParameters().add("keystorePath", configuration.getProperty("https.keystore.path"));
+	    server.getContext().getParameters().add("keystorePassword", configuration.getProperty("https.keystore.password"));
+	    server.getContext().getParameters().add("keyPassword", configuration.getProperty("https.key.password"));
+	    server.getContext().getParameters().add("keystoreType", configuration.getProperty("https.keystore.type"));
 	    
 	    Context context = component.getContext().createChildContext();
 		component.getDefaultHost().attach(new MediaServerApplication(context));
@@ -38,8 +47,7 @@ public class Main {
 	    component.start(); 
 	}
 
-	private static void startXMPPComponent() throws Exception {
-		Properties configuration = ConfigurationUtils.loadConfiguration();
+	private static void startXMPPComponent(Properties configuration) throws Exception {
 //		XMPPConnection connection = createConnection(configuration);
 //		addTraceListeners(connection);
 		

@@ -11,7 +11,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
-import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 
 public class Schema {
 	
@@ -43,15 +42,13 @@ public class Schema {
 	}
 	
 	public void create() throws FileNotFoundException, IOException, SQLException {
-		MetaDataSource dataSource = new MetaDataSource(
-				ConfigurationUtils.loadConfiguration());
+		MetaDataSource dataSource = new MetaDataSource();
 
 		runScript(dataSource, SQL_CREATE_SCHEMA_FILE);
 	}
 	
 	public void drop() throws FileNotFoundException, IOException, SQLException {
-		MetaDataSource dataSource = new MetaDataSource(
-				ConfigurationUtils.loadConfiguration());
+		MetaDataSource dataSource = new MetaDataSource();
 
 		runScript(dataSource, SQL_DROP_SCHEMA_FILE);
 	}

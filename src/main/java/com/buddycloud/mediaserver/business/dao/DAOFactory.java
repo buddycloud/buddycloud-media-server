@@ -1,9 +1,6 @@
 package com.buddycloud.mediaserver.business.dao;
 
-import java.util.Properties;
-
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
-import com.buddycloud.mediaserver.commons.ConfigurationUtils;
 
 public class DAOFactory {
 	
@@ -11,15 +8,13 @@ public class DAOFactory {
 	
 	
 	private MetaDataSource dataSource;
-	private Properties configuration;
 
 
 	private static final DAOFactory instance = new DAOFactory();
 
 
 	private DAOFactory() {
-		this.configuration = ConfigurationUtils.loadConfiguration();
-		this.dataSource = new MetaDataSource(configuration);
+		this.dataSource = new MetaDataSource();
 	}
 	
 	
@@ -30,7 +25,7 @@ public class DAOFactory {
 	
 	public MediaDAO getMediaDAO() {
 		if (this.mediaDAO == null) {
-			mediaDAO = new MediaDAO(dataSource, configuration);
+			mediaDAO = new MediaDAO(dataSource);
 		}
 		
 		return mediaDAO;

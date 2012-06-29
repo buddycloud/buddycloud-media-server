@@ -16,6 +16,7 @@ import org.apache.log4j.Logger;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
+import com.buddycloud.mediaserver.commons.ConfigurationContext;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -29,8 +30,8 @@ public class MetaDataSource {
 	private Properties configuration;
 	
 
-	public MetaDataSource(Properties configuration) {
-		this.configuration = configuration;
+	public MetaDataSource() {
+		this.configuration = ConfigurationContext.getInstance().getConfiguration();
 		
 		try {
 			createDataSource();

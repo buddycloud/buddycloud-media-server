@@ -26,6 +26,7 @@ import org.restlet.ext.fileupload.RestletFileUpload;
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
+import com.buddycloud.mediaserver.commons.ConfigurationContext;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.ImageUtils;
 import com.buddycloud.mediaserver.commons.VideoUtils;
@@ -45,10 +46,10 @@ public class MediaDAO {
 	private Gson gson;
 
 
-	MediaDAO(MetaDataSource dataSource, Properties configuration) {
-		this.configuration = configuration;
+	MediaDAO(MetaDataSource dataSource) {
 		this.dataSource = dataSource;
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+		this.configuration = ConfigurationContext.getInstance().getConfiguration();
 	}
 	
 	
