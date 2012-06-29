@@ -23,7 +23,7 @@ public class Main {
 		
 		try {
 			startRestletComponent(configuration);
-			//startXMPPComponent(configuration);
+			startXMPPComponent(configuration);
 		} catch (Exception e) {
 			LOGGER.fatal(e.getMessage(), e);
 			System.exit(1);
@@ -48,9 +48,6 @@ public class Main {
 	}
 
 	private static void startXMPPComponent(Properties configuration) throws Exception {
-//		XMPPConnection connection = createConnection(configuration);
-//		addTraceListeners(connection);
-		
 		ExternalComponentManager componentManager = new ExternalComponentManager(
 				configuration.getProperty("xmpp.host"),
 				Integer.valueOf(configuration.getProperty("xmpp.port")));
@@ -72,7 +69,6 @@ public class Main {
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException e) {
-				LOGGER.fatal("Main loop.", e);
 				throw e;
 			}
 		}

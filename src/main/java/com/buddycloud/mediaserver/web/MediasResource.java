@@ -19,7 +19,7 @@ public class MediasResource extends ServerResource {
 	@Post
 	public Representation postMedia(Representation entity) {
 		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
-
+		
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				
