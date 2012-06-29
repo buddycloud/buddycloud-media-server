@@ -45,7 +45,7 @@ public class MediaServerApplication extends Application {
 	private DigestAuthenticator getDigestAuthenticator() {
 		DigestAuthenticator auth = new DigestAuthenticator(getContext(), REALM, "secret");
 		auth.setOptional(true);
-	    auth.setWrappedVerifier(new MediaServerVerifier());
+	    auth.setVerifier(new MediaServerVerifier());
 	    
 	    return auth;
 	}

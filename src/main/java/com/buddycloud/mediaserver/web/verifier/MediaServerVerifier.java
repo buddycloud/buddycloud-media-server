@@ -1,14 +1,13 @@
 package com.buddycloud.mediaserver.web.verifier;
 
-import org.restlet.security.LocalVerifier;
+import org.restlet.security.SecretVerifier;
 
-public class MediaServerVerifier extends LocalVerifier {
-
+public class MediaServerVerifier extends SecretVerifier {
+	
 	@Override
-	public char[] getLocalSecret(String identifier) {
-		//TODO get "identifier" password
-		
-		return null;
+	public int verify(String identifier, char[] secret) {
+		// TODO XMPP component asks client about the "transaction id"
+		return 0;
 	}
 
 }
