@@ -12,7 +12,7 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.web.MediaResourceTest;
 
-public class DeleteMediaTest extends MediaResourceTest {
+public class DeleteAvatarTest extends MediaResourceTest {
 	
 	private File fileToDelete;
 	
@@ -27,18 +27,19 @@ public class DeleteMediaTest extends MediaResourceTest {
 		}
 		
 		fileToDelete = new File(destDir + File.separator + MEDIA_ID);
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTMEDIA_NAME), fileToDelete);
+		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME), fileToDelete);
 		
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTMEDIA_NAME);
+		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTAVATAR_NAME);
 		dataSource.storeMedia(media);
+		dataSource.storeAvatar(media);
 	}
 	
 	@Test
 	public void anonymousSuccessfulDelete() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/avatar");
 		
 		client.delete();
-		
+
 		Assert.assertFalse(fileToDelete.exists());
 	}
 }

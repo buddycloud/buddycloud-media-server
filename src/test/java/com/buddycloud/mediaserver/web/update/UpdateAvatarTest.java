@@ -16,12 +16,13 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.web.MediaResourceTest;
 
-public class UpdateMediaTest extends MediaResourceTest {
+public class UpdateAvatarTest extends MediaResourceTest {
 	
 	public void testTearDown() throws Exception {
 		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 		
+		dataSource.deleteEntityAvatar(BASE_CHANNEL);
 		dataSource.deleteMedia(MEDIA_ID);
 	}
 	
@@ -32,19 +33,20 @@ public class UpdateMediaTest extends MediaResourceTest {
 			FileUtils.cleanDirectory(destDir);
 		}
 		
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTMEDIA_NAME), new File(destDir + File.separator + MEDIA_ID));
+		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME), new File(destDir + File.separator + MEDIA_ID));
 		
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTMEDIA_NAME);
+		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTAVATAR_NAME);
 		dataSource.storeMedia(media);
+		dataSource.storeAvatar(media);
 	}
 	
 	@Test
-	public void anonymousSuccessfulUpload() throws Exception {
+	public void anonymousSuccessfulUpdate() throws Exception {
 		// file fields
-		String title = "New Image";
-		String description = "New Description";
+		String title = "New Avatar";
+		String description = "New Avatar Description";
 
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/avatar");
 
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);

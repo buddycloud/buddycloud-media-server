@@ -45,20 +45,20 @@ public class MediaResource extends ServerResource {
 							MediaType.APPLICATION_JSON);
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				} catch (MetadataSourceException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				} catch (FormMissingFieldException e) {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				}
 			}
 		}
 
 		// POST request with no entity.
 		setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-		return new StringRepresentation("POST request with no entity", MediaType.TEXT_PLAIN);
+		return new StringRepresentation("POST request with no entity", MediaType.APPLICATION_JSON);
 	}
 
 	@Delete
@@ -70,13 +70,13 @@ public class MediaResource extends ServerResource {
 
 		try {
 			mediaDAO.deleteMedia(entityId, mediaId);
-			return new StringRepresentation("Media deleted", MediaType.TEXT_PLAIN);
+			return new StringRepresentation("Media deleted", MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		} catch (MediaNotFoundException e) {
 			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		}
 	}
 
@@ -95,23 +95,23 @@ public class MediaResource extends ServerResource {
 							MediaType.APPLICATION_JSON);
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				} catch (MetadataSourceException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				} catch (FormInvalidFieldException e) {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				} catch (MediaNotFoundException e) {
 					setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-					return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				}
 			}
 		}
 
 		// POST request with no entity.
 		setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-		return new StringRepresentation("POST request with no entity", MediaType.TEXT_PLAIN);
+		return new StringRepresentation("POST request with no entity", MediaType.APPLICATION_JSON);
 	}
 
 	@Get
@@ -145,16 +145,16 @@ public class MediaResource extends ServerResource {
 			return new DynamicFileRepresentation(mediaType, preview);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		} catch (IOException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);	
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);	
 		} catch (MediaNotFoundException e) {
 			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		} catch (InvalidPreviewFormatException e) {
 			setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
-			return new StringRepresentation(e.getMessage(), MediaType.TEXT_PLAIN);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		}
 	}
 }
