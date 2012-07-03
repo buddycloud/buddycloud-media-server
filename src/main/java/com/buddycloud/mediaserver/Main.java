@@ -11,7 +11,7 @@ import org.restlet.data.Protocol;
 import org.xmpp.component.ComponentException;
 
 import com.buddycloud.mediaserver.commons.ConfigurationContext;
-import com.buddycloud.mediaserver.web.MediaServerApplication;
+import com.buddycloud.mediaserver.web.TestMediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServer;
 
 public class Main {
@@ -42,7 +42,7 @@ public class Main {
 	    server.getContext().getParameters().add("keystoreType", configuration.getProperty("https.keystore.type"));
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new MediaServerApplication(context));
+		component.getDefaultHost().attach(new TestMediaServerApplication(context));
 		
 	    component.start(); 
 	}
