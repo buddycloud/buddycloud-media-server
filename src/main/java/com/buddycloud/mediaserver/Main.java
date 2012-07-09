@@ -3,6 +3,12 @@ package com.buddycloud.mediaserver;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.restlet.Component;
 import org.restlet.Context;
@@ -48,6 +54,9 @@ public class Main {
 	}
 
 	private static void startXMPPComponent(Properties configuration) throws Exception {
+		XMPPConnection connection = createConnection(configuration);
+		addTraceListeners(connection);
+		
 		ExternalComponentManager componentManager = new ExternalComponentManager(
 				configuration.getProperty("xmpp.host"),
 				Integer.valueOf(configuration.getProperty("xmpp.port")));
@@ -64,7 +73,6 @@ public class Main {
 			throw e;
 		}
 		
-		
 		while (true) {
 			try {
 				Thread.sleep(10000);
@@ -72,5 +80,48 @@ public class Main {
 				throw e;
 			}
 		}
+	}
+	
+	private static void addTraceListeners(XMPPConnection connection) {
+		PacketFilter iqFilter = new PacketFilter() {
+			@Override
+			public boolean accept(Packet arg0) {
+				return arg0 instanceof IQ;
+			}
+		};
+
+		connection.addPacketSendingListener(new PacketListener() {
+			@Override
+			public void processPacket(Packet arg0) {
+				LOGGER.debug("S: " + arg0.toXML());
+			}
+		}, iqFilter);
+
+		connection.addPacketListener(new PacketListener() {
+
+			@Override
+			public void processPacket(Packet arg0) {
+				LOGGER.debug("R: " + arg0.toXML());
+			}
+		}, iqFilter);
+	}
+
+	private static XMPPConnection createConnection(Properties configuration)
+			throws Exception {
+		
+		String serviceName = configuration.getProperty("crawler.xmpp.servicename");
+		String host = configuration.getProperty("crawler.xmpp.host");
+		String userName = configuration.getProperty("crawler.xmpp.username");
+		
+		ConnectionConfiguration cc = new ConnectionConfiguration(
+				host,
+				Integer.parseInt(configuration.getProperty("crawler.xmpp.port")),
+				serviceName);
+		
+		XMPPConnection connection = new XMPPConnection(cc);
+		connection.connect();
+		connection.login(userName, configuration.getProperty("crawler.xmpp.password"));
+		
+		return connection;
 	}
 }
