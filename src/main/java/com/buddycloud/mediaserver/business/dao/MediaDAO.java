@@ -35,6 +35,8 @@ import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubController;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -42,12 +44,14 @@ public class MediaDAO {
 
 	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
 	private MetaDataSource dataSource;
+	private PubSubController pubsub;
 	private Properties configuration;
 	private Gson gson;
 
 
-	MediaDAO(MetaDataSource dataSource) {
-		this.dataSource = dataSource;
+	MediaDAO() {
+		this.dataSource = new MetaDataSource();
+		this.pubsub = XMPPToolBox.getInstance().getPubSubController();
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 		this.configuration = ConfigurationContext.getInstance().getConfiguration();
 	}
@@ -60,7 +64,7 @@ public class MediaDAO {
 		if (isAvatar) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
 		}
-
+		
 		//TODO authentication
 /*
  * if (!isChannelPublic)

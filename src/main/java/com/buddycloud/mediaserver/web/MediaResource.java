@@ -17,8 +17,8 @@ import org.restlet.resource.ServerResource;
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.FormInvalidFieldException;
+import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -38,7 +38,7 @@ public class MediaResource extends ServerResource {
 					setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
 				}
 
-				MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
+				MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 				try {
 					return new StringRepresentation(mediaDAO.insertMedia(entityId, getRequest(), true), 
@@ -66,7 +66,7 @@ public class MediaResource extends ServerResource {
 		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
-		MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
+		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
 			mediaDAO.deleteMedia(entityId, mediaId);
@@ -88,7 +88,7 @@ public class MediaResource extends ServerResource {
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 
-				MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
+				MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 				try {
 					return new StringRepresentation(mediaDAO.updateMedia(entityId, mediaId, getRequest()), 
@@ -122,7 +122,7 @@ public class MediaResource extends ServerResource {
 		String maxHeight = getQueryValue(Constants.MAX_HEIGHT_QUERY);
 		String maxWidth = getQueryValue(Constants.MAX_WIDTH_QUERY);
 
-		MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
+		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
 			final MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));

@@ -23,7 +23,7 @@ public class MediasResource extends ServerResource {
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				
-				MediaDAO mediaDAO = DAOFactory.getInstance().getMediaDAO();
+				MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 				
 				try {
 					return new StringRepresentation(mediaDAO.insertMedia(entityId, getRequest(), false), 

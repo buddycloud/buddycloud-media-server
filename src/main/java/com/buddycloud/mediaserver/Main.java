@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
@@ -17,8 +18,10 @@ import org.restlet.data.Protocol;
 import org.xmpp.component.ComponentException;
 
 import com.buddycloud.mediaserver.commons.ConfigurationContext;
-import com.buddycloud.mediaserver.web.TestMediaServerApplication;
+import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
+import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServer;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class Main {
 	private static Logger LOGGER = Logger.getLogger(Main.class);
@@ -30,6 +33,7 @@ public class Main {
 		try {
 			startRestletComponent(configuration);
 			startXMPPComponent(configuration);
+			createPubSubController(configuration);
 		} catch (Exception e) {
 			LOGGER.fatal(e.getMessage(), e);
 			System.exit(1);
@@ -48,15 +52,12 @@ public class Main {
 	    server.getContext().getParameters().add("keystoreType", configuration.getProperty("https.keystore.type"));
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new TestMediaServerApplication(context));
+		component.getDefaultHost().attach(new MediaServerApplication(context));
 		
 	    component.start(); 
 	}
 
 	private static void startXMPPComponent(Properties configuration) throws Exception {
-		XMPPConnection connection = createConnection(configuration);
-		addTraceListeners(connection);
-		
 		ExternalComponentManager componentManager = new ExternalComponentManager(
 				configuration.getProperty("xmpp.host"),
 				Integer.valueOf(configuration.getProperty("xmpp.port")));
@@ -65,9 +66,10 @@ public class Main {
 		componentManager.setSecretKey(subdomain, 
 				configuration.getProperty("xmpp.secretkey"));
 		
+		MediaServer mediaServer = XMPPToolBox.getInstance().createMediaServerComponent();
+		
 		try {
-			componentManager.addComponent(subdomain, 
-					new MediaServer(configuration));
+			componentManager.addComponent(subdomain, mediaServer);
 		} catch (ComponentException e) {
 			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
 			throw e;
@@ -80,6 +82,13 @@ public class Main {
 				throw e;
 			}
 		}
+	}
+	
+	private static void createPubSubController(Properties configuration) {
+		XMPPConnection connection = createAndStartConnection(configuration);
+		addTraceListeners(connection);
+		
+		XMPPToolBox.getInstance().createPubSubController(connection);
 	}
 	
 	private static void addTraceListeners(XMPPConnection connection) {
@@ -106,21 +115,27 @@ public class Main {
 		}, iqFilter);
 	}
 
-	private static XMPPConnection createConnection(Properties configuration)
-			throws Exception {
+	private static XMPPConnection createAndStartConnection(Properties configuration) {
 		
-		String serviceName = configuration.getProperty("crawler.xmpp.servicename");
-		String host = configuration.getProperty("crawler.xmpp.host");
-		String userName = configuration.getProperty("crawler.xmpp.username");
+		String serviceName = configuration.getProperty("xmpp.connection.servicename");
+		String host = configuration.getProperty("xmpp.connection.host");
+		String userName = configuration.getProperty("xmpp.connection.username");
 		
 		ConnectionConfiguration cc = new ConnectionConfiguration(
 				host,
-				Integer.parseInt(configuration.getProperty("crawler.xmpp.port")),
+				Integer.parseInt(configuration.getProperty("xmpp.connection.port")),
 				serviceName);
 		
 		XMPPConnection connection = new XMPPConnection(cc);
-		connection.connect();
-		connection.login(userName, configuration.getProperty("crawler.xmpp.password"));
+		try {
+			connection.connect();
+			connection.login(userName, configuration.getProperty("xmpp.connection.password"));
+		} catch (XMPPException e) {
+			LOGGER.fatal("XMPP connection coudn't be started", e);
+			throw new CreateXMPPConnectionException(e.getMessage(), e);
+		}
+		
+		addTraceListeners(connection);
 		
 		return connection;
 	}

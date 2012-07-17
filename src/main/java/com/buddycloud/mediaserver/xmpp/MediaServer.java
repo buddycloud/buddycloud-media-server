@@ -1,7 +1,5 @@
 package com.buddycloud.mediaserver.xmpp;
 
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.packet.Packet;
@@ -14,9 +12,7 @@ public class MediaServer extends AbstractComponent {
 	private static Logger LOGGER = Logger.getLogger(MediaServer.class);
 
 	
-	public MediaServer(Properties configuration) {
-		
-	}
+	MediaServer() {}
 	
 	
 	@Override
