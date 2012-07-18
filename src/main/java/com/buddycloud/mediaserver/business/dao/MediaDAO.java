@@ -30,13 +30,19 @@ import com.buddycloud.mediaserver.commons.ConfigurationContext;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.ImageUtils;
 import com.buddycloud.mediaserver.commons.VideoUtils;
+import com.buddycloud.mediaserver.commons.exception.FormFieldException;
 import com.buddycloud.mediaserver.commons.exception.FormInvalidFieldException;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubController;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.MemberDecorator;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.ModeratorDecorator;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.OwnerDecorator;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.PublisherDecorator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -55,24 +61,27 @@ public class MediaDAO {
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 		this.configuration = ConfigurationContext.getInstance().getConfiguration();
 	}
-	
-	
-	public void deleteMedia(String entityId, String mediaId) 
-			throws MetadataSourceException, MediaNotFoundException {
+
+
+	public void deleteMedia(String userId, String entityId, String mediaId) 
+			throws MetadataSourceException, MediaNotFoundException, UserNotAllowedException {
 
 		boolean isAvatar = isAvatar(mediaId);
 		if (isAvatar) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
 		}
-		
-		//TODO authentication
-/*
- * if (!isChannelPublic)
- * 	if (!isProducer && !isFollower && !isFollower+Post)
- * 		return
- */
 
-		LOGGER.debug("Deleting media. Media ID: " + mediaId);
+		boolean isUploader = dataSource.getMediaUploader(mediaId).equals(userId);
+
+		if (!isUploader) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+					new OwnerDecorator(new ModeratorDecorator()));
+
+			if (!isUserAllowed) {
+				LOGGER.debug("User '" + userId + "' not allowed to peform delete operation on: " + mediaId);
+				throw new UserNotAllowedException(userId);
+			}
+		}
 
 		String fullDirectoryPath = getDirectory(entityId);
 		File media = new File(fullDirectoryPath + File.separator + mediaId);
@@ -80,48 +89,49 @@ public class MediaDAO {
 		if (!media.exists()) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
-		
+
+		LOGGER.debug("Deleting media. Media ID: " + mediaId);
+
 		if (isAvatar) {
 			// delete avatars table entry
 			dataSource.deleteEntityAvatar(entityId);
 		}
-		
+
 		// delete existent previews from media
 		deletePreviews(mediaId, fullDirectoryPath);
 
 		// delete file and metadata
 		media.delete();
 		dataSource.deleteMedia(mediaId);
-
-		//TODO delete previews
 	}
-	
+
 	private void deletePreviews(String mediaId, String dirPath) throws MetadataSourceException {
 		List<String> previews = dataSource.getPreviewsFromMedia(mediaId);
-		
+
 		if (!previews.isEmpty()) {
 			for (String previewId : previews) {
 				File preview = new File(dirPath + File.separator + previewId);
 				preview.delete();
 			}
-			
+
 			dataSource.deletePreviewsFromMedia(mediaId);
 		}
 	}
 
-	public File getMedia(String entityId, String mediaId) 
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+	public File getMedia(String userId, String entityId, String mediaId) 
+			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatar(entityId);
 		}
 
-		//TODO authentication
-/*
- * if (!isChannelPublic)
- * 	if (!isProducer && !isFollower && !isFollower+Post)
- * 		return
- */
+		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+
+		if (!isUserAllowed) {
+			LOGGER.debug("User '" + userId + "' not allowed to peform delete operation on: " + mediaId);
+			throw new UserNotAllowedException(userId);
+		}
 
 		LOGGER.debug("Getting media. Media ID: " + mediaId);
 
@@ -157,31 +167,37 @@ public class MediaDAO {
 
 		return media;
 	}
-	
-	public byte[] getMediaPreview(String entityId, String mediaId, Integer size) 
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 
-		return getMediaPreview(entityId, mediaId, size, size);
+	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer size) 
+			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
+
+		return getMediaPreview(userId, entityId, mediaId, size, size);
 	}
-	
-	public byte[] getMediaPreview(String entityId, String mediaId, Integer maxHeight, Integer maxWidth) 
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+
+	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer maxHeight, Integer maxWidth) 
+			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
-			return getAvatarPreview(entityId, maxHeight, maxWidth);
+			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
 		}
 
-		//TODO authentication
+		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+		
+		if (!isUserAllowed) {
+			LOGGER.debug("User '" + userId + "' not allowed to get media on: " + entityId);
+			throw new UserNotAllowedException(userId);
+		}
 
 		LOGGER.debug("Getting media preview. Media ID: " + mediaId);
 
 		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
 	}
 
-	public byte[] getAvatarPreview(String entityId, Integer maxHeight, Integer maxWidth)
+	public byte[] getAvatarPreview(String userId, String entityId, Integer maxHeight, Integer maxWidth)
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
-
+		
 		LOGGER.debug("Getting avatar preview. Avatar ID: " + entityId);
 
 		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
@@ -191,39 +207,45 @@ public class MediaDAO {
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
 		}
-		
+
 		return dataSource.getMediaMimeType(mediaId);
 	}
-	
-	public String updateMedia(String entityId, String mediaId, Request request) 
-			throws FileUploadException, MetadataSourceException, FormInvalidFieldException, MediaNotFoundException {
-		
+
+	public String updateMedia(String userId, String entityId, String mediaId, Request request) 
+			throws FileUploadException, MetadataSourceException, FormFieldException, MediaNotFoundException, UserNotAllowedException {
+
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
 		}
-		
-		//TODO authentication
-		/*
-		 * if (!isChannelPublic)
-		 * 	if (!isProducer && !isFollower && !isFollower+Post)
-		 * 		return
-		 */
-		
+
+		boolean isUploader = dataSource.getMediaUploader(mediaId).equals(userId);
+		boolean isMember = pubsub.matchUserCapability(userId, entityId, new MemberDecorator());
+
+		if (!(isUploader && isMember)) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+					new OwnerDecorator(new ModeratorDecorator()));
+
+			if (!isUserAllowed) {
+				LOGGER.debug("User '" + userId + "' not allowed to peform delete operation on: " + mediaId);
+				throw new UserNotAllowedException(userId);
+			}
+		}
+
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(Constants.MEDIA_SIZE_LIMIT_PROPERTY)));
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
-		
+
 		Media media = dataSource.getMedia(mediaId);
-		
+
 		if (media == null) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
-		
+
 		for (FileItem item : items) {
 			final String fieldName = item.getFieldName();
-			
+
 			if (fieldName.equals(Constants.NAME_FIELD)) {
 				media.setFileName(item.getString());
 			} else if (fieldName.equals(Constants.TITLE_FIELD)) {
@@ -234,23 +256,25 @@ public class MediaDAO {
 				throw new FormInvalidFieldException(fieldName);
 			}
 		}
-		
+
 		dataSource.updateMediaFields(media);
 		LOGGER.debug("Media sucessfully updated. Media ID: " + media.getId());
 
 		return gson.toJson(media); 
 	}
-	
-	
-	public String insertMedia(String entityId, Request request, boolean isAvatar) 
-			throws FileUploadException, MetadataSourceException, FormMissingFieldException {
-		//TODO authentication
-		/*
-		 * if (!isChannelPublic)
-		 * 	if (!isProducer && !isFollower && !isFollower+Post)
-		 * 		return
-		 */
-		
+
+
+	public String insertMedia(String userId, String entityId, Request request, boolean isAvatar) 
+			throws FileUploadException, MetadataSourceException, FormFieldException, UserNotAllowedException {
+
+		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
+
+		if (!isUserAllowed) {
+			LOGGER.debug("User '" + userId + "' not allowed to uploade file on: " + entityId);
+			throw new UserNotAllowedException(userId);
+		}
+
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(Constants.MEDIA_SIZE_LIMIT_PROPERTY)));
 
@@ -261,6 +285,11 @@ public class MediaDAO {
 		String title = getFormField(items, Constants.TITLE_FIELD);
 		String description = getFormField(items, Constants.DESC_FIELD);
 		String author = getFormField(items, Constants.AUTHOR_FIELD);
+
+		if (!author.equals(userId)) {
+			new FormFieldException("User '" + userId + "' tried to upload media as '" + author + "'");
+		}
+
 		InputStream inputStream = getFileFormField(items);
 
 		Media media = storeMedia(fileName, title, description, author, entityId, inputStream, isAvatar);
@@ -269,7 +298,7 @@ public class MediaDAO {
 
 		return gson.toJson(media); 
 	}
-	
+
 	private Media storeMedia(String fileName, String title, String description, String author,
 			String entityId, InputStream inputStream, final boolean isAvatar) throws FileUploadException {
 
@@ -280,7 +309,7 @@ public class MediaDAO {
 		String mediaId = RandomStringUtils.randomAlphanumeric(20);
 		String filePath = directory + File.separator + mediaId;
 		File file = new File(filePath);
-		
+
 		LOGGER.debug("Storing new media: " + file.getAbsolutePath());
 
 		try {
@@ -304,7 +333,7 @@ public class MediaDAO {
 
 		final Media media = createMedia(mediaId, fileName, title, description, 
 				author, entityId, file);
-		
+
 		// store media metadata
 		new Thread() {
 			public void start() {
@@ -325,7 +354,7 @@ public class MediaDAO {
 
 		return media;
 	}
-	
+
 	private byte[] getPreview(String entityId, String mediaId, Integer maxHeight, Integer maxWidth, String mediaDirectory)  
 			throws MetadataSourceException, IOException, InvalidPreviewFormatException, MediaNotFoundException {
 		File media = new File(mediaDirectory + File.separator + mediaId);
@@ -370,7 +399,7 @@ public class MediaDAO {
 
 		return ImageUtils.imageToBytes(previewImg, extension);
 	}
-	
+
 	private boolean isAvatar(String mediaId) {
 		return mediaId.equals(Constants.AVATAR_ARG);
 	}
@@ -507,7 +536,7 @@ public class MediaDAO {
 			this.img = img;
 		}
 
-		
+
 		public void start() {
 			try {
 				File previewFile = ImageUtils.storeImageIntoFile(img, extension, 

@@ -16,6 +16,7 @@ public class Queries {
 	
 	// Select
 	public static final String GET_MEDIA = "SELECT * FROM medias WHERE id = ?";
+	public static final String GET_MEDIA_UPLOADER = "SELECT author FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_MIME_TYPE = "SELECT mimeType FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_EXTENSION = "SELECT fileExtension FROM medias WHERE id = ?";
 	public static final String GET_ENTITY_AVATAR_ID = "SELECT mediaId FROM avatars WHERE entityId = ?";

@@ -163,7 +163,7 @@ public class PubSubController {
 		return affiliations;
 	}
 	
-	public boolean isUserAllowed(String userId, String entityId, CapabilitiesDecorator capability) {
+	public boolean matchUserCapability(String userId, String entityId, CapabilitiesDecorator capability) {
 		Node node = resolveNode(entityId);
 		
 		if (node != null) {

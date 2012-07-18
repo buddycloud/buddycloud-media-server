@@ -10,8 +10,9 @@ import org.restlet.resource.ServerResource;
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
+import com.buddycloud.mediaserver.commons.exception.FormFieldException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 
 
 public class MediasResource extends ServerResource {
@@ -25,8 +26,10 @@ public class MediasResource extends ServerResource {
 				
 				MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 				
+				String userId = getRequest().getChallengeResponse().getIdentifier();
+				
 				try {
-					return new StringRepresentation(mediaDAO.insertMedia(entityId, getRequest(), false), 
+					return new StringRepresentation(mediaDAO.insertMedia(userId, entityId, getRequest(), false), 
 									MediaType.APPLICATION_JSON);
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
@@ -34,8 +37,11 @@ public class MediasResource extends ServerResource {
 				} catch (MetadataSourceException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
 					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
-				} catch (FormMissingFieldException e) {
+				} catch (FormFieldException e) {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
+				} catch (UserNotAllowedException e) {
+					setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				}
 			}

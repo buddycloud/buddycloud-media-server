@@ -145,6 +145,32 @@ public class MetaDataSource {
 		return media;
 	}
 	
+	public String getMediaUploader(String mediaId) throws MetadataSourceException {
+		LOGGER.debug("Getting media uploader. Media ID: " + mediaId);
+		
+		String uploader = null;
+		
+		PreparedStatement statement;
+		try {
+			statement = prepareStatement(Queries.GET_MEDIA_UPLOADER, mediaId);
+
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				uploader = result.getString(1); 
+				LOGGER.debug("Media metadata successfully fetched. Media ID: " + mediaId);
+			} else {
+				LOGGER.debug("No media with id '" + mediaId + "' found.");
+			}
+
+			statement.close();
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		}
+		
+		return uploader;
+	}
+	
 	public String getMediaMimeType(String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Getting media type. Media ID: " + mediaId);
 		

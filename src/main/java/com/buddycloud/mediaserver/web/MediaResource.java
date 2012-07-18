@@ -17,11 +17,11 @@ import org.restlet.resource.ServerResource;
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.FormInvalidFieldException;
-import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
+import com.buddycloud.mediaserver.commons.exception.FormFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 
 
@@ -39,9 +39,11 @@ public class MediaResource extends ServerResource {
 				}
 
 				MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
+				
+				String userId = getRequest().getChallengeResponse().getIdentifier();
 
 				try {
-					return new StringRepresentation(mediaDAO.insertMedia(entityId, getRequest(), true), 
+					return new StringRepresentation(mediaDAO.insertMedia(userId, entityId, getRequest(), true), 
 							MediaType.APPLICATION_JSON);
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
@@ -49,8 +51,11 @@ public class MediaResource extends ServerResource {
 				} catch (MetadataSourceException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
 					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
-				} catch (FormMissingFieldException e) {
+				} catch (FormFieldException e) {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
+				} catch (UserNotAllowedException e) {
+					setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				}
 			}
@@ -67,15 +72,19 @@ public class MediaResource extends ServerResource {
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
+		
+		String userId = getRequest().getChallengeResponse().getIdentifier();
 		try {
-			mediaDAO.deleteMedia(entityId, mediaId);
+			mediaDAO.deleteMedia(userId, entityId, mediaId);
 			return new StringRepresentation("Media deleted", MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		} catch (MediaNotFoundException e) {
 			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
+		} catch (UserNotAllowedException e) {
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		}
 	}
@@ -89,9 +98,10 @@ public class MediaResource extends ServerResource {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 
 				MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
+				
+				String userId = getRequest().getChallengeResponse().getIdentifier();
 				try {
-					return new StringRepresentation(mediaDAO.updateMedia(entityId, mediaId, getRequest()), 
+					return new StringRepresentation(mediaDAO.updateMedia(userId, entityId, mediaId, getRequest()), 
 							MediaType.APPLICATION_JSON);
 				} catch (FileUploadException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
@@ -99,11 +109,14 @@ public class MediaResource extends ServerResource {
 				} catch (MetadataSourceException e) {
 					setStatus(Status.SERVER_ERROR_INTERNAL);
 					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
-				} catch (FormInvalidFieldException e) {
+				} catch (FormFieldException e) {
 					setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				} catch (MediaNotFoundException e) {
 					setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
+				} catch (UserNotAllowedException e) {
+					setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 					return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 				}
 			}
@@ -126,20 +139,21 @@ public class MediaResource extends ServerResource {
 
 		try {
 			final MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
+			String userId = getRequest().getChallengeResponse().getIdentifier();
 
 			if (maxHeight == null && maxWidth == null) {
-				File media = mediaDAO.getMedia(entityId, mediaId);
+				File media = mediaDAO.getMedia(userId, entityId, mediaId);
 				return new FileRepresentation(media, mediaType);
 			}
-
+			
 			byte[] preview = null;
 
 			if (maxHeight != null && maxWidth == null) {
-				preview = mediaDAO.getMediaPreview(entityId, mediaId, Integer.valueOf(maxHeight));
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, Integer.valueOf(maxHeight));
 			} else if (maxHeight == null && maxWidth != null) {
-				preview = mediaDAO.getMediaPreview(entityId, mediaId, Integer.valueOf(maxWidth));
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, Integer.valueOf(maxWidth));
 			} else {
-				preview = mediaDAO.getMediaPreview(entityId, mediaId, Integer.valueOf(maxHeight), Integer.valueOf(maxWidth));
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, Integer.valueOf(maxHeight), Integer.valueOf(maxWidth));
 			}
 
 			return new DynamicFileRepresentation(mediaType, preview);
@@ -154,6 +168,9 @@ public class MediaResource extends ServerResource {
 			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		} catch (InvalidPreviewFormatException e) {
 			setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
+		} catch (UserNotAllowedException e) {
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
 		}
 	}

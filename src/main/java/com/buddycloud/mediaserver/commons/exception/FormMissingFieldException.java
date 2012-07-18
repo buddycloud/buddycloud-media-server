@@ -1,30 +1,26 @@
 package com.buddycloud.mediaserver.commons.exception;
 
-public class FormMissingFieldException extends Exception {
+public class FormMissingFieldException extends FormFieldException {
 
 	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -3440806143900550595L;
-	private String missingField;
+	private String field;
 
 	
-	public FormMissingFieldException(String missingField) {
-		super("multipart/form-data missing field: '" + missingField + "'");
-		this.missingField = missingField;
+	public FormMissingFieldException(String field) {
+		super("multipart/form-data missing field: '" + field + "'");
+		this.field = field;
 	}
 	
-	public FormMissingFieldException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
 	
-	public String getMissingField() {
-		return missingField;
+	public String getField() {
+		return field;
 	}
 
-	public void setSetMissingField(String missingField) {
-		this.missingField = missingField;
+	public void setSetField(String missingField) {
+		this.field = missingField;
 	}
 }
