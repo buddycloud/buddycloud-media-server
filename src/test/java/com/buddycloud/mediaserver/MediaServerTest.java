@@ -1,4 +1,4 @@
-package com.buddycloud.mediaserver.web;
+package com.buddycloud.mediaserver;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -15,10 +15,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.Component;
-import org.restlet.Context;
-import org.restlet.data.Protocol;
 
-import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.ConfigurationContext;
@@ -26,7 +23,7 @@ import com.buddycloud.mediaserver.commons.Constants;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public abstract class MediaResourceTest {
+public abstract class MediaServerTest {
 	
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
 	protected static final String TESTMEDIA_NAME = "testimage.jpg";
@@ -37,13 +34,13 @@ public abstract class MediaResourceTest {
 	protected static final String MEDIA_ID = generateRandomString();
 
 	protected static final String BASE_PASSWORD = "secret";
-	protected static final String BASE_CHANNEL = "channel@topics.domain.com";
+	//protected static final String BASE_CHANNEL = "team@topics.buddycloud.org";
+	protected static final String BASE_CHANNEL = "topics@topics.buddycloud.org";
 	protected static final String BASE_USER = "user@domain.com";
 	protected static final String BASE_URL = "http://localhost:8080";
 	
 
 	protected Component component;
-	protected TestMediaDAO dao;
 	protected Properties configuration;
 	protected MetaDataSource dataSource;
 	protected Gson gson;
@@ -70,22 +67,9 @@ public abstract class MediaResourceTest {
 		testTearDown();
 	}
 	
-	private void start() throws Exception{
-		startRestletComponent();
-		
-		dao = new TestMediaDAO(dataSource, new TestPubSubController(null), configuration, gson);
-		
-		DAOFactory.getInstance().setDAO(dao);
-	}
-	
-	private void startRestletComponent() throws Exception {
-		component = new Component();  
-	    component.getServers().add(Protocol.HTTP, 8080);  
-	    
-	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new TestMediaServerApplication(context));
-		
-	    component.start();  
+	protected void start() throws Exception {
+		component = new RestletTest().start();
+		new XMPPTest().start(configuration);
 	}
 	
 	protected Media buildMedia(String mediaId, String filePath) throws Exception {

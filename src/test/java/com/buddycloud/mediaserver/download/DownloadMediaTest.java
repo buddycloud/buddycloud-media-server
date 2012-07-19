@@ -1,4 +1,4 @@
-package com.buddycloud.mediaserver.web.download;
+package com.buddycloud.mediaserver.download;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,9 +12,9 @@ import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.web.MediaResourceTest;
+import com.buddycloud.mediaserver.MediaServerTest;
 
-public class DownloadMediaTest extends MediaResourceTest {
+public class DownloadMediaTest extends MediaServerTest {
 	
 	private static final String TEST_OUTPUT_DIR = "test";
 

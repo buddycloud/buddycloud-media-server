@@ -1,4 +1,4 @@
-package com.buddycloud.mediaserver.web.update;
+package com.buddycloud.mediaserver.update;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -15,9 +15,9 @@ import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.web.MediaResourceTest;
+import com.buddycloud.mediaserver.MediaServerTest;
 
-public class UpdateAvatarTest extends MediaResourceTest {
+public class UpdateAvatarTest extends MediaServerTest {
 	
 	public void testTearDown() throws Exception {
 		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 

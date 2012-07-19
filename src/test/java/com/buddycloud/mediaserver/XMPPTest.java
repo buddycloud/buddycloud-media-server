@@ -11,70 +11,38 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.whack.ExternalComponentManager;
-import org.restlet.Component;
-import org.restlet.Context;
-import org.restlet.Server;
-import org.restlet.data.Protocol;
 import org.xmpp.component.ComponentException;
 
-import com.buddycloud.mediaserver.commons.ConfigurationContext;
 import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
-import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServer;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
-public class Main {
-	private static Logger LOGGER = Logger.getLogger(Main.class);
-	
-	
-	public static void main(String[] args) {  
-		Properties configuration = ConfigurationContext.getInstance().getConfiguration();
-		
-		try {
-			startRestletComponent(configuration);
-			startXMPPComponent(configuration);
-			createPubSubController(configuration);
-		} catch (Exception e) {
-			LOGGER.fatal(e.getMessage(), e);
-			System.exit(1);
-		}
-	} 
-	
-	
-	private static void startRestletComponent(Properties configuration) throws Exception {
-	    Component component = new Component();  
-	    
-	    Server server = component.getServers().add(Protocol.HTTPS, 8443);
-	    server.getContext().getParameters().add("sslContextFactory","org.restlet.ext.ssl.PkixSslContextFactory");
-	    server.getContext().getParameters().add("keystorePath", configuration.getProperty("https.keystore.path"));
-	    server.getContext().getParameters().add("keystorePassword", configuration.getProperty("https.keystore.password"));
-	    server.getContext().getParameters().add("keyPassword", configuration.getProperty("https.key.password"));
-	    server.getContext().getParameters().add("keystoreType", configuration.getProperty("https.keystore.type"));
-	    
-	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new MediaServerApplication(context));
-		
-	    component.start(); 
-	}
+public class XMPPTest {
+	private static Logger LOGGER = Logger.getLogger(XMPPTest.class);
 
-	private static void startXMPPComponent(Properties configuration) throws Exception {
+	
+	public void start(Properties configuration) throws Exception {
+		//startXMPPComponent(configuration);
+		createPubSubController(configuration);
+	} 
+
+	private void startXMPPComponent(Properties configuration) throws Exception {
 		ExternalComponentManager componentManager = new ExternalComponentManager(
 				configuration.getProperty("xmpp.host"),
 				Integer.valueOf(configuration.getProperty("xmpp.port")));
-		
+
 		String subdomain = configuration.getProperty("xmpp.subdomain");
 		componentManager.setSecretKey(subdomain, 
 				configuration.getProperty("xmpp.secretkey"));
-		
+
 		MediaServer mediaServer = XMPPToolBox.getInstance().createMediaServerComponent();
-		
+
 		try {
 			componentManager.addComponent(subdomain, mediaServer);
 		} catch (ComponentException e) {
-			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
 			throw e;
 		}
-		
+
 		while (true) {
 			try {
 				Thread.sleep(10000);
@@ -83,8 +51,8 @@ public class Main {
 			}
 		}
 	}
-	
-	private static void createPubSubController(Properties configuration) {
+
+	private void createPubSubController(Properties configuration) {
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
 		
@@ -92,7 +60,7 @@ public class Main {
 		XMPPToolBox.getInstance().createPubSubController(connection, servers);
 	}
 	
-	private static void addTraceListeners(XMPPConnection connection) {
+	private void addTraceListeners(XMPPConnection connection) {
 		PacketFilter iqFilter = new PacketFilter() {
 			@Override
 			public boolean accept(Packet arg0) {
@@ -116,7 +84,7 @@ public class Main {
 		}, iqFilter);
 	}
 
-	private static XMPPConnection createAndStartConnection(Properties configuration) {
+	private XMPPConnection createAndStartConnection(Properties configuration) {
 		
 		String serviceName = configuration.getProperty("xmpp.connection.servicename");
 		String host = configuration.getProperty("xmpp.connection.host");

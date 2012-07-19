@@ -34,9 +34,9 @@ public class XMPPToolBox {
 		return mediaServer;
 	}
 	
-	public PubSubController createPubSubController(Connection connection) {
+	public PubSubController createPubSubController(Connection connection, String[] servers) {
 		if (pubsubController == null) {
-			pubsubController = new PubSubController(connection);
+			pubsubController = new PubSubController(connection, servers);
 		}
 		
 		return pubsubController;

@@ -1,4 +1,4 @@
-package com.buddycloud.mediaserver.web.delete;
+package com.buddycloud.mediaserver.delete;
 
 import java.io.File;
 
@@ -11,9 +11,9 @@ import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.web.MediaResourceTest;
+import com.buddycloud.mediaserver.MediaServerTest;
 
-public class DeleteAvatarTest extends MediaResourceTest {
+public class DeleteAvatarTest extends MediaServerTest {
 	
 	private File fileToDelete;
 	

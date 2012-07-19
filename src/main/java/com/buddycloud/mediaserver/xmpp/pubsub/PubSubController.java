@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 buddycloud
+ * Copyright 2012 buddycloud
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,13 @@
  */
 package com.buddycloud.mediaserver.xmpp.pubsub;
 
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ.Type;
-import org.jivesoftware.smackx.packet.DiscoverItems;
-import org.jivesoftware.smackx.packet.DiscoverItems.Item;
 import org.jivesoftware.smackx.packet.RSMSet;
 import org.jivesoftware.smackx.pubsub.Affiliation;
 import org.jivesoftware.smackx.pubsub.AffiliationsExtension;
@@ -39,152 +34,98 @@ import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
-/**
- * Simply maintain a collection of {@link PubSubManager}, 
- * so different crawling strategies can use the same
- * node cache.
- * 
- */
 public class PubSubController {
-	
+
 	private static Logger LOGGER = Logger.getLogger(PubSubController.class);
-	//private static final String IDENTITY_CATEGORY = "pubsub";
-	//private static final String IDENTITY_TYPE = "channels";
 
-	private Map<String, PubSubManager> pubSubManagers = new HashMap<String, PubSubManager>();
-	private Connection connection;
-	
-	
-	public PubSubController(Connection connection) {
-		this.connection = connection;
+	private List<PubSubManager> pubSubManagers = new LinkedList<PubSubManager>();
+
+
+	public PubSubController(Connection connection, String[] servers) {
+		init(connection, servers);
 	}
 
-	
-	private PubSubManager getPubSubManager(String server) {
-		PubSubManager pubSubManager = pubSubManagers.get(server);
-		if (pubSubManager == null) {
-			pubSubManager = discoverChannelServer(server);
-			pubSubManagers.put(server, pubSubManager);
+
+	private void init(Connection connection, String[] servers) {
+		for (String server : servers) {
+			PubSubManager pubSubManager = new PubSubManager(connection, server);
+			pubSubManagers.add(pubSubManager);
 		}
-		
-		return pubSubManager;
 	}
 
-	private PubSubManager discoverChannelServer(String server) {
-		/* TODO server discovery
-		 * ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
-		while (true) {
-			DiscoverInfo discoInfo = discoManager.discoverInfo(server);
-			
-			Iterator<Identity> identities = discoInfo.getIdentities();
-			while (identities.hasNext()) {
-				Identity identity = identities.next();
-				
-				if (identity.getCategory().equals(IDENTITY_CATEGORY) 
-						&& identity.getType().equals(IDENTITY_TYPE)) {
-					
-				}
-				
-			}
-		}
-		 */
-
-		return new PubSubManager(connection, server);
-	}
-	
-	
-	
-	private Node resolveNode(String entityId) {
-		String server = entityId.split("@")[1];
-		PubSubManager manager = getPubSubManager(server);
-		
-		DiscoverItems discoverNodes;
-		
-		try {
-			discoverNodes = manager.discoverNodes(entityId);
-		} catch (XMPPException e) {
-			LOGGER.warn("Could not discover nodes from server [" + server + "]", e);
-			
-			return null;
-		}
-
-		final Iterator<Item> items = discoverNodes.getItems();
-		
-		while (items.hasNext()) {
-			Item item = items.next();
-			
-			Node node = null;
-			
+	private Node getNode(String entityId) {
+		Node node = null;
+		for (PubSubManager manager : pubSubManagers) {
 			try {
-				node = manager.getNode(item.getNode());
+				node = manager.getNode("/user/" + entityId + "/posts");
 			} catch (Exception e) {
-				LOGGER.warn("Could not read node [" + item.getNode() + "] "
-						+ "from server [" + server + "]", e);
-				
+				//do nothing
 				continue;
 			}
-			
-			if (node.getId().endsWith("/posts")) {
-				return node;
-			}
 		}
 		
-		
-		return null;
+		return node;
 	}
-	
-	private List<Affiliation> getAffiliations(Node node) throws XMPPException {
-		
-		List<Affiliation> affiliations = new LinkedList<Affiliation>();
-		
+
+	private Affiliation getAffiliation(Node node, String userId) throws XMPPException {
+
 		PubSub request = node.createPubsubPacket(Type.GET, 
 				new NodeExtension(PubSubElementType.AFFILIATIONS, node.getId()), 
 				PubSubNamespace.OWNER);
-		
+
+		int itemCount = 0;
 		while (true) {
-			
+
 			PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
-			
+
 			AffiliationsExtension subElem = (AffiliationsExtension) reply.getExtension(
 					PubSubElementType.AFFILIATIONS.getElementName(), PubSubNamespace.BASIC.getXmlns());
-			
-			affiliations.addAll(subElem.getAffiliations());
-			
-			if (reply.getRsmSet() == null || 
-					affiliations.size() == reply.getRsmSet().getCount()) {
+
+			if (subElem != null) {
+				
+				List<Affiliation> affiliations = subElem.getAffiliations();
+				
+				for (Affiliation affiliation : affiliations) {
+					if (affiliation.getNodeId().equals(userId)) {
+						return affiliation;
+					}
+				}
+				
+				itemCount += affiliations.size();
+			}
+
+			if (reply.getRsmSet() == null || itemCount == reply.getRsmSet().getCount()) {
 				break;
 			}
-			
+
 			RSMSet rsmSet = new RSMSet();
 			rsmSet.setAfter(reply.getRsmSet().getLast());
 			request.setRsmSet(rsmSet);
 		}
-		
-		return affiliations;
-	}
-	
-	public boolean matchUserCapability(String userId, String entityId, CapabilitiesDecorator capability) {
-		Node node = resolveNode(entityId);
-		
-		if (node != null) {
-			List<Affiliation> affiliations;
 
+		return null;
+	}
+
+	public boolean matchUserCapability(String userId, String entityId, CapabilitiesDecorator capability) {
+		Node node = getNode(entityId);
+
+		if (node != null) {
+			Affiliation affiliation = null;
+			
 			try {
-				affiliations = getAffiliations(node);
+				affiliation = getAffiliation(node, userId);
 			} catch (XMPPException e) {
-				LOGGER.warn("Could not read node [" + node.getId() + "] "
-						+ "affiliations", e);
-				
+				LOGGER.warn("Could not read node '" + node.getId() + "' " +
+						"affiliation for '" + userId + "'", e);
+
 				return false;
 			}
 			
-			for (Affiliation affiliation : affiliations) {
-				if (affiliation.getNodeId().equals(userId)) {
-					return capability.isUserAllowed(affiliation.getType().toString());
-				}
+			if (affiliation != null) {
+				return capability.isUserAllowed(affiliation.getType().toString());
 			}
 		}
-		
+
 		return false;
 	}
 }
