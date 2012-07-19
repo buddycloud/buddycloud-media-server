@@ -12,7 +12,7 @@ public class MediaServer extends AbstractComponent {
 	private static Logger LOGGER = Logger.getLogger(MediaServer.class);
 
 	
-	MediaServer() {}
+	protected MediaServer() {}
 	
 	
 	@Override

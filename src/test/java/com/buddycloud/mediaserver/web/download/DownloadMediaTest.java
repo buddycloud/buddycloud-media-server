@@ -7,6 +7,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.business.model.Media;
@@ -41,6 +42,7 @@ public class DownloadMediaTest extends MediaResourceTest {
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
@@ -60,6 +62,7 @@ public class DownloadMediaTest extends MediaResourceTest {
 		String url = BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID + "?maxheight=" + height + "&maxwidth=" + width;
 		
 		ClientResource client = new ClientResource(url);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);

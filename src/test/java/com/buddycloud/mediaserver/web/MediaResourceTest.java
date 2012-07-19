@@ -18,6 +18,7 @@ import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
 
+import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.ConfigurationContext;
@@ -35,12 +36,15 @@ public abstract class MediaResourceTest {
 	protected static final String TEST_OUTPUT_DIR = "test";
 	protected static final String MEDIA_ID = generateRandomString();
 
+	protected static final String BASE_PASSWORD = "secret";
 	protected static final String BASE_CHANNEL = "channel@topics.domain.com";
 	protected static final String BASE_USER = "user@domain.com";
 	protected static final String BASE_URL = "http://localhost:8080";
 	
 
 	protected Component component;
+	protected TestMediaDAO dao;
+	protected TestMediaServer mediaServer;
 	protected Properties configuration;
 	protected MetaDataSource dataSource;
 	protected Gson gson;
@@ -54,7 +58,7 @@ public abstract class MediaResourceTest {
 		dataSource = new MetaDataSource();
 		gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 		
-		setupComponent();
+		start();
 	    testSetUp();
 	    
 	    Thread.sleep(1000);
@@ -67,12 +71,21 @@ public abstract class MediaResourceTest {
 		testTearDown();
 	}
 	
-	private void setupComponent() throws Exception {
+	private void start() throws Exception{
+		startRestletComponent();
+		
+		mediaServer = new TestMediaServer();
+		dao = new TestMediaDAO(dataSource, new TestPubSubController(null), configuration, gson);
+		
+		DAOFactory.getInstance().setDAO(dao);
+	}
+	
+	private void startRestletComponent() throws Exception {
 		component = new Component();  
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new TestMediaServerApplication(context));
+		component.getDefaultHost().attach(new MediaServerApplication(context));
 		
 	    component.start();  
 	}

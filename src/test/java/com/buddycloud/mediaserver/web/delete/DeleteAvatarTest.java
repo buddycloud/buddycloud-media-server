@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.business.model.Media;
@@ -37,6 +38,7 @@ public class DeleteAvatarTest extends MediaResourceTest {
 	@Test
 	public void anonymousSuccessfulDelete() throws Exception {
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/avatar");
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
 		
 		client.delete();
 

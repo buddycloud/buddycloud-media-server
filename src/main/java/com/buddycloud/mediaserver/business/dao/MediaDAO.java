@@ -49,13 +49,14 @@ import com.google.gson.GsonBuilder;
 public class MediaDAO {
 
 	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
-	private MetaDataSource dataSource;
-	private PubSubController pubsub;
-	private Properties configuration;
-	private Gson gson;
+	
+	protected MetaDataSource dataSource;
+	protected PubSubController pubsub;
+	protected Properties configuration;
+	protected Gson gson;
 
 
-	MediaDAO() {
+	protected MediaDAO() {
 		this.dataSource = new MetaDataSource();
 		this.pubsub = XMPPToolBox.getInstance().getPubSubController();
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
@@ -105,7 +106,7 @@ public class MediaDAO {
 		dataSource.deleteMedia(mediaId);
 	}
 
-	private void deletePreviews(String mediaId, String dirPath) throws MetadataSourceException {
+	protected void deletePreviews(String mediaId, String dirPath) throws MetadataSourceException {
 		List<String> previews = dataSource.getPreviewsFromMedia(mediaId);
 
 		if (!previews.isEmpty()) {
@@ -299,7 +300,7 @@ public class MediaDAO {
 		return gson.toJson(media); 
 	}
 
-	private Media storeMedia(String fileName, String title, String description, String author,
+	protected Media storeMedia(String fileName, String title, String description, String author,
 			String entityId, InputStream inputStream, final boolean isAvatar) throws FileUploadException {
 
 		String directory = getDirectory(entityId);
@@ -355,7 +356,7 @@ public class MediaDAO {
 		return media;
 	}
 
-	private byte[] getPreview(String entityId, String mediaId, Integer maxHeight, Integer maxWidth, String mediaDirectory)  
+	protected byte[] getPreview(String entityId, String mediaId, Integer maxHeight, Integer maxWidth, String mediaDirectory)  
 			throws MetadataSourceException, IOException, InvalidPreviewFormatException, MediaNotFoundException {
 		File media = new File(mediaDirectory + File.separator + mediaId);
 
@@ -400,11 +401,11 @@ public class MediaDAO {
 		return ImageUtils.imageToBytes(previewImg, extension);
 	}
 
-	private boolean isAvatar(String mediaId) {
+	protected boolean isAvatar(String mediaId) {
 		return mediaId.equals(Constants.AVATAR_ARG);
 	}
 
-	private String getFormField(List<FileItem> items, String fieldName) throws FormMissingFieldException {
+	protected String getFormField(List<FileItem> items, String fieldName) throws FormMissingFieldException {
 		String field = null;
 
 		for (int i = 0; i < items.size(); i++) {
@@ -424,7 +425,7 @@ public class MediaDAO {
 		return field;
 	}
 
-	private InputStream getFileFormField(List<FileItem> items) throws FormMissingFieldException, FileUploadException {
+	protected InputStream getFileFormField(List<FileItem> items) throws FormMissingFieldException, FileUploadException {
 		InputStream field = null;
 
 		for (int i = 0; i < items.size(); i++) {
@@ -447,7 +448,7 @@ public class MediaDAO {
 		return field;
 	}
 
-	private Media createMedia(String mediaId, String fileName, String title,
+	protected Media createMedia(String mediaId, String fileName, String title,
 			String description, String author, String entityId, File file) {
 		Media media = new Media();
 		media.setId(mediaId);
@@ -479,7 +480,7 @@ public class MediaDAO {
 		return media;
 	}
 
-	private Preview createPreview(String previewId, String mediaId, Integer height, Integer width, File file) {
+	protected Preview createPreview(String previewId, String mediaId, Integer height, Integer width, File file) {
 		Preview preview = new Preview();
 		preview.setFileSize(file.length());
 		preview.setHeight(height);
@@ -491,11 +492,11 @@ public class MediaDAO {
 		return preview;
 	}
 
-	private String getFileExtension(String fileName) {
+	protected String getFileExtension(String fileName) {
 		return fileName.substring(fileName.lastIndexOf(".") + 1);
 	}
 
-	private String getFileShaChecksum(File file) {
+	protected String getFileShaChecksum(File file) {
 		try {
 			return DigestUtils.shaHex(FileUtils.openInputStream(file));
 		} catch (IOException e) {
@@ -505,7 +506,7 @@ public class MediaDAO {
 		return null;
 	}
 
-	private boolean mkdir(String fullDirectoryPath) {
+	protected boolean mkdir(String fullDirectoryPath) {
 		File directory = new File(fullDirectoryPath);
 		return directory.mkdir();
 	}

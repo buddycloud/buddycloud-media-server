@@ -14,7 +14,7 @@ public class XMPPToolBox {
 	private static final XMPPToolBox instance = new XMPPToolBox();
 
 
-	private XMPPToolBox() {}
+	protected XMPPToolBox() {}
 	
 	
 	public static XMPPToolBox getInstance() {

@@ -6,6 +6,7 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
@@ -45,6 +46,7 @@ public class UpdateMediaTest extends MediaResourceTest {
 		String description = "New Description";
 
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
 
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);

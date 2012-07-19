@@ -24,4 +24,8 @@ public class DAOFactory {
 		
 		return mediaDAO;
 	}
+	
+	public void setDAO(MediaDAO mediaDAO) {
+		this.mediaDAO = mediaDAO;
+	}
 }
