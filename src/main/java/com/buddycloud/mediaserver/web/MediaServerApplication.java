@@ -13,7 +13,7 @@ import com.buddycloud.mediaserver.web.verifier.MediaServerVerifier;
 
 public class MediaServerApplication extends Application {
 	
-	private static final String REALM = "xmpp";
+	protected static final String REALM = "xmpp";
 	
 	
 	public MediaServerApplication(Context parentContext) {
@@ -42,7 +42,7 @@ public class MediaServerApplication extends Application {
 		return router;
 	}
 	
-	private DigestAuthenticator getDigestAuthenticator() {
+	protected DigestAuthenticator getDigestAuthenticator() {
 		DigestAuthenticator auth = new DigestAuthenticator(getContext(), REALM, "secret");
 		auth.setOptional(true);
 	    auth.setWrappedVerifier(new MediaServerVerifier());
@@ -50,7 +50,7 @@ public class MediaServerApplication extends Application {
 	    return auth;
 	}
 	
-	private ChallengeAuthenticator getBasicAuthenticator() {
+	protected ChallengeAuthenticator getBasicAuthenticator() {
 		ChallengeAuthenticator auth = new ChallengeAuthenticator(getContext(), ChallengeScheme.HTTP_BASIC, REALM);
 		auth.setOptional(false);
 	    auth.setVerifier(new MediaServerVerifier());

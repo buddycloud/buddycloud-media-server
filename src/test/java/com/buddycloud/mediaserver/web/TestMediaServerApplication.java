@@ -1,32 +1,31 @@
 package com.buddycloud.mediaserver.web;
-import org.restlet.Application;
 import org.restlet.Context;
-import org.restlet.Restlet;
-import org.restlet.routing.Router;
+import org.restlet.data.ChallengeScheme;
+import org.restlet.ext.crypto.DigestAuthenticator;
+import org.restlet.security.ChallengeAuthenticator;
 
-import com.buddycloud.mediaserver.commons.Constants;
 
-
-public class TestMediaServerApplication extends Application {
+public class TestMediaServerApplication extends MediaServerApplication {
 
 	
 	public TestMediaServerApplication(Context parentContext) {
 		super(parentContext);
 	}
 	
-	/**
-	 * Creates a root Restlet that will receive all incoming calls.
-	 */
-	@Override
-	public synchronized Restlet createInboundRoot() {
-		Router router = new Router(getContext());
-		
-		// GET/PUT/DELETE /media/<name@domain.com>/<mediaID>
-		router.attach(Constants.MEDIA_ID_URL, MediaResource.class);
-		
-		// POST /media/<name@domain.com>
-		router.attach(Constants.MEDIAS_URL, MediasResource.class);
-		
-		return router;
+	
+	protected DigestAuthenticator getDigestAuthenticator() {
+		DigestAuthenticator auth = new DigestAuthenticator(getContext(), REALM, "secret");
+		auth.setOptional(true);
+	    auth.setWrappedVerifier(new TestMediaServerVerifier());
+	    
+	    return auth;
+	}
+	
+	protected ChallengeAuthenticator getBasicAuthenticator() {
+		ChallengeAuthenticator auth = new ChallengeAuthenticator(getContext(), ChallengeScheme.HTTP_BASIC, REALM);
+		auth.setOptional(false);
+	    auth.setVerifier(new TestMediaServerVerifier());
+	    
+	    return auth;
 	}
 }

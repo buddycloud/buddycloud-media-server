@@ -44,7 +44,6 @@ public abstract class MediaResourceTest {
 
 	protected Component component;
 	protected TestMediaDAO dao;
-	protected TestMediaServer mediaServer;
 	protected Properties configuration;
 	protected MetaDataSource dataSource;
 	protected Gson gson;
@@ -74,7 +73,6 @@ public abstract class MediaResourceTest {
 	private void start() throws Exception{
 		startRestletComponent();
 		
-		mediaServer = new TestMediaServer();
 		dao = new TestMediaDAO(dataSource, new TestPubSubController(null), configuration, gson);
 		
 		DAOFactory.getInstance().setDAO(dao);
@@ -85,7 +83,7 @@ public abstract class MediaResourceTest {
 	    component.getServers().add(Protocol.HTTP, 8080);  
 	    
 	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new MediaServerApplication(context));
+		component.getDefaultHost().attach(new TestMediaServerApplication(context));
 		
 	    component.start();  
 	}
