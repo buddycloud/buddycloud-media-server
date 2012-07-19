@@ -34,9 +34,8 @@ public abstract class MediaServerTest {
 	protected static final String MEDIA_ID = generateRandomString();
 
 	protected static final String BASE_PASSWORD = "secret";
-	//protected static final String BASE_CHANNEL = "team@topics.buddycloud.org";
-	protected static final String BASE_CHANNEL = "topics@topics.buddycloud.org";
-	protected static final String BASE_USER = "user@domain.com";
+	protected static final String BASE_CHANNEL = "mediaservertest@topics.buddycloud.org";
+	protected static final String BASE_USER = "rodrigods@buddycloud.org";
 	protected static final String BASE_URL = "http://localhost:8080";
 	
 

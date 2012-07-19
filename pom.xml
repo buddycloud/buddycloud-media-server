@@ -101,7 +101,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.6.6</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
@@ -157,6 +157,18 @@
 			<artifactId>smackx</artifactId>
 			<version>3.2.2</version>
 		</dependency>
+		<!-- 
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx</artifactId>
+			<version>3.2.1</version>
+		</dependency>
+		 -->
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>tinder</artifactId>

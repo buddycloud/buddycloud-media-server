@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ.Type;
+import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.RSMSet;
 import org.jivesoftware.smackx.pubsub.Affiliation;
 import org.jivesoftware.smackx.pubsub.AffiliationsExtension;
@@ -51,6 +52,16 @@ public class PubSubController {
 			PubSubManager pubSubManager = new PubSubManager(connection, server);
 			pubSubManagers.add(pubSubManager);
 		}
+		
+		Object affiliationsProvider = ProviderManager.getInstance().getExtensionProvider(
+				PubSubElementType.AFFILIATIONS.getElementName(), PubSubNamespace.BASIC.getXmlns());
+		ProviderManager.getInstance().addExtensionProvider(PubSubElementType.AFFILIATIONS.getElementName(), 
+				PubSubNamespace.OWNER.getXmlns(), affiliationsProvider);
+		
+		Object affiliationProvider = ProviderManager.getInstance().getExtensionProvider(
+				"affiliation", PubSubNamespace.BASIC.getXmlns());
+		ProviderManager.getInstance().addExtensionProvider("affiliation", 
+				PubSubNamespace.OWNER.getXmlns(), affiliationProvider);
 	}
 
 	private Node getNode(String entityId) {
@@ -63,7 +74,7 @@ public class PubSubController {
 				continue;
 			}
 		}
-		
+
 		return node;
 	}
 
@@ -72,7 +83,7 @@ public class PubSubController {
 		PubSub request = node.createPubsubPacket(Type.GET, 
 				new NodeExtension(PubSubElementType.AFFILIATIONS, node.getId()), 
 				PubSubNamespace.OWNER);
-
+		
 		int itemCount = 0;
 		while (true) {
 
@@ -81,18 +92,16 @@ public class PubSubController {
 			AffiliationsExtension subElem = (AffiliationsExtension) reply.getExtension(
 					PubSubElementType.AFFILIATIONS.getElementName(), PubSubNamespace.BASIC.getXmlns());
 
-			if (subElem != null) {
-				
-				List<Affiliation> affiliations = subElem.getAffiliations();
-				
-				for (Affiliation affiliation : affiliations) {
-					if (affiliation.getNodeId().equals(userId)) {
-						return affiliation;
-					}
+			List<Affiliation> affiliations = subElem.getAffiliations();
+
+			for (Affiliation affiliation : affiliations) {
+				System.out.println("Affiliation: " + affiliation.getNodeId() + " - " + affiliation.getType());
+				if (affiliation.getNodeId().equals(userId)) {
+					return affiliation;
 				}
-				
-				itemCount += affiliations.size();
 			}
+
+			itemCount += affiliations.size();
 
 			if (reply.getRsmSet() == null || itemCount == reply.getRsmSet().getCount()) {
 				break;
@@ -111,7 +120,7 @@ public class PubSubController {
 
 		if (node != null) {
 			Affiliation affiliation = null;
-			
+
 			try {
 				affiliation = getAffiliation(node, userId);
 			} catch (XMPPException e) {
@@ -120,7 +129,7 @@ public class PubSubController {
 
 				return false;
 			}
-			
+
 			if (affiliation != null) {
 				return capability.isUserAllowed(affiliation.getType().toString());
 			}

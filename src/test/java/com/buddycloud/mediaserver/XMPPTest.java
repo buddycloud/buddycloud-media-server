@@ -56,7 +56,7 @@ public class XMPPTest {
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
 		
-		String[] servers = configuration.getProperty("xmpp.channels.server").split(";");
+		String[] servers = configuration.getProperty("bc.channels.server").split(";");
 		XMPPToolBox.getInstance().createPubSubController(connection, servers);
 	}
 	
@@ -94,6 +94,7 @@ public class XMPPTest {
 				host,
 				Integer.parseInt(configuration.getProperty("xmpp.connection.port")),
 				serviceName);
+		cc.setSASLAuthenticationEnabled(false);
 		
 		XMPPConnection connection = new XMPPConnection(cc);
 		try {
