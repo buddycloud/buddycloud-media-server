@@ -88,7 +88,7 @@ public class Main {
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
 		
-		String[] servers = configuration.getProperty("xmpp.channels.server").split(";");
+		String[] servers = configuration.getProperty("bc.channels.server").split(";");
 		XMPPToolBox.getInstance().createPubSubController(connection, servers);
 	}
 	
