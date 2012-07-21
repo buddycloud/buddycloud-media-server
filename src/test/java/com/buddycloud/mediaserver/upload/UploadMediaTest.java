@@ -15,9 +15,9 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
+import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.MediaServerTest;
 
 public class UploadMediaTest extends MediaServerTest {
 	
@@ -36,7 +36,7 @@ public class UploadMediaTest extends MediaServerTest {
 		String description = "My Test Image";
 
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 
 		
 		FormDataSet form = new FormDataSet();
@@ -52,7 +52,7 @@ public class UploadMediaTest extends MediaServerTest {
 
 		form.getEntries().add(new FormData(Constants.FILE_FIELD,
 		new FileRepresentation(TESTFILE_PATH + TESTMEDIA_NAME, MediaType.IMAGE_JPEG)));
-		
+
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 

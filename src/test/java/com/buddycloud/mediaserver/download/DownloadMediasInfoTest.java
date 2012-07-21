@@ -39,7 +39,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
 	}
@@ -50,7 +50,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		calendar.add(Calendar.HOUR, -1);
 		
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + calendar.getTimeInMillis());
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
 	}

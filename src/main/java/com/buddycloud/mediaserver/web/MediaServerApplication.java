@@ -35,11 +35,11 @@ public class MediaServerApplication extends Application {
 		
 		ChallengeAuthenticator basicAuth = getBasicAuthenticator();
 		basicAuth.setNext(router);
-		
+
 		DigestAuthenticator digestAuth = getDigestAuthenticator();
-		digestAuth.setNext(router);
+		digestAuth.setNext(basicAuth);
 		
-		return router;
+		return digestAuth;
 	}
 	
 	protected DigestAuthenticator getDigestAuthenticator() {

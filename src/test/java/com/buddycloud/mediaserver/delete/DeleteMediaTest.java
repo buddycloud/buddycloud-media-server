@@ -37,7 +37,7 @@ public class DeleteMediaTest extends MediaServerTest {
 	@Test
 	public void anonymousSuccessfulDelete() throws Exception {
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		client.delete();
 		

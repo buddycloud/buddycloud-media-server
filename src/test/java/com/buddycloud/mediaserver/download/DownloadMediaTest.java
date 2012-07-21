@@ -42,7 +42,7 @@ public class DownloadMediaTest extends MediaServerTest {
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
@@ -62,7 +62,7 @@ public class DownloadMediaTest extends MediaServerTest {
 		String url = BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID + "?maxheight=" + height + "&maxwidth=" + width;
 		
 		ClientResource client = new ClientResource(url);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);

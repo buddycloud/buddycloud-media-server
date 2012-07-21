@@ -46,7 +46,7 @@ public class UpdateMediaTest extends MediaServerTest {
 		String description = "New Description";
 
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_PASSWORD);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);

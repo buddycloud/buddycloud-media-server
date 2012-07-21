@@ -3,7 +3,6 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.fileupload.FileUploadException;
-import org.restlet.data.ChallengeResponse;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
@@ -30,16 +29,7 @@ public class MediaResource extends ServerResource {
 
 	@Post
 	public Representation postAvatar(Representation entity) {
-		String userId = null;
-		ChallengeResponse challengeResponse = getRequest().getChallengeResponse();
-		
-		if (challengeResponse != null) {
-			userId = challengeResponse.getIdentifier();
-		} else {
-			// TODO respond with auth request
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation("POST request with no authentication", MediaType.APPLICATION_JSON);
-		}
+		String userId = getRequest().getChallengeResponse().getIdentifier();
 
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
@@ -78,17 +68,7 @@ public class MediaResource extends ServerResource {
 
 	@Delete
 	public Representation deleteMedia() {
-		String userId = null;
-		ChallengeResponse challengeResponse = getRequest().getChallengeResponse();
-		
-		if (challengeResponse != null) {
-			userId = challengeResponse.getIdentifier();
-		} else {
-			// TODO respond with auth request
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation("POST request with no authentication", MediaType.APPLICATION_JSON);
-		}
-
+		String userId = getRequest().getChallengeResponse().getIdentifier();
 		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
@@ -111,17 +91,7 @@ public class MediaResource extends ServerResource {
 
 	@Put
 	public Representation putMedia(Representation entity) {
-		String userId = null;
-		ChallengeResponse challengeResponse = getRequest().getChallengeResponse();
-		
-		if (challengeResponse != null) {
-			userId = challengeResponse.getIdentifier();
-		} else {
-			// TODO respond with auth request
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation("POST request with no authentication", MediaType.APPLICATION_JSON);
-		}
-
+		String userId = getRequest().getChallengeResponse().getIdentifier();
 		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
@@ -159,18 +129,7 @@ public class MediaResource extends ServerResource {
 
 	@Get
 	public Representation getMedia() {
-		String userId = null;
-		ChallengeResponse challengeResponse = getRequest().getChallengeResponse();
-		
-		if (challengeResponse != null) {
-			userId = challengeResponse.getIdentifier();
-		} else {
-			// TODO respond with auth request
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation("POST request with no authentication", MediaType.APPLICATION_JSON);
-		}
-
-
+		String userId = getRequest().getChallengeResponse().getIdentifier();
 		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
