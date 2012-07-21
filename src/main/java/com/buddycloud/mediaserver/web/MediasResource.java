@@ -5,6 +5,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
@@ -61,5 +62,35 @@ public class MediasResource extends ServerResource {
 		setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 		return new StringRepresentation("POST request with no entity", MediaType.APPLICATION_JSON);
 
+	}
+	
+	@Get
+	public Representation getMediasInfo() {
+		String userId = null;
+		ChallengeResponse challengeResponse = getRequest().getChallengeResponse();
+		
+		if (challengeResponse != null) {
+			userId = challengeResponse.getIdentifier();
+		} else {
+			// TODO respond with auth request
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return new StringRepresentation("POST request with no authentication", MediaType.APPLICATION_JSON);
+		}
+
+		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+
+		String since = getQueryValue(Constants.MAX_HEIGHT_QUERY);
+
+		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
+
+		try {
+			return new StringRepresentation(mediaDAO.getMediasInfo(userId, entityId, since), MediaType.APPLICATION_JSON);
+		} catch (MetadataSourceException e) {
+			setStatus(Status.SERVER_ERROR_INTERNAL);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
+		} catch (UserNotAllowedException e) {
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);
+		}
 	}
 }

@@ -95,7 +95,6 @@ public class PubSubController {
 			List<Affiliation> affiliations = subElem.getAffiliations();
 
 			for (Affiliation affiliation : affiliations) {
-				System.out.println("Affiliation: " + affiliation.getNodeId() + " - " + affiliation.getType());
 				if (affiliation.getNodeId().equals(userId)) {
 					return affiliation;
 				}

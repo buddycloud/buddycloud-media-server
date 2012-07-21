@@ -118,6 +118,21 @@ public class MediaDAO {
 			dataSource.deletePreviewsFromMedia(mediaId);
 		}
 	}
+	
+	public String getMediasInfo(String userId, String entityId, String since) 
+			throws UserNotAllowedException, MetadataSourceException {
+		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+
+		if (!isUserAllowed) {
+			LOGGER.debug("User '" + userId + "' not allowed to peform get info operation on: " + entityId);
+			throw new UserNotAllowedException(userId);
+		}
+		
+		List<Media> medias = dataSource.getMediasInfo(entityId, since);
+	
+		return gson.toJson(medias);
+	}
 
 	public File getMedia(String userId, String entityId, String mediaId) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
@@ -130,7 +145,7 @@ public class MediaDAO {
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
 
 		if (!isUserAllowed) {
-			LOGGER.debug("User '" + userId + "' not allowed to peform delete operation on: " + mediaId);
+			LOGGER.debug("User '" + userId + "' not allowed to peform get operation on: " + entityId);
 			throw new UserNotAllowedException(userId);
 		}
 
@@ -142,9 +157,6 @@ public class MediaDAO {
 		if (!media.exists()) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
-
-		// Update last viewed date
-		dataSource.updateMediaLastViewed(mediaId);
 
 		return media;
 	}
@@ -162,9 +174,6 @@ public class MediaDAO {
 		if (!media.exists()) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
-
-		// Update last viewed date
-		dataSource.updateMediaLastViewed(mediaId);
 
 		return media;
 	}
@@ -259,6 +268,9 @@ public class MediaDAO {
 		}
 
 		dataSource.updateMediaFields(media);
+		
+		// Update last updated date
+		dataSource.updateMediaLastUpdated(mediaId);
 		LOGGER.debug("Media sucessfully updated. Media ID: " + media.getId());
 
 		return gson.toJson(media); 
@@ -372,9 +384,6 @@ public class MediaDAO {
 			if (!preview.exists()) {
 				dataSource.deletePreview(previewId);
 			} else {
-				// Update last viewed date
-				dataSource.updateMediaLastViewed(mediaId);
-
 				return IOUtils.toByteArray(FileUtils.openInputStream(preview));
 			}
 		} else {
@@ -395,8 +404,6 @@ public class MediaDAO {
 
 		// store preview in another flow
 		new StorePreviewThread(previewId, mediaDirectory, mediaId, maxHeight, maxWidth, extension, previewImg).start();
-
-		dataSource.updateMediaLastViewed(mediaId);
 
 		return ImageUtils.imageToBytes(previewImg, extension);
 	}

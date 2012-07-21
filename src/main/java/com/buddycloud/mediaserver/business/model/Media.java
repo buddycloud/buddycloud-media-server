@@ -12,7 +12,7 @@ public class Media {
 //		  "description": string,
 //		  "mimeType": string,
 //		  "uploadedDate": datetime,
-//		  "lastViewedDate": datetime,
+//		  "lastUpdatedDate": datetime,
 //		  "fileExtension": string,
 //		  "shaChecksum": string,
 //		  "fileSize": long,
@@ -28,7 +28,7 @@ public class Media {
 	private String mimeType;
 	private String description;
 	private Date uploadedDate = null; 
-	private Date lastViewedDate = null; 
+	private Date lastUpdatedDate = null; 
 	private String fileExtension;
 	private String shaChecksum;
 	private Long fileSize;
@@ -78,12 +78,12 @@ public class Media {
 		this.uploadedDate = uploadedDate;
 	}
 	
-	public Date getLastViewedDate() {
-		return lastViewedDate;
+	public Date getLastUpdatedDate() {
+		return lastUpdatedDate;
 	}
 	
-	public void setLastViewedDate(Date lastViewedDate) {
-		this.lastViewedDate = lastViewedDate;
+	public void setLastUpdatedDate(Date lastUpdatedDate) {
+		this.lastUpdatedDate = lastUpdatedDate;
 	}
 	
 	public String getFileExtension() {

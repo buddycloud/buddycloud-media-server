@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,11 +42,7 @@ public class MetaDataSource {
 		}
 	}
 
-	public Statement createStatement() throws SQLException {
-		return dataSource.getConnection().createStatement();
-	}
-	
-	public PreparedStatement prepareStatement(String sql, Object... args) throws SQLException {
+	private PreparedStatement prepareStatement(String sql, Object... args) throws SQLException {
 		PreparedStatement prepareStatement = dataSource.getConnection().prepareStatement(sql);
 		for (int i = 1; i <= args.length; i++) {
 			prepareStatement.setObject(i, args[i-1]);
@@ -103,6 +100,59 @@ public class MetaDataSource {
 		}
 	}
 	
+	private Media resultToMedia(ResultSet result) throws SQLException {
+		Media media = new Media();
+		
+		media.setId(result.getString(1));
+		media.setFileName(result.getString(2));
+		media.setEntityId(result.getString(3));
+		media.setAuthor(result.getString(4));
+		media.setTitle(result.getString(5));
+		media.setDescription(result.getString(6));
+		media.setMimeType(result.getString(7));
+		media.setUploadedDate(result.getTimestamp(8));
+		media.setLastUpdatedDate(result.getTimestamp(9));
+		media.setFileExtension(result.getString(10));
+		media.setShaChecksum(result.getString(11));
+		media.setFileSize(result.getLong(12));
+		media.setLength(result.getLong(13));
+		media.setHeight(result.getInt(14));
+		media.setWidth(result.getInt(15));
+		
+		return media;
+	}
+	
+	public List<Media> getMediasInfo(String entityId, String since) throws MetadataSourceException {
+		LOGGER.debug("Get medias info from: " + entityId);
+		
+		List<Media> medias = new ArrayList<Media>();
+		
+		PreparedStatement statement;
+		try {
+			if (since != null) {
+				Timestamp timestamp = new Timestamp((new Date(Long.valueOf(since))).getTime());
+				
+				statement = prepareStatement(Queries.GET_MEDIAS_INFO_SINCE, entityId, timestamp);
+			} else {
+				statement = prepareStatement(Queries.GET_MEDIAS_INFO, entityId);
+			}
+			
+			ResultSet result = statement.executeQuery();
+			while (result.next()) {
+				medias.add(resultToMedia(result));
+			}
+			
+			statement.close();
+
+			LOGGER.debug("Medias info sucessfully fetched");
+		} catch (SQLException e) {
+			LOGGER.error("Error while fetching medias info", e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		}
+		
+		return medias;
+	}
+	
 	public Media getMedia(String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Getting media. Media ID: " + mediaId);
 		
@@ -114,22 +164,7 @@ public class MetaDataSource {
 
 			ResultSet result = statement.executeQuery();
 			if (result.next()) {
-				media = new Media();
-				media.setId(result.getString(1));
-				media.setFileName(result.getString(2));
-				media.setEntityId(result.getString(3));
-				media.setAuthor(result.getString(4));
-				media.setTitle(result.getString(5));
-				media.setDescription(result.getString(6));
-				media.setMimeType(result.getString(7));
-				media.setUploadedDate(result.getDate(8));
-				media.setLastViewedDate(result.getDate(9));
-				media.setFileExtension(result.getString(10));
-				media.setShaChecksum(result.getString(11));
-				media.setFileSize(result.getLong(12));
-				media.setLength(result.getLong(13));
-				media.setHeight(result.getInt(14));
-				media.setWidth(result.getInt(15));
+				media = resultToMedia(result);
 				
 				LOGGER.debug("Media metadata successfully fetched. Media ID: " + mediaId);
 			} else {
@@ -223,20 +258,20 @@ public class MetaDataSource {
 		return mimeType;
 	}
 	
-	public void updateMediaLastViewed(String mediaId) throws MetadataSourceException {
-		LOGGER.debug("Updating last viewed date. Media ID: " + mediaId);
+	public void updateMediaLastUpdated(String mediaId) throws MetadataSourceException {
+		LOGGER.debug("Updating last updated date. Media ID: " + mediaId);
 		
 		PreparedStatement statement;
 		try {
 			Timestamp now = new Timestamp((new Date()).getTime());
 
-			statement = prepareStatement(Queries.UPDATE_MEDIA_LAST_VIEWED, now, mediaId);
+			statement = prepareStatement(Queries.UPDATE_MEDIA_LAST_UPDATED, now, mediaId);
 			statement.execute();
 			statement.close();
 			
-			LOGGER.debug("Media last viewed date successfully updated. Media ID: " + mediaId);
+			LOGGER.debug("Media last updated date successfully updated. Media ID: " + mediaId);
 		} catch (SQLException e) {
-			LOGGER.error("Error while updating media last viewed date", e);
+			LOGGER.error("Error while updating media last updated date", e);
 			throw new MetadataSourceException(e.getMessage(), e);
 		}
 	}

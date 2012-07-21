@@ -12,6 +12,7 @@ public class Constants {
 	//URL queries
 	public static final String MAX_HEIGHT_QUERY = "maxheight";
 	public static final String MAX_WIDTH_QUERY = "maxwidth";
+	public static final String SINCE_QUERY = "since";
 
 	//URLs
 	public static final String MEDIAS_URL = "/media/{" + ENTITY_ARG + "}";

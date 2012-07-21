@@ -16,6 +16,8 @@ public class Queries {
 	
 	// Select
 	public static final String GET_MEDIA = "SELECT * FROM medias WHERE id = ?";
+	public static final String GET_MEDIAS_INFO = "SELECT * FROM medias WHERE entityId = ?";
+	public static final String GET_MEDIAS_INFO_SINCE = "SELECT * FROM medias WHERE entityId = ? AND lastUpdatedDate >= ? ";
 	public static final String GET_MEDIA_UPLOADER = "SELECT author FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_MIME_TYPE = "SELECT mimeType FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_EXTENSION = "SELECT fileExtension FROM medias WHERE id = ?";
@@ -30,7 +32,7 @@ public class Queries {
 	public static final String DELETE_PREVIEWS_FROM_MEDIA = "DELETE FROM previews WHERE mediaId = ?";
 	
 	// Update
-	public static final String UPDATE_MEDIA_LAST_VIEWED = "UPDATE medias SET lastViewedDate = ? WHERE id = ?";
+	public static final String UPDATE_MEDIA_LAST_UPDATED = "UPDATE medias SET lastUpdatedDate = ? WHERE id = ?";
 	public static final String UPDATE_MEDIA_FIELDS = "UPDATE medias SET fileName = ?, title = ?, description = ? WHERE id = ?";
 	public static final String UPDATE_AVATAR = "UPDATE avatars SET mediaId = ? WHERE entityId = ?";
 }
