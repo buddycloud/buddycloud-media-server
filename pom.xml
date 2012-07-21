@@ -107,6 +107,7 @@
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.6.6</version>
 		</dependency>
+
 		<!-- c3p0 -->
 		<dependency>
 			<groupId>c3p0</groupId>
@@ -157,18 +158,9 @@
 			<artifactId>smackx</artifactId>
 			<version>3.2.2</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smack</artifactId>
-			<version>3.2.1</version>
-		</dependency>
-		<dependency>
-			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smackx</artifactId>
-			<version>3.2.1</version>
-		</dependency>
-		 -->
+		<!-- <dependency> <groupId>org.igniterealtime.smack</groupId> <artifactId>smack</artifactId> 
+			<version>3.2.1</version> </dependency> <dependency> <groupId>org.igniterealtime.smack</groupId> 
+			<artifactId>smackx</artifactId> <version>3.2.1</version> </dependency> -->
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>tinder</artifactId>
@@ -180,6 +172,12 @@
 			<version>1.0.0</version>
 		</dependency>
 
+		<!-- Joda -->
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.1</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
@@ -222,7 +220,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<restlet-version>2.1-SNAPSHOT</restlet-version>
+		<restlet-version>2.2-SNAPSHOT</restlet-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<repositories>
