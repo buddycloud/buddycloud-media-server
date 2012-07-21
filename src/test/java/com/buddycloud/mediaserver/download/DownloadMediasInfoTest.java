@@ -1,10 +1,12 @@
 package com.buddycloud.mediaserver.download;
 
 import java.io.File;
+import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.helpers.ISO8601DateFormat;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
@@ -49,7 +51,9 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.add(Calendar.HOUR, -1);
 		
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + calendar.getTimeInMillis());
+		DateFormat dateFormat = ISO8601DateFormat.getInstance();
+		
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + dateFormat.format(calendar.getTime()));
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
