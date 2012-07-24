@@ -35,14 +35,14 @@ import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
-public class PubSubController {
+public class PubSubClient {
 
-	private static Logger LOGGER = Logger.getLogger(PubSubController.class);
+	private static Logger LOGGER = Logger.getLogger(PubSubClient.class);
 
 	private List<PubSubManager> pubSubManagers = new LinkedList<PubSubManager>();
 
 
-	public PubSubController(Connection connection, String[] servers) {
+	public PubSubClient(Connection connection, String[] servers) {
 		init(connection, servers);
 	}
 

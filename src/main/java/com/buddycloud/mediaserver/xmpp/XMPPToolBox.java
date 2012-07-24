@@ -1,20 +1,23 @@
 package com.buddycloud.mediaserver.xmpp;
 
-import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.XMPPConnection;
 
-import com.buddycloud.mediaserver.xmpp.pubsub.PubSubController;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 
 
 public class XMPPToolBox {
 	
-	private MediaServer mediaServer;
-	private PubSubController pubsubController;
+	private AuthVerifierClient authClient;
+	private PubSubClient pubSubClient;
+	private boolean started;
 	
 	
 	private static final XMPPToolBox instance = new XMPPToolBox();
 
 
-	protected XMPPToolBox() {}
+	protected XMPPToolBox() {
+		started = false;
+	}
 	
 	
 	public static XMPPToolBox getInstance() {
@@ -22,27 +25,21 @@ public class XMPPToolBox {
 	}
 	
 	
-	public MediaServer createMediaServerComponent() {
-		if (mediaServer == null) {
-			mediaServer = new MediaServer();
+	public void start(XMPPConnection connection, String[] servers) {
+		if (!started) {
+			authClient = new AuthVerifierClient(connection);
+			pubSubClient = new PubSubClient(connection, servers);
+			
+			started = true;
 		}
-		
-		return mediaServer;
 	}
 	
-	public MediaServer getMediaServerComponent() {
-		return mediaServer;
+
+	public AuthVerifierClient getAuthClient() {
+		return authClient;
 	}
-	
-	public PubSubController createPubSubController(Connection connection, String[] servers) {
-		if (pubsubController == null) {
-			pubsubController = new PubSubController(connection, servers);
-		}
-		
-		return pubsubController;
-	}
-	
-	public PubSubController getPubSubController() {
-		return pubsubController;
+
+	public PubSubClient getPubSubClient() {
+		return pubSubClient;
 	}
 }

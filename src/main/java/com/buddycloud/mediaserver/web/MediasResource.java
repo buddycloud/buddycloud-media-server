@@ -18,11 +18,10 @@ import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 
 public class MediasResource extends ServerResource {
 	
-
 	@Post
 	public Representation postMedia(Representation entity) {
-		String userId = getRequest().getChallengeResponse().getIdentifier();
-		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+		String userId = getChallengeResponse().getIdentifier();
+		String entityId = getAttribute(Constants.ENTITY_ARG);
 
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
@@ -55,8 +54,8 @@ public class MediasResource extends ServerResource {
 	
 	@Get
 	public Representation getMediasInfo() {
-		String userId = getRequest().getChallengeResponse().getIdentifier();
-		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+		String userId = getChallengeResponse().getIdentifier();
+		String entityId = getAttribute(Constants.ENTITY_ARG);
 		
 		String since = getQueryValue(Constants.MAX_HEIGHT_QUERY);
 

@@ -52,7 +52,7 @@ public class UploadMediaTest extends MediaServerTest {
 
 		form.getEntries().add(new FormData(Constants.FILE_FIELD,
 		new FileRepresentation(TESTFILE_PATH + TESTMEDIA_NAME, MediaType.IMAGE_JPEG)));
-
+		
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 

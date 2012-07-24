@@ -38,7 +38,7 @@ import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
-import com.buddycloud.mediaserver.xmpp.pubsub.PubSubController;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.MemberDecorator;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.ModeratorDecorator;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.OwnerDecorator;
@@ -51,14 +51,14 @@ public class MediaDAO {
 	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
 	
 	protected MetaDataSource dataSource;
-	protected PubSubController pubsub;
+	protected PubSubClient pubsub;
 	protected Properties configuration;
 	protected Gson gson;
 
 
 	protected MediaDAO() {
 		this.dataSource = new MetaDataSource();
-		this.pubsub = XMPPToolBox.getInstance().getPubSubController();
+		this.pubsub = XMPPToolBox.getInstance().getPubSubClient();
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 		this.configuration = ConfigurationContext.getInstance().getConfiguration();
 	}

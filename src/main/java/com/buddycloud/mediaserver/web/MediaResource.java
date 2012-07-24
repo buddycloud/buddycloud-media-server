@@ -26,14 +26,15 @@ import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 
 
 public class MediaResource extends ServerResource {
-
+	
+	
 	@Post
 	public Representation postAvatar(Representation entity) {
-		String userId = getRequest().getChallengeResponse().getIdentifier();
+		String userId = getChallengeResponse().getIdentifier();
 
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-				String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+				String entityId = getAttribute(Constants.ENTITY_ARG);
 				String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 				if (!mediaId.equals(Constants.AVATAR_ARG)) {
@@ -68,8 +69,8 @@ public class MediaResource extends ServerResource {
 
 	@Delete
 	public Representation deleteMedia() {
-		String userId = getRequest().getChallengeResponse().getIdentifier();
-		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+		String userId = getChallengeResponse().getIdentifier();
+		String entityId = getAttribute(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
@@ -91,8 +92,8 @@ public class MediaResource extends ServerResource {
 
 	@Put
 	public Representation putMedia(Representation entity) {
-		String userId = getRequest().getChallengeResponse().getIdentifier();
-		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+		String userId = getChallengeResponse().getIdentifier();
+		String entityId = getAttribute(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 		if (entity != null) {
@@ -129,8 +130,8 @@ public class MediaResource extends ServerResource {
 
 	@Get
 	public Representation getMedia() {
-		String userId = getRequest().getChallengeResponse().getIdentifier();
-		String entityId = (String) getRequest().getAttributes().get(Constants.ENTITY_ARG);
+		String userId = getChallengeResponse().getIdentifier();
+		String entityId = getAttribute(Constants.ENTITY_ARG);
 		String mediaId = (String) getRequest().getAttributes().get(Constants.MEDIA_ARG);
 
 		String maxHeight = getQueryValue(Constants.MAX_HEIGHT_QUERY);
