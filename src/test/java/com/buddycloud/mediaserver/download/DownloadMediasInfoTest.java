@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.helpers.ISO8601DateFormat;
 import org.junit.Test;
@@ -47,6 +48,17 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	}
 	
 	@Test
+	public void anonymousSuccessfulDownloadParamAuth() throws Exception {
+		Base64 encoder = new Base64(true);
+		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL +
+				"?auth=" + new String(encoder.encode(authStr.getBytes())));
+		
+		client.get(MediaType.APPLICATION_JSON).write(System.out);
+	}
+	
+	@Test
 	public void anonymousSuccessfulDownloadSince() throws Exception {
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.add(Calendar.HOUR, -1);
@@ -55,6 +67,22 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + dateFormat.format(calendar.getTime()));
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
+		
+		client.get(MediaType.APPLICATION_JSON).write(System.out);
+	}
+	
+	@Test
+	public void anonymousSuccessfulDownloadSinceParamAuth() throws Exception {
+		Calendar calendar = GregorianCalendar.getInstance();
+		calendar.add(Calendar.HOUR, -1);
+		
+		DateFormat dateFormat = ISO8601DateFormat.getInstance();
+
+		Base64 encoder = new Base64(true);
+		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + dateFormat.format(calendar.getTime()) +
+				"?auth=" + new String(encoder.encode(authStr.getBytes())));
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
 	}

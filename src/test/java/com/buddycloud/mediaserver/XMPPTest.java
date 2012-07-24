@@ -30,7 +30,7 @@ public class XMPPTest {
 		addTraceListeners(connection);
 		
 		MediaServerComponent component = createXMPPComponent(configuration);
-
+		
 		String[] servers = configuration.getProperty("bc.channels.server").split(";");
 		
 		XMPPToolBox.getInstance().start(component, connection, servers);

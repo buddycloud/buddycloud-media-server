@@ -47,9 +47,11 @@ public class MediaResource extends MediaServerResource {
 				token = new String(challenge.getSecret());
 			}
 		} else {
-			
-
+			String[] split = decodeAuth(auth).split(";");
+			userId = split[0];
+			token = split[1];
 		}
+		
 		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
@@ -92,18 +94,28 @@ public class MediaResource extends MediaServerResource {
 
 	@Delete
 	public Representation deleteMedia() {
-		ChallengeResponse challenge = getChallengeResponse();
+		String auth = getQueryValue(Constants.AUTH_QUERY);
 		
-		if (challenge == null) {
-			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-			
-			return authenticationResponse();
+		String userId = null;
+		String token = null;
+
+		Request request = getRequest();
+		if (auth == null) {
+			ChallengeResponse challenge = request.getChallengeResponse();
+			if (challenge == null) {
+				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+				return authenticationResponse();
+			} else {
+				userId = challenge.getIdentifier();
+				token = new String(challenge.getSecret());
+			}
+		} else {
+			String[] split = decodeAuth(auth).split(";");
+			userId = split[0];
+			token = split[1];
 		}
 		
-		String userId = challenge.getIdentifier();
-		Request request = getRequest();
-		
-		if (!verifyRequest(userId, new String(challenge.getSecret()), request.getResourceRef().getIdentifier())) {
+		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
 		}
@@ -130,18 +142,28 @@ public class MediaResource extends MediaServerResource {
 
 	@Put
 	public Representation putMedia(Representation entity) {
-		ChallengeResponse challenge = getChallengeResponse();
+		String auth = getQueryValue(Constants.AUTH_QUERY);
 		
-		if (challenge == null) {
-			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-			
-			return authenticationResponse();
+		String userId = null;
+		String token = null;
+
+		Request request = getRequest();
+		if (auth == null) {
+			ChallengeResponse challenge = request.getChallengeResponse();
+			if (challenge == null) {
+				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+				return authenticationResponse();
+			} else {
+				userId = challenge.getIdentifier();
+				token = new String(challenge.getSecret());
+			}
+		} else {
+			String[] split = decodeAuth(auth).split(";");
+			userId = split[0];
+			token = split[1];
 		}
 		
-		String userId = challenge.getIdentifier();
-		Request request = getRequest();
-		
-		if (!verifyRequest(userId, new String(challenge.getSecret()), request.getResourceRef().getIdentifier())) {
+		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
 		}
@@ -183,18 +205,28 @@ public class MediaResource extends MediaServerResource {
 
 	@Get
 	public Representation getMedia() {
-		ChallengeResponse challenge = getChallengeResponse();
+		String auth = getQueryValue(Constants.AUTH_QUERY);
 		
-		if (challenge == null) {
-			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-			
-			return authenticationResponse();
+		String userId = null;
+		String token = null;
+
+		Request request = getRequest();
+		if (auth == null) {
+			ChallengeResponse challenge = request.getChallengeResponse();
+			if (challenge == null) {
+				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+				return authenticationResponse();
+			} else {
+				userId = challenge.getIdentifier();
+				token = new String(challenge.getSecret());
+			}
+		} else {
+			String[] split = decodeAuth(auth).split(";");
+			userId = split[0];
+			token = split[1];
 		}
 		
-		String userId = challenge.getIdentifier();
-		Request request = getRequest();
-		
-		if (!verifyRequest(userId, new String(challenge.getSecret()), request.getResourceRef().getIdentifier())) {
+		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
 		}

@@ -3,6 +3,7 @@ package com.buddycloud.mediaserver.web;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Base64;
 import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
@@ -28,5 +29,11 @@ public abstract class MediaServerResource extends ServerResource {
 		response.setChallengeRequests(challengeRequests);
 		
 		return response.getEntity();
+	}
+	
+	protected String decodeAuth(String auth) {
+		Base64 decoder = new Base64(true);
+		
+		return new String(decoder.decode(auth.getBytes()));
 	}
 }

@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 
 import junit.framework.Assert;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
@@ -56,6 +57,25 @@ public class DownloadMediaTest extends MediaServerTest {
 	}
 	
 	@Test
+	public void anonymousSuccessfulDownloadParamAuth() throws Exception {
+		Base64 encoder = new Base64(true);
+		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID +
+				"?auth=" + new String(encoder.encode(authStr.getBytes())));
+		
+		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.jpg");
+		FileOutputStream outputStream = FileUtils.openOutputStream(file);
+		client.get().write(outputStream);
+
+		Assert.assertTrue(file.exists());
+		
+		// Delete downloaded file
+		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
+		outputStream.close();
+	}
+	
+	@Test
 	public void anonymousPreviewSuccessfulDownload() throws Exception {
 		int height = 50;
 		int width = 50;
@@ -63,6 +83,32 @@ public class DownloadMediaTest extends MediaServerTest {
 		
 		ClientResource client = new ClientResource(url);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
+		
+		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
+		FileOutputStream outputStream = FileUtils.openOutputStream(file);
+		client.get().write(outputStream);
+
+		Assert.assertTrue(file.exists());
+		
+		// Delete downloaded file
+		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
+		outputStream.close();
+		
+		// Delete previews table row
+		final String previewId = dataSource.getPreviewId(MEDIA_ID, height, width);
+		dataSource.deletePreview(previewId);
+	}
+	
+	@Test
+	public void anonymousPreviewSuccessfulDownloadParamAuth() throws Exception {
+		int height = 50;
+		int width = 50;
+		Base64 encoder = new Base64(true);
+		String authStr = BASE_USER + ";" + BASE_TOKEN;
+
+		String url = BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID + "?maxheight=" + height + "&maxwidth=" + width +
+				"?auth=" + new String(encoder.encode(authStr.getBytes()));
+		ClientResource client = new ClientResource(url);
 		
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);

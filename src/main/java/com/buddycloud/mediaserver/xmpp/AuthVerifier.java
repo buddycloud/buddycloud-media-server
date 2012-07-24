@@ -27,8 +27,6 @@ public class AuthVerifier {
 			LOGGER.warn("Error while verifying user '" + userId + "' request");
 		}
 		
-		System.out.println(createVerifyTokenPacket(userId, token, url).toXML());
-		
 		return true;
 	}
 	
