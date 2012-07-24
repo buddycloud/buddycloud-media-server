@@ -7,7 +7,7 @@ import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 
 public class XMPPToolBox {
 	
-	private AuthVerifierClient authClient;
+	private AuthVerifier authClient;
 	private PubSubClient pubSubClient;
 	private boolean started;
 	
@@ -25,9 +25,9 @@ public class XMPPToolBox {
 	}
 	
 	
-	public void start(XMPPConnection connection, String[] servers) {
+	public void start(MediaServerComponent component, XMPPConnection connection, String[] servers) {
 		if (!started) {
-			authClient = new AuthVerifierClient(connection);
+			authClient = new AuthVerifier(component);
 			pubSubClient = new PubSubClient(connection, servers);
 			
 			started = true;
@@ -35,7 +35,7 @@ public class XMPPToolBox {
 	}
 	
 
-	public AuthVerifierClient getAuthClient() {
+	public AuthVerifier getAuthClient() {
 		return authClient;
 	}
 

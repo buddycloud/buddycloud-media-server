@@ -8,7 +8,6 @@ import org.restlet.routing.Router;
 import org.restlet.security.ChallengeAuthenticator;
 
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.web.verifier.MediaServerVerifier;
 
 
 public class MediaServerApplication extends Application {
@@ -39,13 +38,12 @@ public class MediaServerApplication extends Application {
 		DigestAuthenticator digestAuth = getDigestAuthenticator();
 		digestAuth.setNext(basicAuth);
 		
-		return digestAuth;
+		return router;
 	}
 	
 	protected DigestAuthenticator getDigestAuthenticator() {
 		DigestAuthenticator auth = new DigestAuthenticator(getContext(), REALM, "secret");
 		auth.setOptional(true);
-	    auth.setWrappedVerifier(new MediaServerVerifier());
 	    
 	    return auth;
 	}
@@ -53,7 +51,6 @@ public class MediaServerApplication extends Application {
 	protected ChallengeAuthenticator getBasicAuthenticator() {
 		ChallengeAuthenticator auth = new ChallengeAuthenticator(getContext(), ChallengeScheme.HTTP_BASIC, REALM);
 		auth.setOptional(false);
-	    auth.setVerifier(new MediaServerVerifier());
 	    
 	    return auth;
 	}

@@ -1,12 +1,13 @@
 package com.buddycloud.mediaserver.web;
 import org.apache.commons.fileupload.FileUploadException;
+import org.restlet.Request;
+import org.restlet.data.ChallengeResponse;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
-import org.restlet.resource.ServerResource;
 
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
@@ -16,12 +17,27 @@ import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 
 
-public class MediasResource extends ServerResource {
+public class MediasResource extends MediaServerResource {
 	
 	@Post
 	public Representation postMedia(Representation entity) {
-		String userId = getChallengeResponse().getIdentifier();
-		String entityId = getAttribute(Constants.ENTITY_ARG);
+		ChallengeResponse challenge = getChallengeResponse();
+		
+		if (challenge == null) {
+			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+			
+			return authenticationResponse();
+		}
+		
+		String userId = challenge.getIdentifier();
+		Request request = getRequest();
+		
+		if (!verifyRequest(userId, new String(challenge.getSecret()), request.getResourceRef().getIdentifier())) {
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
+		}
+		
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
 		if (entity != null) {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
@@ -54,9 +70,23 @@ public class MediasResource extends ServerResource {
 	
 	@Get
 	public Representation getMediasInfo() {
-		String userId = getChallengeResponse().getIdentifier();
-		String entityId = getAttribute(Constants.ENTITY_ARG);
+		ChallengeResponse challenge = getChallengeResponse();
 		
+		if (challenge == null) {
+			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+			
+			return authenticationResponse();
+		}
+		
+		String userId = challenge.getIdentifier();
+		Request request = getRequest();
+		
+		if (!verifyRequest(userId, new String(challenge.getSecret()), request.getResourceRef().getIdentifier())) {
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
+		}
+		
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 		String since = getQueryValue(Constants.MAX_HEIGHT_QUERY);
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();

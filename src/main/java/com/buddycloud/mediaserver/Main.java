@@ -10,14 +10,17 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.whack.ExternalComponentManager;
 import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.Server;
 import org.restlet.data.Protocol;
+import org.xmpp.component.ComponentException;
 
 import com.buddycloud.mediaserver.commons.ConfigurationContext;
 import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
+import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class Main {
@@ -29,7 +32,7 @@ public class Main {
 		
 		try {
 			startRestletComponent(configuration);
-			startXMPPConnection(configuration);
+			startXMPPToolBox(configuration);
 		} catch (Exception e) {
 			LOGGER.fatal(e.getMessage(), e);
 			System.exit(1);
@@ -54,12 +57,44 @@ public class Main {
 	}
 
 
-	private static void startXMPPConnection(Properties configuration) {
+	private static void startXMPPToolBox(Properties configuration) throws Exception {
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
 		
+		MediaServerComponent component = createXMPPComponent(configuration);
+
 		String[] servers = configuration.getProperty("bc.channels.server").split(";");
-		XMPPToolBox.getInstance().start(connection, servers);
+		
+		XMPPToolBox.getInstance().start(component, connection, servers);
+		
+		while (true) {
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				throw e;
+			}
+		}
+	}
+	
+	private static MediaServerComponent createXMPPComponent(Properties configuration) throws Exception {
+		ExternalComponentManager componentManager = new ExternalComponentManager(
+				configuration.getProperty("xmpp.component.host"),
+				Integer.valueOf(configuration.getProperty("xmpp.component.port")));
+
+		String subdomain = configuration.getProperty("xmpp.component.subdomain");
+		componentManager.setSecretKey(subdomain, 
+				configuration.getProperty("xmpp.component.secretkey"));
+
+		MediaServerComponent mediaServer = new MediaServerComponent();
+
+		try {
+			componentManager.addComponent(subdomain, mediaServer);
+		} catch (ComponentException e) {
+			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
+			throw e;
+		}
+		
+		return mediaServer;
 	}
 	
 	private static void addTraceListeners(XMPPConnection connection) {

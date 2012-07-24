@@ -10,8 +10,11 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.whack.ExternalComponentManager;
+import org.xmpp.component.ComponentException;
 
 import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
+import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class XMPPTest {
@@ -19,15 +22,39 @@ public class XMPPTest {
 
 	
 	public void start(Properties configuration) throws Exception {
-		startXMPPConnection(configuration);
+		startXMPPToolBox(configuration);
 	} 
 
-	private static void startXMPPConnection(Properties configuration) {
+	private static void startXMPPToolBox(Properties configuration) throws Exception {
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
 		
+		MediaServerComponent component = createXMPPComponent(configuration);
+
 		String[] servers = configuration.getProperty("bc.channels.server").split(";");
-		XMPPToolBox.getInstance().start(connection, servers);
+		
+		XMPPToolBox.getInstance().start(component, connection, servers);
+	}
+	
+	private static MediaServerComponent createXMPPComponent(Properties configuration) throws Exception {
+		ExternalComponentManager componentManager = new ExternalComponentManager(
+				configuration.getProperty("xmpp.component.host"),
+				Integer.valueOf(configuration.getProperty("xmpp.component.port")));
+
+		String subdomain = configuration.getProperty("xmpp.component.subdomain");
+		componentManager.setSecretKey(subdomain, 
+				configuration.getProperty("xmpp.component.secretkey"));
+
+		MediaServerComponent mediaServer = new MediaServerComponent();
+
+		try {
+			componentManager.addComponent(subdomain, mediaServer);
+		} catch (ComponentException e) {
+			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
+			throw e;
+		}
+		
+		return mediaServer;
 	}
 	
 	private static void addTraceListeners(XMPPConnection connection) {
