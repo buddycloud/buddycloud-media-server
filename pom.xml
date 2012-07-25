@@ -1,7 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<groupId>com.buddycloud.mediaserver</groupId>
 	<artifactId>buddycloud-media-server</artifactId>
 	<version>0.1</version>
@@ -9,9 +8,9 @@
 	<name>buddycloud-media-server</name>
 	<profiles>
 		<profile>
-			<id>broker</id>
+			<id>mediaserver</id>
 			<properties>
-				<assembly-config>broker-assembly.xml</assembly-config>
+				<assembly-config>mediaserver-assembly.xml</assembly-config>
 			</properties>
 		</profile>
 	</profiles>
@@ -230,7 +229,25 @@
 			<!-- Tomcat <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>tomcat-maven-plugin</artifactId> 
 				<configuration> <warFile>${project.build.directory}/${project.build.finalName}.war</warFile> 
 				</configuration> </plugin> -->
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>package-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/${assembly-config}</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
 			<!-- Jetty -->
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
