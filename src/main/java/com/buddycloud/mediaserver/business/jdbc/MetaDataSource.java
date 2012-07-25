@@ -20,7 +20,6 @@ import org.joda.time.format.ISODateTimeFormat;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.mchange.v2.c3p0.ComboPooledDataSource;

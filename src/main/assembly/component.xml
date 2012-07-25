@@ -8,7 +8,13 @@
   </dependencySets>
   
   <fileSets>
-  	
+  	<fileSet>
+  		<outputDirectory>/resources/schema</outputDirectory>
+  		<directory>resources/schema</directory>
+  		<includes>
+  			<include>**</include>
+  		</includes>
+  	</fileSet>
   	<fileSet>
   		<outputDirectory></outputDirectory>
   		<includes>
