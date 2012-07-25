@@ -21,7 +21,7 @@ public class MediaServerConfiguration {
 	public static final String JDBC_DB_URL_PROPERTY = "jdbc.db.url";
 	
 	// buddycloud
-	public static final String BC_CHANNELS_SERVER = "channels.buddycloud.org";
+	public static final String BC_CHANNELS_SERVER = "bc.channels.server";
 	
 	// XMPP
 	public static final String XMPP_COMPONENT_HOST = "xmpp.component.host";
