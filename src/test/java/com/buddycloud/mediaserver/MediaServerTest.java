@@ -14,7 +14,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
-import org.restlet.Component;
 
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
@@ -38,7 +37,8 @@ public abstract class MediaServerTest {
 	protected static final String BASE_URL = "http://localhost:8080";
 	
 
-	protected Component component;
+	protected RestletTest restletTest;
+	protected XMPPTest xmppTest;
 	protected Properties configuration;
 	protected MetaDataSource dataSource;
 	protected Gson gson;
@@ -60,14 +60,17 @@ public abstract class MediaServerTest {
 	
 	@After
 	public void tearDown() throws Exception {
-		component.stop();
-		
+		restletTest.shutdown();
+		xmppTest.shutdown();
 		testTearDown();
 	}
 	
 	protected void start() throws Exception {
-		component = new RestletTest().start();
-		new XMPPTest().start(configuration);
+		restletTest = new RestletTest();
+		restletTest.start(configuration);
+		
+		xmppTest = new XMPPTest();
+		xmppTest.start(configuration);
 	}
 	
 	protected Media buildMedia(String mediaId, String filePath) throws Exception {
