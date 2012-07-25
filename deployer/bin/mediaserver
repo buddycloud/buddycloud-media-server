@@ -21,8 +21,6 @@
 
 # Go to Search home and start the Crawler
 
-BIN_DIR=`dirname $0`
-cd "$BIN_DIR"/..
-java -cp .:./*:./lib/* com.buddycloud.mediaserver.Main &
+java -cp .:*:lib/* com.buddycloud.mediaserver.Main &
 
 exit 0

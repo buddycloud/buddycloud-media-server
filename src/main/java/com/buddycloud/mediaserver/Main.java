@@ -43,12 +43,19 @@ public class Main {
 	private static void startRestletComponent(Properties configuration) throws Exception {
 	    Component component = new Component();  
 	    
-	    Server server = component.getServers().add(Protocol.HTTPS, 8443);
-	    server.getContext().getParameters().add("sslContextFactory","org.restlet.ext.ssl.PkixSslContextFactory");
-	    server.getContext().getParameters().add("keystorePath", configuration.getProperty("https.keystore.path"));
-	    server.getContext().getParameters().add("keystorePassword", configuration.getProperty("https.keystore.password"));
-	    server.getContext().getParameters().add("keyPassword", configuration.getProperty("https.key.password"));
-	    server.getContext().getParameters().add("keystoreType", configuration.getProperty("https.keystore.type"));
+	    if (Boolean.valueOf(configuration.getProperty("https.enabled"))) {
+	    	Server server = component.getServers().add(Protocol.HTTPS, 
+	    			Integer.valueOf(configuration.getProperty("https.port")));
+	    	
+	    	server.getContext().getParameters().add("sslContextFactory","org.restlet.ext.ssl.PkixSslContextFactory");
+	    	server.getContext().getParameters().add("keystorePath", configuration.getProperty("https.keystore.path"));
+	    	server.getContext().getParameters().add("keystorePassword", configuration.getProperty("https.keystore.password"));
+	    	server.getContext().getParameters().add("keyPassword", configuration.getProperty("https.key.password"));
+	    	server.getContext().getParameters().add("keystoreType", configuration.getProperty("https.keystore.type"));
+	    } else {
+	    	component.getServers().add(Protocol.HTTP, 
+	    			Integer.valueOf(configuration.getProperty("http.port")));
+	    }
 	    
 	    Context context = component.getContext().createChildContext();
 		component.getDefaultHost().attach(new MediaServerApplication(context));
