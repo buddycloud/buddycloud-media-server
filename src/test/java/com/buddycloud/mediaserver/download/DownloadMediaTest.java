@@ -11,9 +11,9 @@ import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
 
-import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.MediaServerTest;
+import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class DownloadMediaTest extends MediaServerTest {
 	
@@ -21,7 +21,7 @@ public class DownloadMediaTest extends MediaServerTest {
 
 	
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
+		FileUtils.cleanDirectory(new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 		
 		dataSource.deleteMedia(MEDIA_ID);
@@ -29,7 +29,7 @@ public class DownloadMediaTest extends MediaServerTest {
 	
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
+		File destDir = new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}

@@ -25,11 +25,4 @@ public class Constants {
 	public static final String FILE_FIELD = "binaryfile";
 	public static final String NAME_FIELD = "filename";
 	public static final String DESC_FIELD = "description"; //optional
-	
-	//Properties file constants
-	public static final String MEDIA_STORAGE_ROOT_PROPERTY = "media.storage.root";
-	public static final String MEDIA_SIZE_LIMIT_PROPERTY = "media.sizelimit";
-	
-	public static final String JDBC_DRIVER_CLASS_PROPERTY = "jdbc.driver.class";
-	public static final String JDBC_DB_URL_PROPERTY = "jdbc.db.url";
 }

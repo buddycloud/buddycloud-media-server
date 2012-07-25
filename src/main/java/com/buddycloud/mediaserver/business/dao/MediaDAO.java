@@ -26,7 +26,7 @@ import org.restlet.ext.fileupload.RestletFileUpload;
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
-import com.buddycloud.mediaserver.commons.ConfigurationContext;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.ImageUtils;
 import com.buddycloud.mediaserver.commons.VideoUtils;
@@ -60,7 +60,7 @@ public class MediaDAO {
 		this.dataSource = new MetaDataSource();
 		this.pubsub = XMPPToolBox.getInstance().getPubSubClient();
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-		this.configuration = ConfigurationContext.getInstance().getConfiguration();
+		this.configuration = MediaServerConfiguration.getInstance().getConfiguration();
 	}
 
 
@@ -242,7 +242,7 @@ public class MediaDAO {
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(Constants.MEDIA_SIZE_LIMIT_PROPERTY)));
+		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
@@ -289,7 +289,7 @@ public class MediaDAO {
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(Constants.MEDIA_SIZE_LIMIT_PROPERTY)));
+		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
@@ -519,7 +519,7 @@ public class MediaDAO {
 	}
 
 	public String getDirectory(String entityId) {
-		return configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) +
+		return configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) +
 				File.separator + entityId;
 	}
 

@@ -18,8 +18,7 @@ import org.restlet.Component;
 
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.ConfigurationContext;
-import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -47,8 +46,8 @@ public abstract class MediaServerTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		configuration = ConfigurationContext.getInstance().getConfiguration();
-		configuration.setProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
+		configuration = MediaServerConfiguration.getInstance().getConfiguration();
+		configuration.setProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY, TEST_MEDIA_STORAGE_ROOT);
 		
 		dataSource = new MetaDataSource();
 		gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();

@@ -1,0 +1,21 @@
+<component>
+  
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/lib</outputDirectory>
+      <scope>runtime</scope>
+    </dependencySet>
+  </dependencySets>
+  
+  <fileSets>
+  	
+  	<fileSet>
+  		<outputDirectory></outputDirectory>
+  		<includes>
+  			<include>mediaserver.properties</include>
+  			<include>log4j.properties</include>
+  		</includes>
+  	</fileSet>
+  </fileSets>
+  
+</component>

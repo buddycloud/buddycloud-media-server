@@ -19,11 +19,12 @@ import org.restlet.resource.ClientResource;
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class UploadMediaTest extends MediaServerTest {
 	
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(Constants.MEDIA_STORAGE_ROOT_PROPERTY) + 
+		FileUtils.cleanDirectory(new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + 
 				File.separator + BASE_CHANNEL));
 	}
 	

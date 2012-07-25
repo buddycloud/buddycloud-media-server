@@ -19,7 +19,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
-import com.buddycloud.mediaserver.commons.ConfigurationContext;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -34,7 +34,7 @@ public class MetaDataSource {
 	
 
 	public MetaDataSource() {
-		this.configuration = ConfigurationContext.getInstance().getConfiguration();
+		this.configuration = MediaServerConfiguration.getInstance().getConfiguration();
 		
 		try {
 			createDataSource();
@@ -76,8 +76,8 @@ public class MetaDataSource {
 
 	private void createDataSource() throws PropertyVetoException {
 		this.dataSource = new ComboPooledDataSource();
-		dataSource.setDriverClass(configuration.getProperty(Constants.JDBC_DRIVER_CLASS_PROPERTY));
-		dataSource.setJdbcUrl(configuration.getProperty(Constants.JDBC_DB_URL_PROPERTY));
+		dataSource.setDriverClass(configuration.getProperty(MediaServerConfiguration.JDBC_DRIVER_CLASS_PROPERTY));
+		dataSource.setJdbcUrl(configuration.getProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY));
 	}
 	
 	// Medias

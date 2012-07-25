@@ -17,7 +17,7 @@ import org.restlet.Server;
 import org.restlet.data.Protocol;
 import org.xmpp.component.ComponentException;
 
-import com.buddycloud.mediaserver.commons.ConfigurationContext;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
@@ -28,7 +28,7 @@ public class Main {
 	
 	
 	public static void main(String[] args) {  
-		Properties configuration = ConfigurationContext.getInstance().getConfiguration();
+		Properties configuration = MediaServerConfiguration.getInstance().getConfiguration();
 		
 		try {
 			startRestletComponent(configuration);
