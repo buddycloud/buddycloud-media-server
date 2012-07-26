@@ -21,6 +21,6 @@
 
 # Go to MediaServer home and invoke the CreateSchema class
 
-java -cp .:*:lib/* com.buddycloud.mediaserver.jdbc.schema.CreateSchema
+java -cp .:../../*:../../lib/* com.buddycloud.mediaserver.jdbc.schema.CreateSchema
 
 exit 0

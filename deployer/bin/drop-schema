@@ -21,6 +21,6 @@
 
 # Go to MediaServer home and invoke the DropSchema class
 
-java -cp .:*:lib/* com.buddycloud.mediaserver.jdbc.schema.DropSchema
+java -cp .:../../*:../../lib/* com.buddycloud.mediaserver.jdbc.schema.DropSchema
 
 exit 0

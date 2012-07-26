@@ -8,6 +8,13 @@
   </dependencySets>
   
   <fileSets>
+   	<fileSet>
+  		<outputDirectory>/bin/schema</outputDirectory>
+  		<directory>deployer/bin</directory>
+  		<excludes>
+  			<exclude>mediaserver</exclude>
+  		</excludes>
+  	</fileSet>
   	<fileSet>
   		<outputDirectory>/resources/schema</outputDirectory>
   		<directory>resources/schema</directory>
