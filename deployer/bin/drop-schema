@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
@@ -16,11 +16,11 @@
 # limitations under the License.
 
 # -----------------------------------------------------------------------------
-# Start script for the buddycloud Media server
+# Drop schema script for the buddycloud Media Server
 # -----------------------------------------------------------------------------
 
-# Go to Media Server home and start the HTTP server, XMPP component and XMPP client
+# Go to MediaServer home and invoke the DropSchema class
 
-java -cp .:*:lib/* com.buddycloud.mediaserver.Main &
+java -cp .:*:lib/* com.buddycloud.mediaserver.jdbc.schema.DropSchema
 
 exit 0
