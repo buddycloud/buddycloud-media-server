@@ -121,7 +121,7 @@ public class PubSubClient {
 			Affiliation affiliation = null;
 
 			try {
-				affiliation = getAffiliation(node, userId);
+				affiliation = getAffiliation(node, getBareId(userId));
 			} catch (XMPPException e) {
 				LOGGER.warn("Could not read node '" + node.getId() + "' " +
 						"affiliation for '" + userId + "'", e);
@@ -135,5 +135,10 @@ public class PubSubClient {
 		}
 
 		return false;
+	}
+
+
+	private String getBareId(String userId) {
+		return userId.split("/")[0];
 	}
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Request;
-import org.restlet.data.ChallengeResponse;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.restlet.representation.FileRepresentation;
@@ -29,27 +28,27 @@ import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 public class MediaResource extends MediaServerResource {
 	
 	
-	@Post
-	public Representation postAvatar(Representation entity) {
+	@Put
+	public Representation putAvatar(Representation entity) {
 		String auth = getQueryValue(Constants.AUTH_QUERY);
+		Request request = getRequest();
 		
 		String userId = null;
 		String token = null;
+		
+		try {
+			userId = getUserId(request, auth);
+			token = getTransactionId(request, auth);
+			
+		} catch (Throwable t) {
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			
+			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
+		}
 
-		Request request = getRequest();
-		if (auth == null) {
-			ChallengeResponse challenge = request.getChallengeResponse();
-			if (challenge == null) {
-				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-				return authenticationResponse();
-			} else {
-				userId = challenge.getIdentifier();
-				token = new String(challenge.getSecret());
-			}
-		} else {
-			String[] split = decodeAuth(auth).split(";");
-			userId = split[0];
-			token = split[1];
+		if (userId == null || token == null) {
+			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+			return authenticationResponse();
 		}
 		
 		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
@@ -95,24 +94,22 @@ public class MediaResource extends MediaServerResource {
 	@Delete
 	public Representation deleteMedia() {
 		String auth = getQueryValue(Constants.AUTH_QUERY);
+		Request request = getRequest();
 		
 		String userId = null;
 		String token = null;
+		
+		try {
+			userId = getUserId(request, auth);
+			token = getTransactionId(request, auth);
+		} catch (Throwable t) {
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
+		}
 
-		Request request = getRequest();
-		if (auth == null) {
-			ChallengeResponse challenge = request.getChallengeResponse();
-			if (challenge == null) {
-				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-				return authenticationResponse();
-			} else {
-				userId = challenge.getIdentifier();
-				token = new String(challenge.getSecret());
-			}
-		} else {
-			String[] split = decodeAuth(auth).split(";");
-			userId = split[0];
-			token = split[1];
+		if (userId == null || token == null) {
+			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+			return authenticationResponse();
 		}
 		
 		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
@@ -140,27 +137,25 @@ public class MediaResource extends MediaServerResource {
 		}
 	}
 
-	@Put
-	public Representation putMedia(Representation entity) {
+	@Post
+	public Representation postMedia(Representation entity) {
 		String auth = getQueryValue(Constants.AUTH_QUERY);
+		Request request = getRequest();
 		
 		String userId = null;
 		String token = null;
+		
+		try {
+			userId = getUserId(request, auth);
+			token = getTransactionId(request, auth);
+		} catch (Throwable t) {
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
+		}
 
-		Request request = getRequest();
-		if (auth == null) {
-			ChallengeResponse challenge = request.getChallengeResponse();
-			if (challenge == null) {
-				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-				return authenticationResponse();
-			} else {
-				userId = challenge.getIdentifier();
-				token = new String(challenge.getSecret());
-			}
-		} else {
-			String[] split = decodeAuth(auth).split(";");
-			userId = split[0];
-			token = split[1];
+		if (userId == null || token == null) {
+			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+			return authenticationResponse();
 		}
 		
 		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
@@ -206,24 +201,28 @@ public class MediaResource extends MediaServerResource {
 	@Get
 	public Representation getMedia() {
 		String auth = getQueryValue(Constants.AUTH_QUERY);
+		Request request = getRequest();
 		
 		String userId = null;
 		String token = null;
+		
+		Integer maxHeight = null;
+		Integer maxWidth = null;
+		
+		try {
+			userId = getUserId(request, auth);
+			token = getTransactionId(request, auth);
 
-		Request request = getRequest();
-		if (auth == null) {
-			ChallengeResponse challenge = request.getChallengeResponse();
-			if (challenge == null) {
-				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-				return authenticationResponse();
-			} else {
-				userId = challenge.getIdentifier();
-				token = new String(challenge.getSecret());
-			}
-		} else {
-			String[] split = decodeAuth(auth).split(";");
-			userId = split[0];
-			token = split[1];
+			maxHeight = Integer.valueOf(getQueryValue(Constants.MAX_HEIGHT_QUERY));
+			maxWidth = Integer.valueOf(getQueryValue(Constants.MAX_WIDTH_QUERY));
+		} catch (Throwable t) {
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
+		}
+
+		if (userId == null || token == null) {
+			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+			return authenticationResponse();
 		}
 		
 		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
@@ -233,9 +232,6 @@ public class MediaResource extends MediaServerResource {
 		
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
-
-		String maxHeight = getQueryValue(Constants.MAX_HEIGHT_QUERY);
-		String maxWidth = getQueryValue(Constants.MAX_WIDTH_QUERY);
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
@@ -250,11 +246,11 @@ public class MediaResource extends MediaServerResource {
 			byte[] preview = null;
 
 			if (maxHeight != null && maxWidth == null) {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, Integer.valueOf(maxHeight));
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight);
 			} else if (maxHeight == null && maxWidth != null) {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, Integer.valueOf(maxWidth));
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxWidth);
 			} else {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, Integer.valueOf(maxHeight), Integer.valueOf(maxWidth));
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, maxWidth);
 			}
 
 			return new DynamicFileRepresentation(mediaType, preview);

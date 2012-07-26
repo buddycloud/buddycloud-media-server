@@ -14,8 +14,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
+import org.joda.time.DateTime;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
@@ -123,7 +122,7 @@ public class MetaDataSource {
 		return media;
 	}
 	
-	public List<Media> getMediasInfo(String entityId, String since) throws MetadataSourceException {
+	public List<Media> getMediasInfo(String entityId, DateTime since) throws MetadataSourceException {
 		LOGGER.debug("Get medias info from: " + entityId);
 		
 		List<Media> medias = new ArrayList<Media>();
@@ -131,8 +130,7 @@ public class MetaDataSource {
 		PreparedStatement statement;
 		try {
 			if (since != null) {
-				DateTimeFormatter formatter = ISODateTimeFormat.dateTime();
-				Timestamp timestamp = new Timestamp(formatter.parseDateTime(since).getMillis());
+				Timestamp timestamp = new Timestamp(since.getMillis());
 				
 				statement = prepareStatement(Queries.GET_MEDIAS_INFO_SINCE, entityId, timestamp);
 			} else {

@@ -59,7 +59,7 @@ public class DownloadMediaTest extends MediaServerTest {
 	@Test
 	public void anonymousSuccessfulDownloadParamAuth() throws Exception {
 		Base64 encoder = new Base64(true);
-		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
@@ -104,7 +104,7 @@ public class DownloadMediaTest extends MediaServerTest {
 		int height = 50;
 		int width = 50;
 		Base64 encoder = new Base64(true);
-		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
 		String url = BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID + "?maxheight=" + height + "&maxwidth=" + width +
 				"?auth=" + new String(encoder.encode(authStr.getBytes()));

@@ -75,7 +75,7 @@ public class UploadMediaTest extends MediaServerTest {
 		String description = "My Test Image";
 
 		Base64 encoder = new Base64(true);
-		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));

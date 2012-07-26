@@ -57,7 +57,7 @@ public class UpdateMediaTest extends MediaServerTest {
 		form.getEntries().add(new FormData(Constants.DESC_FIELD,
 		new StringRepresentation(description)));
 		
-		Representation result = client.put(form);
+		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
@@ -72,7 +72,7 @@ public class UpdateMediaTest extends MediaServerTest {
 		String description = "New Description";
 
 		Base64 encoder = new Base64(true);
-		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
@@ -84,7 +84,7 @@ public class UpdateMediaTest extends MediaServerTest {
 		form.getEntries().add(new FormData(Constants.DESC_FIELD,
 		new StringRepresentation(description)));
 		
-		Representation result = client.put(form);
+		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes

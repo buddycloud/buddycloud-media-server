@@ -50,7 +50,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	@Test
 	public void anonymousSuccessfulDownloadParamAuth() throws Exception {
 		Base64 encoder = new Base64(true);
-		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
@@ -79,7 +79,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		DateFormat dateFormat = ISO8601DateFormat.getInstance();
 
 		Base64 encoder = new Base64(true);
-		String authStr = BASE_USER + ";" + BASE_TOKEN;
+		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
 		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + dateFormat.format(calendar.getTime()) +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
