@@ -27,7 +27,7 @@ public class AuthVerifier {
 			LOGGER.warn("Error while verifying user '" + userId + "' request");
 		}
 		
-		return true;
+		return false;
 	}
 	
 	private Packet createVerifyTokenPacket(String userId, String token, String url) {
