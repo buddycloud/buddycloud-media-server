@@ -16,6 +16,7 @@ import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.FormFieldException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 
 public class MediasResource extends MediaServerResource {
@@ -102,17 +103,21 @@ public class MediasResource extends MediaServerResource {
 			return authenticationResponse();
 		}
 		
-		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
-			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
-		}
-		
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
+
+		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId); 
+		
+		if (!isChannelPublic) {
+			if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
+				setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+				return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
+			}
+		}
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
-			return new StringRepresentation(mediaDAO.getMediasInfo(userId, entityId, since), MediaType.APPLICATION_JSON);
+			return new StringRepresentation(mediaDAO.getMediasInfo(userId, entityId, since, isChannelPublic), MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);

@@ -119,9 +119,9 @@ public class MediaDAO {
 		}
 	}
 	
-	public String getMediasInfo(String userId, String entityId, DateTime since) 
+	public String getMediasInfo(String userId, String entityId, DateTime since, boolean isChannelPublic) 
 			throws UserNotAllowedException, MetadataSourceException {
-		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+		boolean isUserAllowed = isChannelPublic ? true : pubsub.matchUserCapability(userId, entityId, 
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
 
 		if (!isUserAllowed) {
