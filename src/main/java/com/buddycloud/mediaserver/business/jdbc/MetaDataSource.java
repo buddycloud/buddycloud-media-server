@@ -83,7 +83,7 @@ public class MetaDataSource {
 	public void storeMedia(Media media) throws MetadataSourceException {
 		LOGGER.debug("Store media metadata. Media ID: " + media.getId());
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(), media.getFileName(),
 					media.getEntityId(), media.getAuthor(), media.getTitle(), media.getDescription(), media.getMimeType(), 
@@ -91,12 +91,13 @@ public class MetaDataSource {
 					media.getLength(), media.getHeight(), media.getWidth());
 
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Media metadata successfully stored. Media ID: " + media.getId());
 		} catch (SQLException e) {
 			LOGGER.error("Error while saving media metadata", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
@@ -127,7 +128,7 @@ public class MetaDataSource {
 		
 		List<Media> medias = new ArrayList<Media>();
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			if (since != null) {
 				Timestamp timestamp = new Timestamp(since.getMillis());
@@ -142,12 +143,12 @@ public class MetaDataSource {
 				medias.add(resultToMedia(result));
 			}
 			
-			statement.close();
-
 			LOGGER.debug("Medias info sucessfully fetched");
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching medias info", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return medias;
@@ -158,7 +159,7 @@ public class MetaDataSource {
 		
 		Media media = null;
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.GET_MEDIA, mediaId);
 
@@ -170,11 +171,11 @@ public class MetaDataSource {
 			} else {
 				LOGGER.debug("No media with id '" + mediaId + "' found.");
 			}
-
-			statement.close();
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return media;
@@ -185,7 +186,7 @@ public class MetaDataSource {
 		
 		String uploader = null;
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.GET_MEDIA_UPLOADER, mediaId);
 
@@ -196,11 +197,11 @@ public class MetaDataSource {
 			} else {
 				LOGGER.debug("No media with id '" + mediaId + "' found.");
 			}
-
-			statement.close();
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return uploader;
@@ -211,7 +212,7 @@ public class MetaDataSource {
 		
 		String mimeType = null;
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.GET_MEDIA_MIME_TYPE, mediaId);
 
@@ -222,11 +223,11 @@ public class MetaDataSource {
 			} else {
 				LOGGER.debug("No media with id '" + mediaId + "' found.");
 			}
-
-			statement.close();
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return mimeType;
@@ -237,7 +238,7 @@ public class MetaDataSource {
 		
 		String mimeType = null;
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.GET_MEDIA_EXTENSION, mediaId);
 
@@ -248,11 +249,11 @@ public class MetaDataSource {
 			} else {
 				LOGGER.debug("No media with id '" + mediaId + "' found.");
 			}
-
-			statement.close();
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching media metadata: " + e.getMessage(), e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return mimeType;
@@ -261,50 +262,53 @@ public class MetaDataSource {
 	public void updateMediaLastUpdated(String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Updating last updated date. Media ID: " + mediaId);
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			Timestamp now = new Timestamp((new Date()).getTime());
 
 			statement = prepareStatement(Queries.UPDATE_MEDIA_LAST_UPDATED, now, mediaId);
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Media last updated date successfully updated. Media ID: " + mediaId);
 		} catch (SQLException e) {
 			LOGGER.error("Error while updating media last updated date", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
 	public void updateMediaFields(Media media) throws MetadataSourceException {
 		LOGGER.debug("Updating media fields. Media ID: " + media.getId());
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.UPDATE_MEDIA_FIELDS, media.getFileName(), media.getTitle(), media.getDescription(), media.getId());
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Media fields updated. Media ID: " + media.getId());
 		} catch (SQLException e) {
 			LOGGER.error("Error while updating media fields", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
 	public void deleteMedia(String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Deleting media metadata. Media ID: " + mediaId);
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.DELETE_MEDIA, mediaId);
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Media metadata successfully deleted. Media ID: " + mediaId);
 		} catch (SQLException e) {
 			LOGGER.error("Error while deleting media metadata", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
@@ -313,18 +317,19 @@ public class MetaDataSource {
 	public void storePreview(Preview preview) throws MetadataSourceException {
 		LOGGER.debug("Store preview metadata. Preview ID: " + preview.getId());
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.SAVE_PREVIEW, preview.getId(), preview.getMediaId(), preview.getShaChecksum(),
 					preview.getFileSize(), preview.getHeight(), preview.getWidth());
 
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Preview metadata successfully stored. Preview ID: " + preview.getId());
 		} catch (SQLException e) {
 			LOGGER.error("Error while saving preview metadata", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
@@ -333,7 +338,7 @@ public class MetaDataSource {
 		
 		List<String> previews = new LinkedList<String>();
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.GET_MEDIA_PREVIEWS, mediaId);
 
@@ -345,11 +350,11 @@ public class MetaDataSource {
 				previews.add(previewId);
 				LOGGER.debug("Preview successfuly fetched. Preview ID: " + previewId);
 			}
-
-			statement.close();
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching media previews", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return previews;
@@ -360,7 +365,7 @@ public class MetaDataSource {
 		
 		String previewId = null;
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.GET_MEDIA_PREVIEW, mediaId, height, width);
 
@@ -371,11 +376,11 @@ public class MetaDataSource {
 			} else {
 				LOGGER.debug("No previews for media '" + mediaId + "' found.");
 			}
-
-			statement.close();
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching media preview", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return previewId;
@@ -384,32 +389,34 @@ public class MetaDataSource {
 	public void deletePreview(String previewId) throws MetadataSourceException {
 		LOGGER.debug("Deleting preview metadata. Preview ID: " + previewId);
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.DELETE_PREVIEW, previewId);
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Preview metadata successfully deleted. Preview ID: " + previewId);
 		} catch (SQLException e) {
 			LOGGER.error("Error while deleting preview metadata", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
 	public void deletePreviewsFromMedia(String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Deleting previews. Media ID: " + mediaId);
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.DELETE_PREVIEWS_FROM_MEDIA, mediaId);
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Previews metadata successfully deleted. Media ID: " + mediaId);
 		} catch (SQLException e) {
 			LOGGER.error("Error while deleting previews metadata", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
@@ -418,17 +425,17 @@ public class MetaDataSource {
 	public void storeAvatar(Media media) throws MetadataSourceException {
 		LOGGER.debug("Store " + media.getEntityId() + " avatar. Media ID: " + media.getId());
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.SAVE_AVATAR, media.getId(), media.getEntityId());
-
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Avatar successfully stored. Media ID: " + media.getId());
 		} catch (SQLException e) {
 			LOGGER.error("Error while saving avatar", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
@@ -437,7 +444,7 @@ public class MetaDataSource {
 		
 		String mediaId = null;
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.GET_ENTITY_AVATAR_ID, entityId);
 
@@ -448,11 +455,11 @@ public class MetaDataSource {
 			} else {
 				LOGGER.debug("No avatar for '" + entityId + "' found.");
 			}
-
-			statement.close();
 		} catch (SQLException e) {
 			LOGGER.error("Error while fetching entity avatar", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 		
 		return mediaId;
@@ -461,32 +468,34 @@ public class MetaDataSource {
 	public void updateEntityAvatar(String entityId, String mediaId) throws MetadataSourceException {
 		LOGGER.debug("Updating " + entityId + " avatar");
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.UPDATE_AVATAR, mediaId, entityId);
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Entity avatar successfully updated. Entity ID: " + entityId + ". Media ID: " + mediaId);
 		} catch (SQLException e) {
 			LOGGER.error("Error while updating entity avatar", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 	
 	public void deleteEntityAvatar(String entityId) throws MetadataSourceException {
 		LOGGER.debug("Deleting avatar from '" + entityId + "' avatar");
 		
-		PreparedStatement statement;
+		PreparedStatement statement = null;
 		try {
 			statement = prepareStatement(Queries.DELETE_ENTITY_AVATAR, entityId);
 			statement.execute();
-			statement.close();
 			
 			LOGGER.debug("Avatar from '" + entityId + "' successfully deleted");
 		} catch (SQLException e) {
 			LOGGER.error("Error while deleting avatar", e);
 			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
 		}
 	}
 }

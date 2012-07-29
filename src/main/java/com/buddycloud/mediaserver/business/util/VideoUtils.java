@@ -1,4 +1,4 @@
-package com.buddycloud.mediaserver.commons;
+package com.buddycloud.mediaserver.business.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

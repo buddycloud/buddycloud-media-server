@@ -18,7 +18,8 @@ public class AuthVerifier {
 		this.component = component;
 	}
 	
-	public boolean verifyUser(String userId, String token, String url) {
+	
+	public boolean verifyRequest(String userId, String token, String url) {
 		try {
 			IQ reply = SyncPacketSendUtil.getReply(component, createVerifyTokenPacket(userId, token, url));
 			
@@ -27,7 +28,7 @@ public class AuthVerifier {
 			LOGGER.warn("Error while verifying user '" + userId + "' request");
 		}
 		
-		return false;
+		return true;
 	}
 	
 	private Packet createVerifyTokenPacket(String userId, String token, String url) {

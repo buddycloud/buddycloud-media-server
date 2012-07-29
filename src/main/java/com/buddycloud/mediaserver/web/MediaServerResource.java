@@ -47,6 +47,7 @@ public abstract class MediaServerResource extends ServerResource {
 
 		if (auth == null) {
 			ChallengeResponse challenge = request.getChallengeResponse();
+			
 			if (challenge != null) {
 				userId = challenge.getIdentifier();
 			}
