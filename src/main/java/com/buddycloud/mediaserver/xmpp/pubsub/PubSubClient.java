@@ -24,8 +24,10 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.RSMSet;
+import org.jivesoftware.smackx.pubsub.AccessModel;
 import org.jivesoftware.smackx.pubsub.Affiliation;
 import org.jivesoftware.smackx.pubsub.AffiliationsExtension;
+import org.jivesoftware.smackx.pubsub.ConfigureForm;
 import org.jivesoftware.smackx.pubsub.Node;
 import org.jivesoftware.smackx.pubsub.NodeExtension;
 import org.jivesoftware.smackx.pubsub.PubSubElementType;
@@ -136,7 +138,23 @@ public class PubSubClient {
 
 		return false;
 	}
-
+	
+	public boolean isChannelPublic(String entityId) {
+		Node node = getNode(entityId);
+		
+		if (node != null) {
+			try {
+				ConfigureForm config = node.getNodeConfiguration();
+				
+				return config.getAccessModel().equals(AccessModel.open);
+			} catch (XMPPException e) {
+				LOGGER.warn("Could not get node '" + node.getId() + "' " +
+						"access model", e);
+			}
+		}
+		
+		return false;
+	}
 
 	private String getBareId(String userId) {
 		return userId.split("/")[0];

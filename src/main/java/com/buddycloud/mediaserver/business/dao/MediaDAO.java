@@ -134,14 +134,14 @@ public class MediaDAO {
 		return gson.toJson(medias);
 	}
 
-	public File getMedia(String userId, String entityId, String mediaId) 
+	public File getMedia(String userId, String entityId, String mediaId, boolean isChannelPublic) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatar(entityId);
 		}
 
-		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+		boolean isUserAllowed = isChannelPublic ? true : pubsub.matchUserCapability(userId, entityId, 
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
 
 		if (!isUserAllowed) {
@@ -178,20 +178,20 @@ public class MediaDAO {
 		return media;
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer size) 
+	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer size, boolean isChannelPublic) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
-		return getMediaPreview(userId, entityId, mediaId, size, size);
+		return getMediaPreview(userId, entityId, mediaId, size, size, isChannelPublic);
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer maxHeight, Integer maxWidth) 
+	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer maxHeight, Integer maxWidth, boolean isChannelPublic) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
 		}
 
-		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+		boolean isUserAllowed = isChannelPublic ? true : pubsub.matchUserCapability(userId, entityId, 
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
 		
 		if (!isUserAllowed) {

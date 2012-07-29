@@ -23,6 +23,7 @@ import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 
 public class MediaResource extends MediaServerResource {
@@ -39,7 +40,6 @@ public class MediaResource extends MediaServerResource {
 		try {
 			userId = getUserId(request, auth);
 			token = getTransactionId(request, auth);
-			
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			
@@ -213,8 +213,15 @@ public class MediaResource extends MediaServerResource {
 			userId = getUserId(request, auth);
 			token = getTransactionId(request, auth);
 
-			maxHeight = Integer.valueOf(getQueryValue(Constants.MAX_HEIGHT_QUERY));
-			maxWidth = Integer.valueOf(getQueryValue(Constants.MAX_WIDTH_QUERY));
+			String queryValue = getQueryValue(Constants.MAX_HEIGHT_QUERY);
+			if (queryValue != null) {
+				maxHeight = Integer.valueOf(queryValue);
+			}
+			
+			queryValue = getQueryValue(Constants.MAX_HEIGHT_QUERY);
+			if (queryValue != null) {
+				maxWidth = Integer.valueOf(queryValue);
+			}
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
@@ -225,13 +232,17 @@ public class MediaResource extends MediaServerResource {
 			return authenticationResponse();
 		}
 		
-		if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
-			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
-		}
-		
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
+
+		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId); 
+		
+		if (!isChannelPublic) {
+			if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
+				setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+				return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
+			}
+		}
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
@@ -239,18 +250,18 @@ public class MediaResource extends MediaServerResource {
 			MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
 
 			if (maxHeight == null && maxWidth == null) {
-				File media = mediaDAO.getMedia(userId, entityId, mediaId);
+				File media = mediaDAO.getMedia(userId, entityId, mediaId, isChannelPublic);
 				return new FileRepresentation(media, mediaType);
 			}
 			
 			byte[] preview = null;
 
 			if (maxHeight != null && maxWidth == null) {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight);
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, isChannelPublic);
 			} else if (maxHeight == null && maxWidth != null) {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxWidth);
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxWidth, isChannelPublic);
 			} else {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, maxWidth);
+				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, maxWidth, isChannelPublic);
 			}
 
 			return new DynamicFileRepresentation(mediaType, preview);
