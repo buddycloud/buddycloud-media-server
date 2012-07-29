@@ -80,44 +80,54 @@ public class MediasResource extends MediaServerResource {
 	
 	@Get
 	public Representation getMediasInfo() {
-		String auth = getQueryValue(Constants.AUTH_QUERY);
 		Request request = getRequest();
-		
+
 		String userId = null;
 		String token = null;
-
-		DateTime since = null;
-		
-		try {
-			userId = getUserId(request, auth);
-			token = getTransactionId(request, auth);
-			
-			since = ISODateTimeFormat.dateTime().parseDateTime(getQueryValue(Constants.SINCE_QUERY));
-		} catch (Throwable t) {
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
-		}
-
-		if (userId == null || token == null) {
-			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-			return authenticationResponse();
-		}
 		
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
 		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId); 
 		
 		if (!isChannelPublic) {
+			String auth = getQueryValue(Constants.AUTH_QUERY);
+
+			try {
+				userId = getUserId(request, auth);
+				token = getTransactionId(request, auth);
+			} catch (Throwable t) {
+				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+				return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
+			}
+	
+			if (userId == null || token == null) {
+				setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+				return authenticationResponse();
+			}
+	
 			if (!verifyRequest(userId, token,request.getResourceRef().getIdentifier())) {
 				setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 				return new StringRepresentation("User '" + userId + "' not allowed to access resource", MediaType.APPLICATION_JSON);
 			}
 		}
+		
+		DateTime since = null;
 
+		try {
+			String queryValue = getQueryValue(Constants.SINCE_QUERY);
+
+			if (queryValue != null) {
+				since = ISODateTimeFormat.dateTime().parseDateTime(queryValue);
+			}
+		} catch (Throwable t) {
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
+		}
+		
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
-			return new StringRepresentation(mediaDAO.getMediasInfo(userId, entityId, since, isChannelPublic), MediaType.APPLICATION_JSON);
+			return new StringRepresentation(mediaDAO.getMediasInfo(userId, entityId, since), MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(), MediaType.APPLICATION_JSON);

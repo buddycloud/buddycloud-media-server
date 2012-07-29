@@ -119,34 +119,41 @@ public class MediaDAO {
 		}
 	}
 	
-	public String getMediasInfo(String userId, String entityId, DateTime since, boolean isChannelPublic) 
+	public String getMediasInfo(String userId, String entityId, DateTime since) 
 			throws UserNotAllowedException, MetadataSourceException {
-		boolean isUserAllowed = isChannelPublic ? true : pubsub.matchUserCapability(userId, entityId, 
-				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
-
-		if (!isUserAllowed) {
-			LOGGER.debug("User '" + userId + "' not allowed to peform get info operation on: " + entityId);
-			throw new UserNotAllowedException(userId);
+		
+		if (userId != null) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+			
+			if (!isUserAllowed) {
+				LOGGER.debug("User '" + userId + "' not allowed to peform get info operation on: " + entityId);
+				throw new UserNotAllowedException(userId);
+			}
 		}
+		
+		LOGGER.debug("Getting medias info from: " + entityId);
 		
 		List<Media> medias = dataSource.getMediasInfo(entityId, since);
 	
 		return gson.toJson(medias);
 	}
 
-	public File getMedia(String userId, String entityId, String mediaId, boolean isChannelPublic) 
+	public File getMedia(String userId, String entityId, String mediaId) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatar(entityId);
 		}
-
-		boolean isUserAllowed = isChannelPublic ? true : pubsub.matchUserCapability(userId, entityId, 
-				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
-
-		if (!isUserAllowed) {
-			LOGGER.debug("User '" + userId + "' not allowed to peform get operation on: " + entityId);
-			throw new UserNotAllowedException(userId);
+		
+		if (userId != null) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+			
+			if (!isUserAllowed) {
+				LOGGER.debug("User '" + userId + "' not allowed to peform get operation on: " + entityId);
+				throw new UserNotAllowedException(userId);
+			}
 		}
 
 		LOGGER.debug("Getting media. Media ID: " + mediaId);
@@ -178,25 +185,27 @@ public class MediaDAO {
 		return media;
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer size, boolean isChannelPublic) 
+	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer size) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
-		return getMediaPreview(userId, entityId, mediaId, size, size, isChannelPublic);
+		return getMediaPreview(userId, entityId, mediaId, size, size);
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer maxHeight, Integer maxWidth, boolean isChannelPublic) 
+	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer maxHeight, Integer maxWidth) 
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
 		}
-
-		boolean isUserAllowed = isChannelPublic ? true : pubsub.matchUserCapability(userId, entityId, 
-				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
 		
-		if (!isUserAllowed) {
-			LOGGER.debug("User '" + userId + "' not allowed to get media on: " + entityId);
-			throw new UserNotAllowedException(userId);
+		if (userId != null) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
+					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+			
+			if (!isUserAllowed) {
+				LOGGER.debug("User '" + userId + "' not allowed to get media on: " + entityId);
+				throw new UserNotAllowedException(userId);
+			}
 		}
 
 		LOGGER.debug("Getting media preview. Media ID: " + mediaId);
