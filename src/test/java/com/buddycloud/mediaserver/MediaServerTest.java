@@ -17,6 +17,9 @@ import org.junit.Before;
 
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.business.util.AudioUtils;
+import com.buddycloud.mediaserver.business.util.ImageUtils;
+import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -77,6 +80,7 @@ public abstract class MediaServerTest {
 	protected Media buildMedia(String mediaId, String filePath) throws Exception {
 		File file = new File(filePath);
 		String fileName = file.getName();
+		String extension = fileName.substring(fileName.indexOf(".") + 1);
 		
 		Media media = new Media();
 		media.setId(mediaId);
@@ -87,12 +91,21 @@ public abstract class MediaServerTest {
 		media.setTitle("A title");
 		media.setFileSize(file.length());
 		media.setShaChecksum(getFileShaChecksum(file));
-		media.setFileExtension(fileName.substring(fileName.indexOf(".")));
+		media.setFileExtension(extension);
 		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
 		
-		BufferedImage img = ImageIO.read(file);
-		media.setHeight(img.getHeight());
-		media.setWidth(img.getWidth());
+		if (ImageUtils.isImage(extension)) {
+			BufferedImage img = ImageIO.read(file);
+			media.setHeight(img.getHeight());
+			media.setWidth(img.getWidth());
+		} else if (VideoUtils.isVideo(extension)) {
+			VideoUtils videoUtils = new VideoUtils(file);
+			media.setLength(videoUtils.getVideoLength());
+			media.setHeight(videoUtils.getVideoHeight());
+			media.setWidth(videoUtils.getVideoWidth());
+		} else if (AudioUtils.isAudio(extension)) {
+			media.setLength(AudioUtils.getAudioLength(file));
+		}
 		
 		return media;
 	}

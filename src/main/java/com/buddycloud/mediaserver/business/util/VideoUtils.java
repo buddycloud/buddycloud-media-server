@@ -2,7 +2,6 @@ package com.buddycloud.mediaserver.business.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 import java.util.Arrays;
 
 import com.xuggle.xuggler.ICodec;
@@ -31,7 +30,7 @@ public class VideoUtils {
 	private void start(File video) {
 		this.container = IContainer.make();
 
-		if (container.open(video.getAbsolutePath(), IContainer.Type.READ, null) > 0) {
+		if (container.open(video.getAbsolutePath(), IContainer.Type.READ, null) >= 0) {
 			int numStreams = container.getNumStreams();
 
 			for (int i = 0; i < numStreams; i++) {
@@ -61,23 +60,29 @@ public class VideoUtils {
 		return this.coder != null ? this.coder.getWidth() : null;
 	}
 
-	public BufferedImage createVideoPreview(int width, int height) throws IOException {
+	@SuppressWarnings("deprecation")
+	public BufferedImage createVideoPreview(int width, int height) {
 		if (coder != null && videoLength != null) {
-			IPacket packet = IPacket.make();
-			container.seekKeyFrame(videoStreamIndex, videoLength/2, IURLProtocolHandler.SEEK_SET); 
-			
-			int nBytesRead = container.readNextPacket(packet); 
-			
-			IVideoPicture picture = null;
-			coder.decodeVideo(picture, packet, nBytesRead);
-			
-			picture = IVideoPicture.make(coder.getPixelType(),
-					coder.getWidth(), coder.getHeight());
-			
-			IConverter converter = ConverterFactory.createConverter(ConverterFactory.XUGGLER_BGR_24, picture);
-			BufferedImage image = converter.toImage(picture);
-			
-			return ImageUtils.createImagePreview(image, width, height);
+			if (coder.open() >= 0) {
+				IPacket packet = IPacket.make();
+				container.seekKeyFrame(videoStreamIndex, videoLength/2, IURLProtocolHandler.SEEK_SET); 
+				
+				int nBytesRead = container.readNextPacket(packet); 
+				while (packet.getStreamIndex() != videoStreamIndex) {
+					nBytesRead = container.readNextPacket(packet); 
+				}
+				
+				IVideoPicture picture = IVideoPicture.make(coder.getPixelType(), coder.getWidth(), coder.getHeight());
+				
+				while (!picture.isComplete()) {
+					coder.decodeVideo(picture, packet, nBytesRead);
+				}
+				
+				IConverter converter = ConverterFactory.createConverter(ConverterFactory.XUGGLER_BGR_24, picture);
+				BufferedImage image = converter.toImage(picture);
+				
+				return ImageUtils.createImagePreview(image, width, height);
+			}
 		}
 		
 		return null;

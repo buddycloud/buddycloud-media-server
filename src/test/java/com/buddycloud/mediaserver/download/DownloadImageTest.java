@@ -15,7 +15,7 @@ import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
-public class DownloadMediaTest extends MediaServerTest {
+public class DownloadImageTest extends MediaServerTest {
 	
 	private static final String TEST_OUTPUT_DIR = "test";
 

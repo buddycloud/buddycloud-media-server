@@ -54,7 +54,7 @@ public class ImageUtils {
 		return thumbnail;
 	}
 	
-	public static BufferedImage createImagePreview(BufferedImage img, int width, int height) throws IOException {
+	public static BufferedImage createImagePreview(BufferedImage img, int width, int height) {
 		final BufferedImage thumbnail = Scalr.resize(img, width, height);
 		img.flush();
 		
