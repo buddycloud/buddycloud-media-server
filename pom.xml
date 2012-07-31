@@ -147,10 +147,11 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- Xuggle -->
 		<dependency>
-			<groupId>javax.media</groupId>
-			<artifactId>jmf</artifactId>
-			<version>2.1.1e</version>
+			<groupId>xuggle</groupId>
+			<artifactId>xuggle-xuggler</artifactId>
+			<version>5.4</version>
 		</dependency>
 
 		<!-- XMPP -->
@@ -182,7 +183,7 @@
 			<artifactId>xpp3</artifactId>
 			<version>1.1.4c</version>
 		</dependency>
-		
+
 		<!-- Joda -->
 		<dependency>
 			<groupId>joda-time</groupId>
@@ -273,6 +274,10 @@
 		<repository>
 			<id>maven-kune</id>
 			<url>http://kune.ourproject.org/mavenrepo/</url>
+		</repository>
+		<repository>
+			<id>xuggle repo</id>
+			<url>http://xuggle.googlecode.com/svn/trunk/repo/share/java/</url>
 		</repository>
 	</repositories>
 </project>

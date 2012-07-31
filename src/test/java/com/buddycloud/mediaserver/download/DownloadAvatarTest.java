@@ -13,7 +13,6 @@ import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class DownloadAvatarTest extends MediaServerTest {

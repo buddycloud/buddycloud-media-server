@@ -24,7 +24,8 @@ import com.google.gson.GsonBuilder;
 public abstract class MediaServerTest {
 	
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
-	protected static final String TESTMEDIA_NAME = "testimage.jpg";
+	protected static final String TESTIMAGE_NAME = "testimage.jpg";
+	protected static final String TESTVIDEO_NAME = "testvideo.avi";
 	protected static final String TESTAVATAR_NAME = "testavatar.jpg";
 	protected static final String TESTFILE_PATH = "resources/tests/";
 	
@@ -32,8 +33,8 @@ public abstract class MediaServerTest {
 	protected static final String MEDIA_ID = generateRandomString();
 
 	protected static final String BASE_TOKEN = "secret";
-	protected static final String BASE_CHANNEL = "mediaservertest@topics.buddycloud.org";
-	protected static final String BASE_USER = "rodrigods@buddycloud.org";
+	protected static final String BASE_CHANNEL = "mediaservertest@buddycloud.org";
+	protected static final String BASE_USER = "mediaservertest@buddycloud.org";
 	protected static final String BASE_URL = "http://localhost:8080";
 	
 
@@ -75,17 +76,18 @@ public abstract class MediaServerTest {
 	
 	protected Media buildMedia(String mediaId, String filePath) throws Exception {
 		File file = new File(filePath);
+		String fileName = file.getName();
 		
 		Media media = new Media();
 		media.setId(mediaId);
-		media.setFileName(TESTMEDIA_NAME);
+		media.setFileName(fileName);
 		media.setEntityId(BASE_CHANNEL);
 		media.setAuthor(BASE_USER);
 		media.setDescription("A description");
 		media.setTitle("A title");
 		media.setFileSize(file.length());
 		media.setShaChecksum(getFileShaChecksum(file));
-		media.setFileExtension("jpg");
+		media.setFileExtension(fileName.substring(fileName.indexOf(".")));
 		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
 		
 		BufferedImage img = ImageIO.read(file);

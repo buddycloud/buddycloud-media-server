@@ -5,7 +5,7 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.Packet;
 
-import com.buddycloud.mediaserver.xmpp.util.HTTPAuthPacket;
+import com.buddycloud.mediaserver.xmpp.util.HTTPAuthIQ;
 import com.buddycloud.mediaserver.xmpp.util.SyncPacketSendUtil;
 
 public class AuthVerifier {
@@ -19,20 +19,20 @@ public class AuthVerifier {
 	}
 	
 	
-	public boolean verifyRequest(String userId, String token, String url) {
+	public boolean verifyRequest(String userId, String tid, String url) {
 		try {
-			IQ reply = SyncPacketSendUtil.getReply(component, createVerifyTokenPacket(userId, token, url));
+			IQ reply = SyncPacketSendUtil.getReply(component, createVerifyIQ(userId, tid, url));
 			
 			return reply.getType().equals(Type.result);
 		} catch (Exception e) {
 			LOGGER.warn("Error while verifying user '" + userId + "' request");
 		}
 		
-		return true;
+		return false;
 	}
 	
-	private Packet createVerifyTokenPacket(String userId, String token, String url) {
-		HTTPAuthPacket packet = new HTTPAuthPacket(token, url);
+	private Packet createVerifyIQ(String userId, String tid, String url) {
+		HTTPAuthIQ packet = new HTTPAuthIQ(tid, url);
 		packet.setTo(userId);
 		
 		return packet;

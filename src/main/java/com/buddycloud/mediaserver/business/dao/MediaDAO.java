@@ -26,6 +26,7 @@ import org.restlet.ext.fileupload.RestletFileUpload;
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
+import com.buddycloud.mediaserver.business.util.AudioUtils;
 import com.buddycloud.mediaserver.business.util.ImageUtils;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.commons.Constants;
@@ -49,7 +50,7 @@ import com.google.gson.GsonBuilder;
 public class MediaDAO {
 
 	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
-	
+
 	protected MetaDataSource dataSource;
 	protected PubSubClient pubsub;
 	protected Properties configuration;
@@ -118,24 +119,24 @@ public class MediaDAO {
 			dataSource.deletePreviewsFromMedia(mediaId);
 		}
 	}
-	
+
 	public String getMediasInfo(String userId, String entityId, DateTime since) 
 			throws UserNotAllowedException, MetadataSourceException {
-		
+
 		if (userId != null) {
 			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
 					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
-			
+
 			if (!isUserAllowed) {
 				LOGGER.debug("User '" + userId + "' not allowed to peform get info operation on: " + entityId);
 				throw new UserNotAllowedException(userId);
 			}
 		}
-		
+
 		LOGGER.debug("Getting medias info from: " + entityId);
-		
+
 		List<Media> medias = dataSource.getMediasInfo(entityId, since);
-	
+
 		return gson.toJson(medias);
 	}
 
@@ -145,11 +146,11 @@ public class MediaDAO {
 		if (isAvatar(mediaId)) {
 			return getAvatar(entityId);
 		}
-		
+
 		if (userId != null) {
 			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
 					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
-			
+
 			if (!isUserAllowed) {
 				LOGGER.debug("User '" + userId + "' not allowed to peform get operation on: " + entityId);
 				throw new UserNotAllowedException(userId);
@@ -197,11 +198,11 @@ public class MediaDAO {
 		if (isAvatar(mediaId)) {
 			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
 		}
-		
+
 		if (userId != null) {
 			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
 					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
-			
+
 			if (!isUserAllowed) {
 				LOGGER.debug("User '" + userId + "' not allowed to get media on: " + entityId);
 				throw new UserNotAllowedException(userId);
@@ -216,7 +217,7 @@ public class MediaDAO {
 	public byte[] getAvatarPreview(String userId, String entityId, Integer maxHeight, Integer maxWidth)
 			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
-		
+
 		LOGGER.debug("Getting avatar preview. Avatar ID: " + entityId);
 
 		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
@@ -277,7 +278,7 @@ public class MediaDAO {
 		}
 
 		dataSource.updateMediaFields(media);
-		
+
 		// Update last updated date
 		dataSource.updateMediaLastUpdated(mediaId);
 		LOGGER.debug("Media sucessfully updated. Media ID: " + media.getId());
@@ -291,7 +292,7 @@ public class MediaDAO {
 
 		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
-		
+
 		if (!isUserAllowed) {
 			LOGGER.debug("User '" + userId + "' not allowed to uploade file on: " + entityId);
 			throw new UserNotAllowedException(userId);
@@ -313,7 +314,7 @@ public class MediaDAO {
 		}
 
 		FileItem fileField = getFileFormField(items);
-		
+
 		InputStream inputStream = null;
 		try {
 			inputStream = fileField.getInputStream();
@@ -413,7 +414,7 @@ public class MediaDAO {
 		if (ImageUtils.isImage(extension)) {
 			previewImg = ImageUtils.createImagePreview(media, maxWidth, maxHeight);
 		} else if (VideoUtils.isVideo(extension)){
-			previewImg = VideoUtils.createVideoPreview(media, maxWidth, maxHeight);
+			previewImg = new VideoUtils(media).createVideoPreview(maxWidth, maxHeight);
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
@@ -483,17 +484,22 @@ public class MediaDAO {
 		media.setFileExtension(fileExtension);
 
 		//XXX adds a lot of delay to the server side, maybe the client should send those information
-		if (ImageUtils.isImage(fileExtension)) {
-			try {
+		try {
+			if (ImageUtils.isImage(fileExtension)) {
 				BufferedImage img = ImageIO.read(file);
 				media.setHeight(img.getHeight());
 				media.setWidth(img.getWidth());
-			} catch (IOException e) {
-				LOGGER.error("Error while getting image height and size", e);
+			} else if (VideoUtils.isVideo(fileExtension)) {
+				VideoUtils videoUtils = new VideoUtils(file);
+				media.setLength(videoUtils.getVideoLength());
+				media.setHeight(videoUtils.getVideoHeight());
+				media.setWidth(videoUtils.getVideoWidth());
+			} else if (AudioUtils.isAudio(fileExtension)) {
+				media.setLength(AudioUtils.getAudioLength(file));
 			}
-		} else if (VideoUtils.isVideo(fileExtension)) {
-			media.setLength(VideoUtils.getVideoLength(file));
-		} //TODO else if AUDIO media.setLength()
+		} catch (Throwable t) {
+			LOGGER.error("Error while resolving media format properties", t);
+		}
 
 		return media;
 	}

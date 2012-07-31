@@ -32,7 +32,7 @@ public class UploadMediaTest extends MediaServerTest {
 	protected void testSetUp() throws Exception {}
 	
 	@Test
-	public void anonymousSuccessfulUpload() throws Exception {
+	public void uploadImage() throws Exception {
 		// file fields
 		String title = "Test Image";
 		String description = "My Test Image";
@@ -44,7 +44,7 @@ public class UploadMediaTest extends MediaServerTest {
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
 		form.getEntries().add(new FormData(Constants.NAME_FIELD,
-		new StringRepresentation(TESTMEDIA_NAME)));
+		new StringRepresentation(TESTIMAGE_NAME)));
 		form.getEntries().add(new FormData(Constants.TITLE_FIELD,
 		new StringRepresentation(title)));	
 		form.getEntries().add(new FormData(Constants.DESC_FIELD,
@@ -53,13 +53,13 @@ public class UploadMediaTest extends MediaServerTest {
 		new StringRepresentation(BASE_USER)));
 
 		form.getEntries().add(new FormData(Constants.FILE_FIELD,
-		new FileRepresentation(TESTFILE_PATH + TESTMEDIA_NAME, MediaType.IMAGE_JPEG)));
+		new FileRepresentation(TESTFILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
 		
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
-		assertEquals(TESTMEDIA_NAME, media.getFileName());
+		assertEquals(TESTIMAGE_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
 		assertEquals(BASE_USER, media.getAuthor());
@@ -69,7 +69,7 @@ public class UploadMediaTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulUploadParamAuth() throws Exception {
+	public void uploadImageParamAuth() throws Exception {
 		// file fields
 		String title = "Test Image";
 		String description = "My Test Image";
@@ -83,7 +83,7 @@ public class UploadMediaTest extends MediaServerTest {
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
 		form.getEntries().add(new FormData(Constants.NAME_FIELD,
-		new StringRepresentation(TESTMEDIA_NAME)));
+		new StringRepresentation(TESTIMAGE_NAME)));
 		form.getEntries().add(new FormData(Constants.TITLE_FIELD,
 		new StringRepresentation(title)));	
 		form.getEntries().add(new FormData(Constants.DESC_FIELD,
@@ -92,13 +92,50 @@ public class UploadMediaTest extends MediaServerTest {
 		new StringRepresentation(BASE_USER)));
 
 		form.getEntries().add(new FormData(Constants.FILE_FIELD,
-		new FileRepresentation(TESTFILE_PATH + TESTMEDIA_NAME, MediaType.IMAGE_JPEG)));
+		new FileRepresentation(TESTFILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
 		
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
-		assertEquals(TESTMEDIA_NAME, media.getFileName());
+		assertEquals(TESTIMAGE_NAME, media.getFileName());
+		assertEquals(title, media.getTitle());
+		assertEquals(description, media.getDescription());
+		assertEquals(BASE_USER, media.getAuthor());
+
+		// delete metadata
+		dataSource.deleteMedia(media.getId());
+	}
+	
+	@Test
+	public void uploadVideo() throws Exception {
+		// file fields
+		String title = "Test Video";
+		String description = "My Test Video";
+
+		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
+
+		
+		FormDataSet form = new FormDataSet();
+		form.setMultipart(true);
+		form.getEntries().add(new FormData(Constants.NAME_FIELD,
+		new StringRepresentation(TESTVIDEO_NAME)));
+		form.getEntries().add(new FormData(Constants.TITLE_FIELD,
+		new StringRepresentation(title)));	
+		form.getEntries().add(new FormData(Constants.DESC_FIELD,
+		new StringRepresentation(description)));
+		form.getEntries().add(new FormData(Constants.AUTHOR_FIELD,
+		new StringRepresentation(BASE_USER)));
+
+		form.getEntries().add(new FormData(Constants.FILE_FIELD,
+		new FileRepresentation(TESTFILE_PATH + TESTVIDEO_NAME, MediaType.VIDEO_AVI)));
+		
+		Representation result = client.post(form);
+		Media media = gson.fromJson(result.getText(), Media.class);
+
+		// verify if resultant media has the passed attributes
+		assertEquals(TESTVIDEO_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
 		assertEquals(BASE_USER, media.getAuthor());

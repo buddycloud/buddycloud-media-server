@@ -33,9 +33,9 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 			FileUtils.cleanDirectory(destDir);
 		}
 		
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTMEDIA_NAME), new File(destDir + File.separator + MEDIA_ID));
+		FileUtils.copyFile(new File(TESTFILE_PATH + TESTIMAGE_NAME), new File(destDir + File.separator + MEDIA_ID));
 		
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTMEDIA_NAME);
+		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTIMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
 	
