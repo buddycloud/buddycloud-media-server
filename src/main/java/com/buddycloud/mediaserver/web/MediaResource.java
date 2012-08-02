@@ -138,7 +138,7 @@ public class MediaResource extends MediaServerResource {
 	}
 
 	@Post
-	public Representation postMedia(Representation entity) {
+	public Representation updateMedia(Representation entity) {
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		Request request = getRequest();
 		

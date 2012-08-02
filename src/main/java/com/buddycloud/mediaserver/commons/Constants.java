@@ -16,8 +16,8 @@ public class Constants {
 	public static final String AUTH_QUERY = "auth";
 
 	//URLs
-	public static final String MEDIAS_URL = "/media/{" + ENTITY_ARG + "}";
-	public static final String MEDIA_ID_URL = "/media/{" + ENTITY_ARG + "}/{" + MEDIA_ARG + "}";
+	public static final String MEDIAS_URL = "/{" + ENTITY_ARG + "}/media";
+	public static final String MEDIA_ID_URL = "/{" + ENTITY_ARG + "}/media/{" + MEDIA_ARG + "}";
 	
 	//Storage constants
 	public static final String AUTHOR_FIELD = "author";

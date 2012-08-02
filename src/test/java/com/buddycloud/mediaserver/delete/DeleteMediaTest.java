@@ -37,7 +37,7 @@ public class DeleteMediaTest extends MediaServerTest {
 	
 	@Test
 	public void anonymousSuccessfulDelete() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		client.delete();
@@ -50,7 +50,7 @@ public class DeleteMediaTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID +
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
 		
 		client.delete();

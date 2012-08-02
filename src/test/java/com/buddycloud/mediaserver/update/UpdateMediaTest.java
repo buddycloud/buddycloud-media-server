@@ -47,7 +47,7 @@ public class UpdateMediaTest extends MediaServerTest {
 		String title = "New Image";
 		String description = "New Description";
 
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID);
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 
 		FormDataSet form = new FormDataSet();
@@ -74,7 +74,7 @@ public class UpdateMediaTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "/" + MEDIA_ID +
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = new FormDataSet();

@@ -37,7 +37,7 @@ public class UploadMediaTest extends MediaServerTest {
 		String title = "Test Image";
 		String description = "My Test Image";
 
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL);
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 
 		
@@ -77,7 +77,7 @@ public class UploadMediaTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL +
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media" +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
 		
 		FormDataSet form = new FormDataSet();
@@ -113,7 +113,7 @@ public class UploadMediaTest extends MediaServerTest {
 		String title = "Test Video";
 		String description = "My Test Video";
 
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL);
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 
 		

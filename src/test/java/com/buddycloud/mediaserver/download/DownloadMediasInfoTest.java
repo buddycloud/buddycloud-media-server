@@ -41,7 +41,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL);
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
@@ -52,7 +52,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL +
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media" +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
@@ -65,7 +65,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		
 		DateFormat dateFormat = ISO8601DateFormat.getInstance();
 		
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + dateFormat.format(calendar.getTime()));
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media?since=" + dateFormat.format(calendar.getTime()));
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
@@ -81,7 +81,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 		
-		ClientResource client = new ClientResource(BASE_URL + "/media/" + BASE_CHANNEL + "?since=" + dateFormat.format(calendar.getTime()) +
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media?since=" + dateFormat.format(calendar.getTime()) +
 				"?auth=" + new String(encoder.encode(authStr.getBytes())));
 		
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
