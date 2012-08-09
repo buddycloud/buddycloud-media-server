@@ -31,89 +31,103 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class DownloadVideoTest extends MediaServerTest {
-	
+
 	private static final String TEST_OUTPUT_DIR = "test";
 
-	
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + 
-				File.separator + BASE_CHANNEL));
-		
+		FileUtils
+				.cleanDirectory(new File(
+						configuration
+								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+								+ File.separator + BASE_CHANNEL));
+
 		dataSource.deleteMedia(MEDIA_ID);
 	}
-	
+
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
+		File destDir = new File(
+				configuration
+						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+						+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
-		
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTVIDEO_NAME), new File(destDir + File.separator + MEDIA_ID));
-		
+
+		FileUtils.copyFile(new File(TESTFILE_PATH + TESTVIDEO_NAME), new File(
+				destDir + File.separator + MEDIA_ID));
+
 		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTVIDEO_NAME);
 		dataSource.storeMedia(media);
 	}
-	
+
 	@Test
 	public void downloadVideo() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
-		
-		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.avi");
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media/" + MEDIA_ID);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
+
+		File file = new File(TEST_OUTPUT_DIR + File.separator
+				+ "downloaded.avi");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
 
 		Assert.assertTrue(file.exists());
-		
+
 		// Delete downloaded file
 		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 		outputStream.close();
 	}
-	
+
 	@Test
 	public void downloadVideoParamAuth() throws Exception {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
-		
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID +
-				"?auth=" + new String(encoder.encode(authStr.getBytes())));
-		
-		File file = new File(TEST_OUTPUT_DIR + File.separator + "downloaded.avi");
+
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media/" + MEDIA_ID + "?auth="
+				+ new String(encoder.encode(authStr.getBytes())));
+
+		File file = new File(TEST_OUTPUT_DIR + File.separator
+				+ "downloaded.avi");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
 
 		Assert.assertTrue(file.exists());
-		
+
 		// Delete downloaded file
 		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 		outputStream.close();
 	}
-	
+
 	@Test
 	public void downloadVideoPreview() throws Exception {
 		int height = 50;
 		int width = 50;
-		String url = BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID + "?maxheight=" + height + "&maxwidth=" + width;
-		
+		String url = BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID
+				+ "?maxheight=" + height + "&maxwidth=" + width;
+
 		ClientResource client = new ClientResource(url);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
-		
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
+
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
 
 		Assert.assertTrue(file.exists());
-		
+
 		// Delete downloaded file
 		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 		outputStream.close();
-		
+
 		// Delete previews table row
-		final String previewId = dataSource.getPreviewId(MEDIA_ID, height, width);
+		final String previewId = dataSource.getPreviewId(MEDIA_ID, height,
+				width);
 		dataSource.deletePreview(previewId);
 	}
-	
+
 	@Test
 	public void downloadVideoPreviewParamAuth() throws Exception {
 		int height = 50;
@@ -121,22 +135,24 @@ public class DownloadVideoTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
-		String url = BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID + "?maxheight=" + height + "&maxwidth=" + width +
-				"&auth=" + new String(encoder.encode(authStr.getBytes()));
+		String url = BASE_URL + "/" + BASE_CHANNEL + "/media/" + MEDIA_ID
+				+ "?maxheight=" + height + "&maxwidth=" + width + "&auth="
+				+ new String(encoder.encode(authStr.getBytes()));
 		ClientResource client = new ClientResource(url);
-		
+
 		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
 
 		Assert.assertTrue(file.exists());
-		
+
 		// Delete downloaded file
 		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 		outputStream.close();
-		
+
 		// Delete previews table row
-		final String previewId = dataSource.getPreviewId(MEDIA_ID, height, width);
+		final String previewId = dataSource.getPreviewId(MEDIA_ID, height,
+				width);
 		dataSource.deletePreview(previewId);
 	}
 }

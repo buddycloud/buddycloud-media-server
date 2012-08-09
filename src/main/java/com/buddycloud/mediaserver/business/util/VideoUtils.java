@@ -36,11 +36,9 @@ public class VideoUtils {
 	private Integer videoStreamIndex;
 	private Long videoLength;
 
-	
 	public VideoUtils(File video) {
 		start(video);
 	}
-
 
 	private void start(File video) {
 		this.container = IContainer.make();
@@ -62,15 +60,15 @@ public class VideoUtils {
 			}
 		}
 	}
-	
+
 	public Long getVideoLength() {
 		return this.videoLength != null ? this.videoLength : null;
 	}
-	
+
 	public Integer getVideoHeight() {
 		return this.coder != null ? this.coder.getHeight() : null;
 	}
-	
+
 	public Integer getVideoWidth() {
 		return this.coder != null ? this.coder.getWidth() : null;
 	}
@@ -80,26 +78,30 @@ public class VideoUtils {
 		if (coder != null && videoLength != null) {
 			if (coder.open() >= 0) {
 				IPacket packet = IPacket.make();
-				container.seekKeyFrame(videoStreamIndex, videoLength/2, IURLProtocolHandler.SEEK_SET); 
-				
-				int nBytesRead = container.readNextPacket(packet); 
+				container.seekKeyFrame(videoStreamIndex, videoLength / 2,
+						IURLProtocolHandler.SEEK_SET);
+
+				int nBytesRead = container.readNextPacket(packet);
 				while (packet.getStreamIndex() != videoStreamIndex) {
-					nBytesRead = container.readNextPacket(packet); 
+					nBytesRead = container.readNextPacket(packet);
 				}
-				
-				IVideoPicture picture = IVideoPicture.make(coder.getPixelType(), coder.getWidth(), coder.getHeight());
-				
+
+				IVideoPicture picture = IVideoPicture.make(
+						coder.getPixelType(), coder.getWidth(),
+						coder.getHeight());
+
 				while (!picture.isComplete()) {
 					coder.decodeVideo(picture, packet, nBytesRead);
 				}
-				
-				IConverter converter = ConverterFactory.createConverter(ConverterFactory.XUGGLER_BGR_24, picture);
+
+				IConverter converter = ConverterFactory.createConverter(
+						ConverterFactory.XUGGLER_BGR_24, picture);
 				BufferedImage image = converter.toImage(picture);
-				
+
 				return ImageUtils.createImagePreview(image, width, height);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -149,5 +151,5 @@ public class VideoUtils {
 			"vpj", "vro", "vs4", "vse", "vsp", "w32", "wcp", "webm", "wlmp",
 			"wm", "wmd", "wmmp", "wmv", "wmx", "wot", "wp3", "wpl", "wtv",
 			"wvx", "xej", "xel", "xesc", "xfl", "xlmv", "xvid", "yuv", "zm1",
-			"zm2", "zm3", "zmv"};
+			"zm2", "zm3", "zmv" };
 }

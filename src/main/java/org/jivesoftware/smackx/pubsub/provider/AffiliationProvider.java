@@ -21,17 +21,20 @@ import org.jivesoftware.smackx.provider.EmbeddedExtensionProvider;
 import org.jivesoftware.smackx.pubsub.Affiliation;
 
 /**
- * Parses the affiliation element out of the reply stanza from the server
- * as specified in the <a href="http://xmpp.org/extensions/xep-0060.html#schemas-pubsub">affiliation schema</a>.
+ * Parses the affiliation element out of the reply stanza from the server as
+ * specified in the <a
+ * href="http://xmpp.org/extensions/xep-0060.html#schemas-pubsub">affiliation
+ * schema</a>.
  * 
  * @author Robin Collier
  */
-public class AffiliationProvider extends EmbeddedExtensionProvider
-{
+public class AffiliationProvider extends EmbeddedExtensionProvider {
 	@Override
-	protected PacketExtension createReturnExtension(String currentElement, String currentNamespace, Map<String, String> attributeMap, List<? extends PacketExtension> content)
-	{
-		return new Affiliation(attributeMap.get("jid"), Affiliation.Type.valueOf(attributeMap.get("affiliation")));
+	protected PacketExtension createReturnExtension(String currentElement,
+			String currentNamespace, Map<String, String> attributeMap,
+			List<? extends PacketExtension> content) {
+		return new Affiliation(attributeMap.get("jid"),
+				Affiliation.Type.valueOf(attributeMap.get("affiliation")));
 	}
 
 }

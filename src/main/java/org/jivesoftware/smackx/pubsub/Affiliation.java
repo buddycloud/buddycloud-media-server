@@ -17,70 +17,63 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.packet.PacketExtension;
 
 /**
- * Represents a affiliation between a user and a node, where the {@link #type} defines 
- * the type of affiliation.
+ * Represents a affiliation between a user and a node, where the {@link #type}
+ * defines the type of affiliation.
  * 
- * Affiliations are retrieved from the {@link PubSubManager#getAffiliations()} method, which 
- * gets affiliations for the calling user, based on the identity that is associated with 
- * the {@link Connection}.
+ * Affiliations are retrieved from the {@link PubSubManager#getAffiliations()}
+ * method, which gets affiliations for the calling user, based on the identity
+ * that is associated with the {@link Connection}.
  * 
  * @author Robin Collier
  */
-public class Affiliation implements PacketExtension
-{
+public class Affiliation implements PacketExtension {
 	protected String node;
 	protected Type type;
-	
-	public enum Type
-	{
-		member, none, outcast, owner, publisher, moderator, followerPlus	
+
+	public enum Type {
+		member, none, outcast, owner, publisher, moderator, followerPlus
 	}
 
 	/**
 	 * Constructs an affiliation.
 	 * 
-	 * @param nodeId The node the user is affiliated with.
-	 * @param affiliation The type of affiliation.
+	 * @param nodeId
+	 *            The node the user is affiliated with.
+	 * @param affiliation
+	 *            The type of affiliation.
 	 */
-	public Affiliation(String nodeId, Type affiliation)
-	{
+	public Affiliation(String nodeId, Type affiliation) {
 		node = nodeId;
 		type = affiliation;
 	}
-	
-	public String getNodeId()
-	{
+
+	public String getNodeId() {
 		return node;
 	}
-	
-	public Type getType()
-	{
+
+	public Type getType() {
 		return type;
 	}
-	
-	public String getElementName()
-	{
+
+	public String getElementName() {
 		return "subscription";
 	}
 
-	public String getNamespace()
-	{
+	public String getNamespace() {
 		return null;
 	}
 
-	public String toXML()
-	{
+	public String toXML() {
 		StringBuilder builder = new StringBuilder("<");
 		builder.append(getElementName());
 		appendAttribute(builder, "node", node);
 		appendAttribute(builder, "affiliation", type.toString());
-		
+
 		builder.append("/>");
 		return builder.toString();
 	}
 
-	private void appendAttribute(StringBuilder builder, String att, String value)
-	{
+	private void appendAttribute(StringBuilder builder, String att, String value) {
 		builder.append(" ");
 		builder.append(att);
 		builder.append("='");

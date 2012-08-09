@@ -43,26 +43,28 @@ public class PubSubClient {
 
 	private List<PubSubManager> pubSubManagers = new LinkedList<PubSubManager>();
 
-
 	public PubSubClient(Connection connection, String[] servers) {
 		init(connection, servers);
 	}
-
 
 	private void init(Connection connection, String[] servers) {
 		for (String server : servers) {
 			PubSubManager pubSubManager = new PubSubManager(connection, server);
 			pubSubManagers.add(pubSubManager);
 		}
-		
-		Object affiliationsProvider = ProviderManager.getInstance().getExtensionProvider(
-				PubSubElementType.AFFILIATIONS.getElementName(), PubSubNamespace.BASIC.getXmlns());
-		ProviderManager.getInstance().addExtensionProvider(PubSubElementType.AFFILIATIONS.getElementName(), 
+
+		Object affiliationsProvider = ProviderManager.getInstance()
+				.getExtensionProvider(
+						PubSubElementType.AFFILIATIONS.getElementName(),
+						PubSubNamespace.BASIC.getXmlns());
+		ProviderManager.getInstance().addExtensionProvider(
+				PubSubElementType.AFFILIATIONS.getElementName(),
 				PubSubNamespace.OWNER.getXmlns(), affiliationsProvider);
-		
-		Object affiliationProvider = ProviderManager.getInstance().getExtensionProvider(
-				"affiliation", PubSubNamespace.BASIC.getXmlns());
-		ProviderManager.getInstance().addExtensionProvider("affiliation", 
+
+		Object affiliationProvider = ProviderManager.getInstance()
+				.getExtensionProvider("affiliation",
+						PubSubNamespace.BASIC.getXmlns());
+		ProviderManager.getInstance().addExtensionProvider("affiliation",
 				PubSubNamespace.OWNER.getXmlns(), affiliationProvider);
 	}
 
@@ -72,7 +74,7 @@ public class PubSubClient {
 			try {
 				node = manager.getNode("/user/" + entityId + "/posts");
 			} catch (Exception e) {
-				//do nothing
+				// do nothing
 				continue;
 			}
 		}
@@ -80,19 +82,22 @@ public class PubSubClient {
 		return node;
 	}
 
-	private Affiliation getAffiliation(Node node, String userId) throws XMPPException {
+	private Affiliation getAffiliation(Node node, String userId)
+			throws XMPPException {
 
-		PubSub request = node.createPubsubPacket(Type.GET, 
-				new NodeExtension(PubSubElementType.AFFILIATIONS, node.getId()), 
+		PubSub request = node.createPubsubPacket(Type.GET, new NodeExtension(
+				PubSubElementType.AFFILIATIONS, node.getId()),
 				PubSubNamespace.OWNER);
-		
+
 		int itemCount = 0;
 		while (true) {
 
 			PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
 
-			AffiliationsExtension subElem = (AffiliationsExtension) reply.getExtension(
-					PubSubElementType.AFFILIATIONS.getElementName(), PubSubNamespace.BASIC.getXmlns());
+			AffiliationsExtension subElem = (AffiliationsExtension) reply
+					.getExtension(
+							PubSubElementType.AFFILIATIONS.getElementName(),
+							PubSubNamespace.BASIC.getXmlns());
 
 			List<Affiliation> affiliations = subElem.getAffiliations();
 
@@ -104,7 +109,8 @@ public class PubSubClient {
 
 			itemCount += affiliations.size();
 
-			if (reply.getRsmSet() == null || itemCount == reply.getRsmSet().getCount()) {
+			if (reply.getRsmSet() == null
+					|| itemCount == reply.getRsmSet().getCount()) {
 				break;
 			}
 
@@ -116,7 +122,8 @@ public class PubSubClient {
 		return null;
 	}
 
-	public boolean matchUserCapability(String userId, String entityId, CapabilitiesDecorator capability) {
+	public boolean matchUserCapability(String userId, String entityId,
+			CapabilitiesDecorator capability) {
 		Node node = getNode(entityId);
 
 		if (node != null) {
@@ -125,34 +132,35 @@ public class PubSubClient {
 			try {
 				affiliation = getAffiliation(node, getBareId(userId));
 			} catch (XMPPException e) {
-				LOGGER.warn("Could not read node '" + node.getId() + "' " +
-						"affiliation for '" + userId + "'", e);
+				LOGGER.warn("Could not read node '" + node.getId() + "' "
+						+ "affiliation for '" + userId + "'", e);
 
 				return false;
 			}
 
 			if (affiliation != null) {
-				return capability.isUserAllowed(affiliation.getType().toString());
+				return capability.isUserAllowed(affiliation.getType()
+						.toString());
 			}
 		}
 
 		return false;
 	}
-	
+
 	public boolean isChannelPublic(String entityId) {
 		Node node = getNode(entityId);
-		
+
 		if (node != null) {
 			try {
 				ConfigureForm config = node.getNodeConfiguration();
-				
+
 				return config.getAccessModel().equals(AccessModel.open);
 			} catch (XMPPException e) {
-				LOGGER.warn("Could not get node '" + node.getId() + "' " +
-						"access model", e);
+				LOGGER.warn("Could not get node '" + node.getId() + "' "
+						+ "access model", e);
 			}
 		}
-		
+
 		return false;
 	}
 

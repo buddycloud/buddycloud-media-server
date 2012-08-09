@@ -28,17 +28,16 @@ import org.apache.commons.io.IOUtils;
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 
 public class Schema {
-	
+
 	private static final String SQL_DELIMITER = ";";
 	private static final String SQL_CREATE_SCHEMA_FILE = "resources/schema/create_schema.sql";
 	private static final String SQL_DROP_SCHEMA_FILE = "resources/schema/drop_schema.sql";
-	
-	
+
 	@SuppressWarnings("unchecked")
 	public void runScript(MetaDataSource dataSource, String sqlFile)
 			throws IOException, FileNotFoundException, SQLException {
-		List<String> readLines = IOUtils.readLines(
-				new FileInputStream(sqlFile));
+		List<String> readLines = IOUtils
+				.readLines(new FileInputStream(sqlFile));
 
 		Connection connection = dataSource.getConnection();
 		StringBuilder statementStr = new StringBuilder();
@@ -55,13 +54,14 @@ public class Schema {
 
 		connection.close();
 	}
-	
-	public void create() throws FileNotFoundException, IOException, SQLException {
+
+	public void create() throws FileNotFoundException, IOException,
+			SQLException {
 		MetaDataSource dataSource = new MetaDataSource();
 
 		runScript(dataSource, SQL_CREATE_SCHEMA_FILE);
 	}
-	
+
 	public void drop() throws FileNotFoundException, IOException, SQLException {
 		MetaDataSource dataSource = new MetaDataSource();
 

@@ -34,49 +34,51 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class XMPPTest implements TextExtension {
 	private static Logger LOGGER = Logger.getLogger(XMPPTest.class);
-	
+
 	private boolean started;
 	private String componentSubDomain;
 	private ExternalComponentManager componentManager;
 	private MediaServerComponent component;
-	
-	
+
 	public XMPPTest() {
 		this.started = false;
 	}
-	
-	
+
 	public void start(Properties configuration) throws Exception {
 		if (!started) {
 			XMPPConnection connection = createAndStartConnection(configuration);
 			addTraceListeners(connection);
-			
+
 			component = createXMPPComponent(configuration);
-			
-			String[] servers = configuration.getProperty("bc.channels.server").split(";");
-			
+
+			String[] servers = configuration.getProperty("bc.channels.server")
+					.split(";");
+
 			XMPPToolBox.getInstance().start(component, connection, servers);
 
 			started = true;
 		}
-	} 
-	
+	}
+
 	public void shutdown() throws Exception {
 		if (started) {
 			component.shutdown();
 			componentManager.removeComponent(componentSubDomain);
-			
+
 			started = false;
 		}
 	}
-	
-	private MediaServerComponent createXMPPComponent(Properties configuration) throws Exception {
+
+	private MediaServerComponent createXMPPComponent(Properties configuration)
+			throws Exception {
 		componentManager = new ExternalComponentManager(
 				configuration.getProperty("xmpp.component.host"),
-				Integer.valueOf(configuration.getProperty("xmpp.component.port")));
+				Integer.valueOf(configuration
+						.getProperty("xmpp.component.port")));
 
-		componentSubDomain = configuration.getProperty("xmpp.component.subdomain");
-		componentManager.setSecretKey(componentSubDomain, 
+		componentSubDomain = configuration
+				.getProperty("xmpp.component.subdomain");
+		componentManager.setSecretKey(componentSubDomain,
 				configuration.getProperty("xmpp.component.secretkey"));
 
 		MediaServerComponent mediaServer = new MediaServerComponent();
@@ -87,10 +89,10 @@ public class XMPPTest implements TextExtension {
 			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
 			throw e;
 		}
-		
+
 		return mediaServer;
 	}
-	
+
 	private void addTraceListeners(XMPPConnection connection) {
 		PacketFilter iqFilter = new PacketFilter() {
 			@Override
@@ -116,27 +118,28 @@ public class XMPPTest implements TextExtension {
 	}
 
 	private XMPPConnection createAndStartConnection(Properties configuration) {
-		
-		String serviceName = configuration.getProperty("xmpp.connection.servicename");
+
+		String serviceName = configuration
+				.getProperty("xmpp.connection.servicename");
 		String host = configuration.getProperty("xmpp.connection.host");
 		String userName = configuration.getProperty("xmpp.connection.username");
-		
-		ConnectionConfiguration cc = new ConnectionConfiguration(
-				host,
-				Integer.parseInt(configuration.getProperty("xmpp.connection.port")),
-				serviceName);
-		
+
+		ConnectionConfiguration cc = new ConnectionConfiguration(host,
+				Integer.parseInt(configuration
+						.getProperty("xmpp.connection.port")), serviceName);
+
 		XMPPConnection connection = new XMPPConnection(cc);
 		try {
 			connection.connect();
-			connection.login(userName, configuration.getProperty("xmpp.connection.password"));
+			connection.login(userName,
+					configuration.getProperty("xmpp.connection.password"));
 		} catch (XMPPException e) {
 			LOGGER.fatal("XMPP connection coudn't be started", e);
 			throw new CreateXMPPConnectionException(e.getMessage(), e);
 		}
-		
+
 		addTraceListeners(connection);
-		
+
 		return connection;
 	}
 }

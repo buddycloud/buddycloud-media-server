@@ -19,5 +19,5 @@ import org.xmpp.packet.Packet;
 
 public interface MediaServerPacketFilter {
 
-    public boolean accept(Packet packet);
+	public boolean accept(Packet packet);
 }

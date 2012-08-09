@@ -18,113 +18,112 @@ package com.buddycloud.mediaserver.business.model;
 import java.util.Date;
 
 public class Media {
-//	{
-//		  "id": string,
-//		  "fileName": string;
-//        "entityId": string,
-//		  "author": string,
-//		  "title": string,
-//		  "description": string,
-//		  "mimeType": string,
-//		  "uploadedDate": datetime,
-//		  "lastUpdatedDate": datetime,
-//		  "fileExtension": string,
-//		  "shaChecksum": string,
-//		  "fileSize": long,
-//		  "length": long,
-//	  	  "height": int,
-//	      "width": int
-//	}
-	
+	// {
+	// "id": string,
+	// "fileName": string;
+	// "entityId": string,
+	// "author": string,
+	// "title": string,
+	// "description": string,
+	// "mimeType": string,
+	// "uploadedDate": datetime,
+	// "lastUpdatedDate": datetime,
+	// "fileExtension": string,
+	// "shaChecksum": string,
+	// "fileSize": long,
+	// "length": long,
+	// "height": int,
+	// "width": int
+	// }
+
 	private String id;
 	private String fileName;
 	private String author;
 	private String title;
 	private String mimeType;
 	private String description;
-	private Date uploadedDate = null; 
-	private Date lastUpdatedDate = null; 
+	private Date uploadedDate = null;
+	private Date lastUpdatedDate = null;
 	private String fileExtension;
 	private String shaChecksum;
 	private Long fileSize;
-	private Long length = null; //for audio and videos
-	private Integer height = null; //for videos and images
-	private Integer width = null; //for videos and images
+	private Long length = null; // for audio and videos
+	private Integer height = null; // for videos and images
+	private Integer width = null; // for videos and images
 	private String entityId;
-	
-	
+
 	public String getId() {
 		return id;
 	}
-	
+
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+
 	public String getTitle() {
 		return title;
 	}
-	
+
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 	public String getMimeType() {
 		return mimeType;
 	}
-	
+
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
 	}
-	
+
 	public String getDescription() {
 		return description;
 	}
-	
+
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	
+
 	public Date getUploadedDate() {
 		return uploadedDate;
 	}
-	
+
 	public void setUploadedDate(Date uploadedDate) {
 		this.uploadedDate = uploadedDate;
 	}
-	
+
 	public Date getLastUpdatedDate() {
 		return lastUpdatedDate;
 	}
-	
+
 	public void setLastUpdatedDate(Date lastUpdatedDate) {
 		this.lastUpdatedDate = lastUpdatedDate;
 	}
-	
+
 	public String getFileExtension() {
 		return fileExtension;
 	}
-	
+
 	public void setFileExtension(String fileExtension) {
 		this.fileExtension = fileExtension;
 	}
-	
+
 	public Long getFileSize() {
 		return fileSize;
 	}
-	
+
 	public void setFileSize(Long fileSize) {
 		this.fileSize = fileSize;
 	}
-	
+
 	public Long getLength() {
 		return length;
 	}
-	
+
 	public void setLength(Long length) {
 		this.length = length;
 	}
-	
+
 	public Integer getHeight() {
 		return height;
 	}

@@ -28,44 +28,40 @@ import org.xmlpull.v1.XmlPullParser;
  * 
  * @author Robin Collier
  */
-public class PubSubProvider implements IQProvider
-{
-	public IQ parseIQ(XmlPullParser parser) throws Exception
-	{
-        PubSub pubsub = new PubSub();
-        String namespace = parser.getNamespace();
-        pubsub.setPubSubNamespace(PubSubNamespace.valueOfFromXmlns(namespace));
-        boolean done = false;
+public class PubSubProvider implements IQProvider {
+	public IQ parseIQ(XmlPullParser parser) throws Exception {
+		PubSub pubsub = new PubSub();
+		String namespace = parser.getNamespace();
+		pubsub.setPubSubNamespace(PubSubNamespace.valueOfFromXmlns(namespace));
+		boolean done = false;
 
-        String lastParserName = parser.getName();
-        
-        while (!done) 
-        {
-            int eventType = parser.next();
-            
-            if (eventType == XmlPullParser.START_TAG && "pubsub".equals(lastParserName)) 
-            {
-            	PacketExtension ext = PacketParserUtils.parsePacketExtension(parser.getName(), namespace, parser);
-            	
-            	if (ext != null)
-            	{
-            		pubsub.addExtension(ext);
-            	}
-            } else if (eventType == XmlPullParser.START_TAG && "set".equals(parser.getName())) {
-            	RSMSet rsmSet = RSMSet.parse(parser);
-            	pubsub.setRsmSet(rsmSet);
-            }
-            
-            else if (eventType == XmlPullParser.END_TAG) 
-            {
-                if (parser.getName().equals("pubsub")) 
-                {
-                    done = true;
-                }
-            }
-            
-            lastParserName = parser.getName();
-        }
-        return pubsub;
+		String lastParserName = parser.getName();
+
+		while (!done) {
+			int eventType = parser.next();
+
+			if (eventType == XmlPullParser.START_TAG
+					&& "pubsub".equals(lastParserName)) {
+				PacketExtension ext = PacketParserUtils.parsePacketExtension(
+						parser.getName(), namespace, parser);
+
+				if (ext != null) {
+					pubsub.addExtension(ext);
+				}
+			} else if (eventType == XmlPullParser.START_TAG
+					&& "set".equals(parser.getName())) {
+				RSMSet rsmSet = RSMSet.parse(parser);
+				pubsub.setRsmSet(rsmSet);
+			}
+
+			else if (eventType == XmlPullParser.END_TAG) {
+				if (parser.getName().equals("pubsub")) {
+					done = true;
+				}
+			}
+
+			lastParserName = parser.getName();
+		}
+		return pubsub;
 	}
 }

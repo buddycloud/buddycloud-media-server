@@ -16,19 +16,19 @@
 package com.buddycloud.mediaserver.business.jdbc;
 
 public class Queries {
-	private Queries() {}
-	
+	private Queries() {
+	}
+
 	// Insert
-	public static final String SAVE_MEDIA = "INSERT INTO medias" +
-			" (id, fileName, entityId, author, title, description, mimeType, fileExtension, shaChecksum, fileSize, length, height, width)" +
-			" VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	public static final String SAVE_AVATAR = "INSERT INTO avatars" +
-			" (mediaId, entityId)" +
-			" VALUES(?, ?)";
-	public static final String SAVE_PREVIEW = "INSERT INTO previews" +
-			" (id, mediaId, shaChecksum, fileSize, height, width)" +
-			" VALUES(?, ?, ?, ?, ?, ?)";
-	
+	public static final String SAVE_MEDIA = "INSERT INTO medias"
+			+ " (id, fileName, entityId, author, title, description, mimeType, fileExtension, shaChecksum, fileSize, length, height, width)"
+			+ " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	public static final String SAVE_AVATAR = "INSERT INTO avatars"
+			+ " (mediaId, entityId)" + " VALUES(?, ?)";
+	public static final String SAVE_PREVIEW = "INSERT INTO previews"
+			+ " (id, mediaId, shaChecksum, fileSize, height, width)"
+			+ " VALUES(?, ?, ?, ?, ?, ?)";
+
 	// Select
 	public static final String GET_MEDIA = "SELECT * FROM medias WHERE id = ?";
 	public static final String GET_MEDIAS_INFO = "SELECT * FROM medias WHERE entityId = ?";
@@ -45,7 +45,7 @@ public class Queries {
 	public static final String DELETE_PREVIEW = "DELETE FROM previews WHERE id = ?";
 	public static final String DELETE_ENTITY_AVATAR = "DELETE FROM avatars WHERE entityId = ?";
 	public static final String DELETE_PREVIEWS_FROM_MEDIA = "DELETE FROM previews WHERE mediaId = ?";
-	
+
 	// Update
 	public static final String UPDATE_MEDIA_LAST_UPDATED = "UPDATE medias SET lastUpdatedDate = ? WHERE id = ?";
 	public static final String UPDATE_MEDIA_FIELDS = "UPDATE medias SET fileName = ?, title = ?, description = ? WHERE id = ?";

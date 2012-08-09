@@ -28,54 +28,57 @@ import org.imgscalr.Scalr;
 
 public class ImageUtils {
 
+	private ImageUtils() {
+	}
 
-	private ImageUtils() {}
-	
-	
-	public static File storeImageIntoFile(BufferedImage image, String imageFormat,
-			String pathToStore) throws IOException {
-		
+	public static File storeImageIntoFile(BufferedImage image,
+			String imageFormat, String pathToStore) throws IOException {
+
 		// Store into provided path
 		File output = new File(pathToStore);
 		ImageIO.write(image, imageFormat, FileUtils.openOutputStream(output));
-		
+
 		return output;
 	}
-	
-	public static byte[] imageToBytes(BufferedImage image, String imageFormat) throws IOException {
+
+	public static byte[] imageToBytes(BufferedImage image, String imageFormat)
+			throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write(image, imageFormat, baos);
 		baos.flush();
-		
+
 		byte[] imageInByte = baos.toByteArray();
 		baos.close();
-		
+
 		return imageInByte;
 	}
-	
-	public static BufferedImage createImagePreview(File image, int size) throws IOException {
+
+	public static BufferedImage createImagePreview(File image, int size)
+			throws IOException {
 		final BufferedImage img = ImageIO.read(image);
 		final BufferedImage thumbnail = Scalr.resize(img, size);
 		img.flush();
-		
+
 		return thumbnail;
 	}
-	
-	public static BufferedImage createImagePreview(File image, int width, int height) throws IOException {
+
+	public static BufferedImage createImagePreview(File image, int width,
+			int height) throws IOException {
 		final BufferedImage img = ImageIO.read(image);
 		final BufferedImage thumbnail = Scalr.resize(img, width, height);
 		img.flush();
-		
+
 		return thumbnail;
 	}
-	
-	public static BufferedImage createImagePreview(BufferedImage img, int width, int height) {
+
+	public static BufferedImage createImagePreview(BufferedImage img,
+			int width, int height) {
 		final BufferedImage thumbnail = Scalr.resize(img, width, height);
 		img.flush();
-		
+
 		return thumbnail;
 	}
-	
+
 	public static boolean isImage(String extension) {
 		return Arrays.binarySearch(FORMATS, extension.toLowerCase()) >= 0;
 	}

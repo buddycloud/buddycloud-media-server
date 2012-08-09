@@ -35,45 +35,56 @@ import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class UpdateAvatarTest extends MediaServerTest {
-	
+
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + 
-				File.separator + BASE_CHANNEL));
-		
+		FileUtils
+				.cleanDirectory(new File(
+						configuration
+								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+								+ File.separator + BASE_CHANNEL));
+
 		dataSource.deleteEntityAvatar(BASE_CHANNEL);
 		dataSource.deleteMedia(MEDIA_ID);
 	}
-	
+
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
+		File destDir = new File(
+				configuration
+						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+						+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
-		
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME), new File(destDir + File.separator + MEDIA_ID));
-		
+
+		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME), new File(
+				destDir + File.separator + MEDIA_ID));
+
 		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTAVATAR_NAME);
 		dataSource.storeMedia(media);
 		dataSource.storeAvatar(media);
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulUpdate() throws Exception {
 		// file fields
 		String title = "New Avatar";
 		String description = "New Avatar Description";
 
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/avatar");
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media/avatar");
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
 
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
-		form.getEntries().add(new FormData(Constants.TITLE_FIELD,
-		new StringRepresentation(title)));	
-		form.getEntries().add(new FormData(Constants.DESC_FIELD,
-		new StringRepresentation(description)));
-		
+		form.getEntries().add(
+				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
+						title)));
+		form.getEntries().add(
+				new FormData(Constants.DESC_FIELD, new StringRepresentation(
+						description)));
+
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
@@ -81,7 +92,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulUpdateParamAuth() throws Exception {
 		// file fields
@@ -90,17 +101,20 @@ public class UpdateAvatarTest extends MediaServerTest {
 
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
-		
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/avatar" +
-				"?auth=" + new String(encoder.encode(authStr.getBytes())));
+
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media/avatar" + "?auth="
+				+ new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
-		form.getEntries().add(new FormData(Constants.TITLE_FIELD,
-		new StringRepresentation(title)));	
-		form.getEntries().add(new FormData(Constants.DESC_FIELD,
-		new StringRepresentation(description)));
-		
+		form.getEntries().add(
+				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
+						title)));
+		form.getEntries().add(
+				new FormData(Constants.DESC_FIELD, new StringRepresentation(
+						description)));
+
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 

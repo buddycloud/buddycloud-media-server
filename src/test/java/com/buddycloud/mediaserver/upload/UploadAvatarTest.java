@@ -37,38 +37,49 @@ import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class UploadAvatarTest extends MediaServerTest {
-	
+
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + 
-				File.separator + BASE_CHANNEL));
+		FileUtils
+				.cleanDirectory(new File(
+						configuration
+								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+								+ File.separator + BASE_CHANNEL));
 	}
-	
+
 	@Override
-	protected void testSetUp() throws Exception {}
-	
+	protected void testSetUp() throws Exception {
+	}
+
 	@Test
 	public void anonymousSuccessfulUpload() throws Exception {
 		// file fields
 		String title = "Test Avatar";
 		String description = "My Test Avatar";
 
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/avatar");
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media/avatar");
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
 
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
-		form.getEntries().add(new FormData(Constants.NAME_FIELD,
-		new StringRepresentation(TESTAVATAR_NAME)));
-		form.getEntries().add(new FormData(Constants.TITLE_FIELD,
-		new StringRepresentation(title)));	
-		form.getEntries().add(new FormData(Constants.DESC_FIELD,
-		new StringRepresentation(description)));
-		form.getEntries().add(new FormData(Constants.AUTHOR_FIELD,
-		new StringRepresentation(BASE_USER)));
+		form.getEntries().add(
+				new FormData(Constants.NAME_FIELD, new StringRepresentation(
+						TESTAVATAR_NAME)));
+		form.getEntries().add(
+				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
+						title)));
+		form.getEntries().add(
+				new FormData(Constants.DESC_FIELD, new StringRepresentation(
+						description)));
+		form.getEntries().add(
+				new FormData(Constants.AUTHOR_FIELD, new StringRepresentation(
+						BASE_USER)));
 
-		form.getEntries().add(new FormData(Constants.FILE_FIELD,
-		new FileRepresentation(TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
-		
+		form.getEntries()
+				.add(new FormData(Constants.FILE_FIELD, new FileRepresentation(
+						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
+
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
@@ -90,24 +101,30 @@ public class UploadAvatarTest extends MediaServerTest {
 
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
-		
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media/avatar" +
-				"?auth=" + new String(encoder.encode(authStr.getBytes())));
+
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media/avatar" + "?auth="
+				+ new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = new FormDataSet();
 		form.setMultipart(true);
-		form.getEntries().add(new FormData(Constants.NAME_FIELD,
-		new StringRepresentation(TESTAVATAR_NAME)));
-		form.getEntries().add(new FormData(Constants.TITLE_FIELD,
-		new StringRepresentation(title)));	
-		form.getEntries().add(new FormData(Constants.DESC_FIELD,
-		new StringRepresentation(description)));
-		form.getEntries().add(new FormData(Constants.AUTHOR_FIELD,
-		new StringRepresentation(BASE_USER)));
+		form.getEntries().add(
+				new FormData(Constants.NAME_FIELD, new StringRepresentation(
+						TESTAVATAR_NAME)));
+		form.getEntries().add(
+				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
+						title)));
+		form.getEntries().add(
+				new FormData(Constants.DESC_FIELD, new StringRepresentation(
+						description)));
+		form.getEntries().add(
+				new FormData(Constants.AUTHOR_FIELD, new StringRepresentation(
+						BASE_USER)));
 
-		form.getEntries().add(new FormData(Constants.FILE_FIELD,
-		new FileRepresentation(TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
-		
+		form.getEntries()
+				.add(new FormData(Constants.FILE_FIELD, new FileRepresentation(
+						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
+
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 

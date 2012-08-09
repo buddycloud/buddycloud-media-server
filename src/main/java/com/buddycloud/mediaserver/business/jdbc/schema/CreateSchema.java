@@ -21,7 +21,8 @@ import java.sql.SQLException;
 
 public class CreateSchema {
 
-	public static void main(String[] args) throws PropertyVetoException, IOException, SQLException {
+	public static void main(String[] args) throws PropertyVetoException,
+			IOException, SQLException {
 		new Schema().create();
 	}
 }

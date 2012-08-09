@@ -31,37 +31,36 @@ import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 import org.jivesoftware.smackx.pubsub.packet.SyncPacketSend;
 import org.jivesoftware.smackx.pubsub.util.NodeUtils;
 
-abstract public class Node
-{
+abstract public class Node {
 	protected Connection con;
 	protected String id;
 	protected String to;
-	
+
 	protected ConcurrentHashMap<ItemEventListener, PacketListener> itemEventToListenerMap = new ConcurrentHashMap<ItemEventListener, PacketListener>();
 	protected ConcurrentHashMap<ItemDeleteListener, PacketListener> itemDeleteToListenerMap = new ConcurrentHashMap<ItemDeleteListener, PacketListener>();
 	protected ConcurrentHashMap<NodeConfigListener, PacketListener> configEventToListenerMap = new ConcurrentHashMap<NodeConfigListener, PacketListener>();
-	
+
 	/**
-	 * Construct a node associated to the supplied connection with the specified 
+	 * Construct a node associated to the supplied connection with the specified
 	 * node id.
 	 * 
-	 * @param connection The connection the node is associated with
-	 * @param nodeName The node id
+	 * @param connection
+	 *            The connection the node is associated with
+	 * @param nodeName
+	 *            The node id
 	 */
-	Node(Connection connection, String nodeName)
-	{
+	Node(Connection connection, String nodeName) {
 		con = connection;
 		id = nodeName;
 	}
 
 	/**
-	 * Some XMPP servers may require a specific service to be addressed on the 
+	 * Some XMPP servers may require a specific service to be addressed on the
 	 * server.
 	 * 
-	 *   For example, OpenFire requires the server to be prefixed by <b>pubsub</b>
+	 * For example, OpenFire requires the server to be prefixed by <b>pubsub</b>
 	 */
-	void setTo(String toAddress)
-	{
+	void setTo(String toAddress) {
 		to = toAddress;
 	}
 
@@ -70,35 +69,36 @@ abstract public class Node
 	 * 
 	 * @return the node id
 	 */
-	public String getId() 
-	{
+	public String getId() {
 		return id;
 	}
+
 	/**
-	 * Returns a configuration form, from which you can create an answer form to be submitted
-	 * via the {@link #sendConfigurationForm(Form)}.
+	 * Returns a configuration form, from which you can create an answer form to
+	 * be submitted via the {@link #sendConfigurationForm(Form)}.
 	 * 
 	 * @return the configuration form
 	 */
-	public ConfigureForm getNodeConfiguration()
-		throws XMPPException
-	{
-		Packet reply = sendPubsubPacket(Type.GET, new NodeExtension(PubSubElementType.CONFIGURE_OWNER, getId()), PubSubNamespace.OWNER);
-		return NodeUtils.getFormFromPacket(reply, PubSubElementType.CONFIGURE_OWNER);
+	public ConfigureForm getNodeConfiguration() throws XMPPException {
+		Packet reply = sendPubsubPacket(Type.GET, new NodeExtension(
+				PubSubElementType.CONFIGURE_OWNER, getId()),
+				PubSubNamespace.OWNER);
+		return NodeUtils.getFormFromPacket(reply,
+				PubSubElementType.CONFIGURE_OWNER);
 	}
-	
+
 	/**
 	 * Update the configuration with the contents of the new {@link Form}
 	 * 
 	 * @param submitForm
 	 */
-	public void sendConfigurationForm(Form submitForm)
-		throws XMPPException
-	{
-		PubSub packet = createPubsubPacket(Type.SET, new FormNode(FormNodeType.CONFIGURE_OWNER, getId(), submitForm), PubSubNamespace.OWNER);
+	public void sendConfigurationForm(Form submitForm) throws XMPPException {
+		PubSub packet = createPubsubPacket(Type.SET, new FormNode(
+				FormNodeType.CONFIGURE_OWNER, getId(), submitForm),
+				PubSubNamespace.OWNER);
 		SyncPacketSend.getReply(con, packet);
 	}
-	
+
 	/**
 	 * Discover node information in standard {@link DiscoverInfo} format.
 	 * 
@@ -106,15 +106,13 @@ abstract public class Node
 	 * 
 	 * @throws XMPPException
 	 */
-	public DiscoverInfo discoverInfo()
-		throws XMPPException
-	{
+	public DiscoverInfo discoverInfo() throws XMPPException {
 		DiscoverInfo info = new DiscoverInfo();
 		info.setTo(to);
 		info.setNode(getId());
-		return (DiscoverInfo)SyncPacketSend.getReply(con, info);
+		return (DiscoverInfo) SyncPacketSend.getReply(con, info);
 	}
-	
+
 	/**
 	 * Get the subscriptions currently associated with this node.
 	 * 
@@ -122,248 +120,256 @@ abstract public class Node
 	 * 
 	 * @throws XMPPException
 	 */
-	public List<Subscription> getSubscriptions()
-		throws XMPPException
-	{
-		PubSub reply = (PubSub)sendPubsubPacket(Type.GET, new NodeExtension(PubSubElementType.SUBSCRIPTIONS, getId()));
-		SubscriptionsExtension subElem = (SubscriptionsExtension)reply.getExtension(PubSubElementType.SUBSCRIPTIONS);
+	public List<Subscription> getSubscriptions() throws XMPPException {
+		PubSub reply = (PubSub) sendPubsubPacket(Type.GET, new NodeExtension(
+				PubSubElementType.SUBSCRIPTIONS, getId()));
+		SubscriptionsExtension subElem = (SubscriptionsExtension) reply
+				.getExtension(PubSubElementType.SUBSCRIPTIONS);
 		return subElem.getSubscriptions();
 	}
-	
+
 	/**
-	 * The user subscribes to the node using the supplied jid.  The
-	 * bare jid portion of this one must match the jid for the connection.
+	 * The user subscribes to the node using the supplied jid. The bare jid
+	 * portion of this one must match the jid for the connection.
 	 * 
-	 * Please note that the {@link Subscription.State} should be checked 
-	 * on return since more actions may be required by the caller.
-	 * {@link Subscription.State#pending} - The owner must approve the subscription 
-	 * request before messages will be received.
-	 * {@link Subscription.State#unconfigured} - If the {@link Subscription#isConfigRequired()} is true, 
-	 * the caller must configure the subscription before messages will be received.  If it is false
-	 * the caller can configure it but is not required to do so.
-	 * @param jid The jid to subscribe as.
+	 * Please note that the {@link Subscription.State} should be checked on
+	 * return since more actions may be required by the caller.
+	 * {@link Subscription.State#pending} - The owner must approve the
+	 * subscription request before messages will be received.
+	 * {@link Subscription.State#unconfigured} - If the
+	 * {@link Subscription#isConfigRequired()} is true, the caller must
+	 * configure the subscription before messages will be received. If it is
+	 * false the caller can configure it but is not required to do so.
+	 * 
+	 * @param jid
+	 *            The jid to subscribe as.
 	 * @return The subscription
 	 * @exception XMPPException
 	 */
-	public Subscription subscribe(String jid)
-		throws XMPPException
-	{
-		PubSub reply = (PubSub)sendPubsubPacket(Type.SET, new SubscribeExtension(jid, getId()));
-		return (Subscription)reply.getExtension(PubSubElementType.SUBSCRIPTION);
+	public Subscription subscribe(String jid) throws XMPPException {
+		PubSub reply = (PubSub) sendPubsubPacket(Type.SET,
+				new SubscribeExtension(jid, getId()));
+		return (Subscription) reply
+				.getExtension(PubSubElementType.SUBSCRIPTION);
 	}
-	
+
 	/**
 	 * The user subscribes to the node using the supplied jid and subscription
-	 * options.  The bare jid portion of this one must match the jid for the 
+	 * options. The bare jid portion of this one must match the jid for the
 	 * connection.
 	 * 
-	 * Please note that the {@link Subscription.State} should be checked 
-	 * on return since more actions may be required by the caller.
-	 * {@link Subscription.State#pending} - The owner must approve the subscription 
-	 * request before messages will be received.
-	 * {@link Subscription.State#unconfigured} - If the {@link Subscription#isConfigRequired()} is true, 
-	 * the caller must configure the subscription before messages will be received.  If it is false
-	 * the caller can configure it but is not required to do so.
-	 * @param jid The jid to subscribe as.
+	 * Please note that the {@link Subscription.State} should be checked on
+	 * return since more actions may be required by the caller.
+	 * {@link Subscription.State#pending} - The owner must approve the
+	 * subscription request before messages will be received.
+	 * {@link Subscription.State#unconfigured} - If the
+	 * {@link Subscription#isConfigRequired()} is true, the caller must
+	 * configure the subscription before messages will be received. If it is
+	 * false the caller can configure it but is not required to do so.
+	 * 
+	 * @param jid
+	 *            The jid to subscribe as.
 	 * @return The subscription
 	 * @exception XMPPException
 	 */
 	public Subscription subscribe(String jid, SubscribeForm subForm)
-		throws XMPPException
-	{
-		PubSub request = createPubsubPacket(Type.SET, new SubscribeExtension(jid, getId()));
+			throws XMPPException {
+		PubSub request = createPubsubPacket(Type.SET, new SubscribeExtension(
+				jid, getId()));
 		request.addExtension(new FormNode(FormNodeType.OPTIONS, subForm));
-		PubSub reply = (PubSub)PubSubManager.sendPubsubPacket(con, jid, Type.SET, request);
-		return (Subscription)reply.getExtension(PubSubElementType.SUBSCRIPTION);
+		PubSub reply = (PubSub) PubSubManager.sendPubsubPacket(con, jid,
+				Type.SET, request);
+		return (Subscription) reply
+				.getExtension(PubSubElementType.SUBSCRIPTION);
 	}
 
 	/**
-	 * Remove the subscription related to the specified JID.  This will only 
-	 * work if there is only 1 subscription.  If there are multiple subscriptions,
-	 * use {@link #unsubscribe(String, String)}.
+	 * Remove the subscription related to the specified JID. This will only work
+	 * if there is only 1 subscription. If there are multiple subscriptions, use
+	 * {@link #unsubscribe(String, String)}.
 	 * 
-	 * @param jid The JID used to subscribe to the node
+	 * @param jid
+	 *            The JID used to subscribe to the node
 	 * 
 	 * @throws XMPPException
 	 */
-	public void unsubscribe(String jid)
-		throws XMPPException
-	{
+	public void unsubscribe(String jid) throws XMPPException {
 		unsubscribe(jid, null);
 	}
-	
+
 	/**
 	 * Remove the specific subscription related to the specified JID.
 	 * 
-	 * @param jid The JID used to subscribe to the node
-	 * @param subscriptionId The id of the subscription being removed
+	 * @param jid
+	 *            The JID used to subscribe to the node
+	 * @param subscriptionId
+	 *            The id of the subscription being removed
 	 * 
 	 * @throws XMPPException
 	 */
 	public void unsubscribe(String jid, String subscriptionId)
-		throws XMPPException
-	{
-		sendPubsubPacket(Type.SET, new UnsubscribeExtension(jid, getId(), subscriptionId));
+			throws XMPPException {
+		sendPubsubPacket(Type.SET, new UnsubscribeExtension(jid, getId(),
+				subscriptionId));
 	}
 
 	/**
-	 * Returns a SubscribeForm for subscriptions, from which you can create an answer form to be submitted
-	 * via the {@link #sendConfigurationForm(Form)}.
+	 * Returns a SubscribeForm for subscriptions, from which you can create an
+	 * answer form to be submitted via the {@link #sendConfigurationForm(Form)}.
 	 * 
 	 * @return A subscription options form
 	 * 
 	 * @throws XMPPException
 	 */
 	public SubscribeForm getSubscriptionOptions(String jid)
-		throws XMPPException
-	{
+			throws XMPPException {
 		return getSubscriptionOptions(jid, null);
 	}
-
 
 	/**
 	 * Get the options for configuring the specified subscription.
 	 * 
-	 * @param jid JID the subscription is registered under
-	 * @param subscriptionId The subscription id
+	 * @param jid
+	 *            JID the subscription is registered under
+	 * @param subscriptionId
+	 *            The subscription id
 	 * 
 	 * @return The subscription option form
 	 * 
 	 * @throws XMPPException
 	 */
-	public SubscribeForm getSubscriptionOptions(String jid, String subscriptionId)
-		throws XMPPException
-	{
-		PubSub packet = (PubSub)sendPubsubPacket(Type.GET, new OptionsExtension(jid, getId(), subscriptionId));
-		FormNode ext = (FormNode)packet.getExtension(PubSubElementType.OPTIONS);
+	public SubscribeForm getSubscriptionOptions(String jid,
+			String subscriptionId) throws XMPPException {
+		PubSub packet = (PubSub) sendPubsubPacket(Type.GET,
+				new OptionsExtension(jid, getId(), subscriptionId));
+		FormNode ext = (FormNode) packet
+				.getExtension(PubSubElementType.OPTIONS);
 		return new SubscribeForm(ext.getForm());
 	}
 
 	/**
-	 * Register a listener for item publication events.  This 
-	 * listener will get called whenever an item is published to 
-	 * this node.
+	 * Register a listener for item publication events. This listener will get
+	 * called whenever an item is published to this node.
 	 * 
-	 * @param listener The handler for the event
+	 * @param listener
+	 *            The handler for the event
 	 */
-	public void addItemEventListener(ItemEventListener listener)
-	{
-		PacketListener conListener = new ItemEventTranslator(listener); 
+	public void addItemEventListener(ItemEventListener listener) {
+		PacketListener conListener = new ItemEventTranslator(listener);
 		itemEventToListenerMap.put(listener, conListener);
-		con.addPacketListener(conListener, new EventContentFilter(EventElementType.items.toString(), "item"));
+		con.addPacketListener(conListener, new EventContentFilter(
+				EventElementType.items.toString(), "item"));
 	}
 
 	/**
 	 * Unregister a listener for publication events.
 	 * 
-	 * @param listener The handler to unregister
+	 * @param listener
+	 *            The handler to unregister
 	 */
-	public void removeItemEventListener(ItemEventListener listener)
-	{
+	public void removeItemEventListener(ItemEventListener listener) {
 		PacketListener conListener = itemEventToListenerMap.remove(listener);
-		
+
 		if (conListener != null)
 			con.removePacketListener(conListener);
 	}
 
 	/**
-	 * Register a listener for configuration events.  This listener
-	 * will get called whenever the node's configuration changes.
+	 * Register a listener for configuration events. This listener will get
+	 * called whenever the node's configuration changes.
 	 * 
-	 * @param listener The handler for the event
+	 * @param listener
+	 *            The handler for the event
 	 */
-	public void addConfigurationListener(NodeConfigListener listener)
-	{
-		PacketListener conListener = new NodeConfigTranslator(listener); 
+	public void addConfigurationListener(NodeConfigListener listener) {
+		PacketListener conListener = new NodeConfigTranslator(listener);
 		configEventToListenerMap.put(listener, conListener);
-		con.addPacketListener(conListener, new EventContentFilter(EventElementType.configuration.toString()));
+		con.addPacketListener(conListener, new EventContentFilter(
+				EventElementType.configuration.toString()));
 	}
 
 	/**
 	 * Unregister a listener for configuration events.
 	 * 
-	 * @param listener The handler to unregister
+	 * @param listener
+	 *            The handler to unregister
 	 */
-	public void removeConfigurationListener(NodeConfigListener listener)
-	{
-		PacketListener conListener = configEventToListenerMap .remove(listener);
-		
+	public void removeConfigurationListener(NodeConfigListener listener) {
+		PacketListener conListener = configEventToListenerMap.remove(listener);
+
 		if (conListener != null)
 			con.removePacketListener(conListener);
 	}
-	
+
 	/**
-	 * Register an listener for item delete events.  This listener
-	 * gets called whenever an item is deleted from the node.
+	 * Register an listener for item delete events. This listener gets called
+	 * whenever an item is deleted from the node.
 	 * 
-	 * @param listener The handler for the event
+	 * @param listener
+	 *            The handler for the event
 	 */
-	public void addItemDeleteListener(ItemDeleteListener listener)
-	{
-		PacketListener delListener = new ItemDeleteTranslator(listener); 
+	public void addItemDeleteListener(ItemDeleteListener listener) {
+		PacketListener delListener = new ItemDeleteTranslator(listener);
 		itemDeleteToListenerMap.put(listener, delListener);
-		EventContentFilter deleteItem = new EventContentFilter(EventElementType.items.toString(), "retract");
-		EventContentFilter purge = new EventContentFilter(EventElementType.purge.toString());
-		
+		EventContentFilter deleteItem = new EventContentFilter(
+				EventElementType.items.toString(), "retract");
+		EventContentFilter purge = new EventContentFilter(
+				EventElementType.purge.toString());
+
 		con.addPacketListener(delListener, new OrFilter(deleteItem, purge));
 	}
 
 	/**
 	 * Unregister a listener for item delete events.
 	 * 
-	 * @param listener The handler to unregister
+	 * @param listener
+	 *            The handler to unregister
 	 */
-	public void removeItemDeleteListener(ItemDeleteListener listener)
-	{
-		PacketListener conListener = itemDeleteToListenerMap .remove(listener);
-		
+	public void removeItemDeleteListener(ItemDeleteListener listener) {
+		PacketListener conListener = itemDeleteToListenerMap.remove(listener);
+
 		if (conListener != null)
 			con.removePacketListener(conListener);
 	}
 
 	@Override
-	public String toString()
-	{
+	public String toString() {
 		return super.toString() + " " + getClass().getName() + " id: " + id;
 	}
-	
-	protected PubSub createPubsubPacket(Type type, PacketExtension ext)
-	{
+
+	protected PubSub createPubsubPacket(Type type, PacketExtension ext) {
 		return createPubsubPacket(type, ext, null);
 	}
-	
-	public PubSub createPubsubPacket(Type type, PacketExtension ext, PubSubNamespace ns)
-	{
+
+	public PubSub createPubsubPacket(Type type, PacketExtension ext,
+			PubSubNamespace ns) {
 		return PubSubManager.createPubsubPacket(to, type, ext, ns);
 	}
 
 	protected Packet sendPubsubPacket(Type type, NodeExtension ext)
-		throws XMPPException
-	{
+			throws XMPPException {
 		return PubSubManager.sendPubsubPacket(con, to, type, ext);
 	}
 
-	protected Packet sendPubsubPacket(Type type, NodeExtension ext, PubSubNamespace ns)
-		throws XMPPException
-	{
+	protected Packet sendPubsubPacket(Type type, NodeExtension ext,
+			PubSubNamespace ns) throws XMPPException {
 		return PubSubManager.sendPubsubPacket(con, to, type, ext, ns);
 	}
 
-	public Packet sendPubsubPacket(Type type, PubSub pubsubPacket) throws XMPPException {
+	public Packet sendPubsubPacket(Type type, PubSub pubsubPacket)
+			throws XMPPException {
 		return PubSubManager.sendPubsubPacket(con, to, type, pubsubPacket);
 	}
-	
-	private static List<String> getSubscriptionIds(Packet packet)
-	{
-		HeadersExtension headers = (HeadersExtension)packet.getExtension("headers", "http://jabber.org/protocol/shim");
+
+	private static List<String> getSubscriptionIds(Packet packet) {
+		HeadersExtension headers = (HeadersExtension) packet.getExtension(
+				"headers", "http://jabber.org/protocol/shim");
 		List<String> values = null;
-		
-		if (headers != null)
-		{
+
+		if (headers != null) {
 			values = new ArrayList<String>(headers.getHeaders().size());
-			
-			for (Header header : headers.getHeaders())
-			{
+
+			for (Header header : headers.getHeaders()) {
 				values.add(header.getValue());
 			}
 		}
@@ -371,154 +377,151 @@ abstract public class Node
 	}
 
 	/**
-	 * This class translates low level item publication events into api level objects for 
-	 * user consumption.
+	 * This class translates low level item publication events into api level
+	 * objects for user consumption.
 	 * 
 	 * @author Robin Collier
 	 */
-	public class ItemEventTranslator implements PacketListener
-	{
+	public class ItemEventTranslator implements PacketListener {
 		private ItemEventListener listener;
 
-		public ItemEventTranslator(ItemEventListener eventListener)
-		{
+		public ItemEventTranslator(ItemEventListener eventListener) {
 			listener = eventListener;
 		}
-		
-		public void processPacket(Packet packet)
-		{
-	        EventElement event = (EventElement)packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-			ItemsExtension itemsElem = (ItemsExtension)event.getEvent();
-			DelayInformation delay = (DelayInformation)packet.getExtension("delay", "urn:xmpp:delay");
-			
-			// If there was no delay based on XEP-0203, then try XEP-0091 for backward compatibility
-			if (delay == null)
-			{
-				delay = (DelayInformation)packet.getExtension("x", "jabber:x:delay");
+
+		public void processPacket(Packet packet) {
+			EventElement event = (EventElement) packet.getExtension("event",
+					PubSubNamespace.EVENT.getXmlns());
+			ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
+			DelayInformation delay = (DelayInformation) packet.getExtension(
+					"delay", "urn:xmpp:delay");
+
+			// If there was no delay based on XEP-0203, then try XEP-0091 for
+			// backward compatibility
+			if (delay == null) {
+				delay = (DelayInformation) packet.getExtension("x",
+						"jabber:x:delay");
 			}
-			ItemPublishEvent eventItems = new ItemPublishEvent(itemsElem.getNode(), (List<Item>)itemsElem.getItems(), getSubscriptionIds(packet), (delay == null ? null : delay.getStamp()));
+			ItemPublishEvent eventItems = new ItemPublishEvent(
+					itemsElem.getNode(), (List<Item>) itemsElem.getItems(),
+					getSubscriptionIds(packet), (delay == null ? null
+							: delay.getStamp()));
 			listener.handlePublishedItems(eventItems);
 		}
 	}
 
 	/**
-	 * This class translates low level item deletion events into api level objects for 
-	 * user consumption.
+	 * This class translates low level item deletion events into api level
+	 * objects for user consumption.
 	 * 
 	 * @author Robin Collier
 	 */
-	public class ItemDeleteTranslator implements PacketListener
-	{
+	public class ItemDeleteTranslator implements PacketListener {
 		private ItemDeleteListener listener;
 
-		public ItemDeleteTranslator(ItemDeleteListener eventListener)
-		{
+		public ItemDeleteTranslator(ItemDeleteListener eventListener) {
 			listener = eventListener;
 		}
-		
-		public void processPacket(Packet packet)
-		{
-	        EventElement event = (EventElement)packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-	        
-	        List<PacketExtension> extList = event.getExtensions();
-	        
-	        if (extList.get(0).getElementName().equals(PubSubElementType.PURGE_EVENT.getElementName()))
-	        {
-	        	listener.handlePurge();
-	        }
-	        else
-	        {
-				ItemsExtension itemsElem = (ItemsExtension)event.getEvent();
-				Collection<? extends PacketExtension> pubItems = itemsElem.getItems();
-				Iterator<RetractItem> it = (Iterator<RetractItem>)pubItems.iterator();
+
+		public void processPacket(Packet packet) {
+			EventElement event = (EventElement) packet.getExtension("event",
+					PubSubNamespace.EVENT.getXmlns());
+
+			List<PacketExtension> extList = event.getExtensions();
+
+			if (extList.get(0).getElementName()
+					.equals(PubSubElementType.PURGE_EVENT.getElementName())) {
+				listener.handlePurge();
+			} else {
+				ItemsExtension itemsElem = (ItemsExtension) event.getEvent();
+				Collection<? extends PacketExtension> pubItems = itemsElem
+						.getItems();
+				Iterator<RetractItem> it = (Iterator<RetractItem>) pubItems
+						.iterator();
 				List<String> items = new ArrayList<String>(pubItems.size());
 
-				while (it.hasNext())
-				{
+				while (it.hasNext()) {
 					RetractItem item = it.next();
 					items.add(item.getId());
 				}
 
-				ItemDeleteEvent eventItems = new ItemDeleteEvent(itemsElem.getNode(), items, getSubscriptionIds(packet));
+				ItemDeleteEvent eventItems = new ItemDeleteEvent(
+						itemsElem.getNode(), items, getSubscriptionIds(packet));
 				listener.handleDeletedItems(eventItems);
-	        }
+			}
 		}
 	}
-	
+
 	/**
-	 * This class translates low level node configuration events into api level objects for 
-	 * user consumption.
+	 * This class translates low level node configuration events into api level
+	 * objects for user consumption.
 	 * 
 	 * @author Robin Collier
 	 */
-	public class NodeConfigTranslator implements PacketListener
-	{
+	public class NodeConfigTranslator implements PacketListener {
 		private NodeConfigListener listener;
 
-		public NodeConfigTranslator(NodeConfigListener eventListener)
-		{
+		public NodeConfigTranslator(NodeConfigListener eventListener) {
 			listener = eventListener;
 		}
-		
-		public void processPacket(Packet packet)
-		{
-	        EventElement event = (EventElement)packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-			ConfigurationEvent config = (ConfigurationEvent)event.getEvent();
+
+		public void processPacket(Packet packet) {
+			EventElement event = (EventElement) packet.getExtension("event",
+					PubSubNamespace.EVENT.getXmlns());
+			ConfigurationEvent config = (ConfigurationEvent) event.getEvent();
 
 			listener.handleNodeConfiguration(config);
 		}
 	}
 
 	/**
-	 * Filter for {@link PacketListener} to filter out events not specific to the 
-	 * event type expected for this node.
+	 * Filter for {@link PacketListener} to filter out events not specific to
+	 * the event type expected for this node.
 	 * 
 	 * @author Robin Collier
 	 */
-	class EventContentFilter implements PacketFilter
-	{
+	class EventContentFilter implements PacketFilter {
 		private String firstElement;
 		private String secondElement;
-		
-		EventContentFilter(String elementName)
-		{
+
+		EventContentFilter(String elementName) {
 			firstElement = elementName;
 		}
 
-		EventContentFilter(String firstLevelEelement, String secondLevelElement)
-		{
+		EventContentFilter(String firstLevelEelement, String secondLevelElement) {
 			firstElement = firstLevelEelement;
 			secondElement = secondLevelElement;
 		}
 
-		public boolean accept(Packet packet)
-		{
+		public boolean accept(Packet packet) {
 			if (!(packet instanceof Message))
 				return false;
 
-			EventElement event = (EventElement)packet.getExtension("event", PubSubNamespace.EVENT.getXmlns());
-			
+			EventElement event = (EventElement) packet.getExtension("event",
+					PubSubNamespace.EVENT.getXmlns());
+
 			if (event == null)
 				return false;
 
 			NodeExtension embedEvent = event.getEvent();
-			
+
 			if (embedEvent == null)
 				return false;
-			
-			if (embedEvent.getElementName().equals(firstElement))
-			{
+
+			if (embedEvent.getElementName().equals(firstElement)) {
 				if (!embedEvent.getNode().equals(getId()))
 					return false;
-				
+
 				if (secondElement == null)
 					return true;
-				
-				if (embedEvent instanceof EmbeddedPacketExtension)
-				{
-					List<PacketExtension> secondLevelList = ((EmbeddedPacketExtension)embedEvent).getExtensions();
-					
-					if (secondLevelList.size() > 0 && secondLevelList.get(0).getElementName().equals(secondElement))
+
+				if (embedEvent instanceof EmbeddedPacketExtension) {
+					List<PacketExtension> secondLevelList = ((EmbeddedPacketExtension) embedEvent)
+							.getExtensions();
+
+					if (secondLevelList.size() > 0
+							&& secondLevelList.get(0).getElementName()
+									.equals(secondElement))
 						return true;
 				}
 			}

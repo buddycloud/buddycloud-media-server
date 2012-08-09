@@ -27,21 +27,21 @@ import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
 import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
 
 /**
- * Media Server XMPP Component
- * Follows the XEP-0114 (http://xmpp.org/extensions/xep-0114.html)
+ * Media Server XMPP Component Follows the XEP-0114
+ * (http://xmpp.org/extensions/xep-0114.html)
  */
 public class MediaServerComponent extends AbstractComponent {
 
 	private static final String DESCRIPTION = "An XMPP Media Server";
 	private static final String NAME = "Media Server";
-	private static final Logger LOGGER = Logger.getLogger(MediaServerComponent.class);
-	
-	
+	private static final Logger LOGGER = Logger
+			.getLogger(MediaServerComponent.class);
+
 	protected final Collection<MediaServerPacketCollector> collectors = new ConcurrentLinkedQueue<MediaServerPacketCollector>();
-	
-	
-	public MediaServerComponent() {}
-	
+
+	public MediaServerComponent() {
+	}
+
 	@Override
 	public String getDescription() {
 		return DESCRIPTION;
@@ -51,36 +51,38 @@ public class MediaServerComponent extends AbstractComponent {
 	public String getName() {
 		return NAME;
 	}
-	
+
 	public void sendPacket(Packet arg0) {
 		LOGGER.debug("S: " + arg0.toXML());
 		super.send(arg0);
 	}
-	
+
 	@Override
 	protected void handleIQResult(IQ iq) {
 		processPacket(iq);
 	}
-	
+
 	@Override
 	protected void handleIQError(IQ iq) {
 		processPacket(iq);
 	}
-	
+
 	private void processPacket(IQ iq) {
 		for (MediaServerPacketCollector packetCollector : collectors) {
 			packetCollector.processPacket(iq);
 		}
 	}
-	
+
 	public void removePacketCollector(MediaServerPacketCollector packetCollector) {
 		collectors.remove(packetCollector);
 	}
 
-	public MediaServerPacketCollector createPacketCollector(MediaServerPacketFilter filter) {
-        MediaServerPacketCollector collector = new MediaServerPacketCollector(this, filter);
-        // Add the collector to the list of active collectors.
-        collectors.add(collector);
-        return collector;
+	public MediaServerPacketCollector createPacketCollector(
+			MediaServerPacketFilter filter) {
+		MediaServerPacketCollector collector = new MediaServerPacketCollector(
+				this, filter);
+		// Add the collector to the list of active collectors.
+		collectors.add(collector);
+		return collector;
 	}
 }

@@ -71,31 +71,35 @@ public class MediaDAO {
 	protected Properties configuration;
 	protected Gson gson;
 
-
 	protected MediaDAO() {
 		this.dataSource = new MetaDataSource();
 		this.pubsub = XMPPToolBox.getInstance().getPubSubClient();
-		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
-		this.configuration = MediaServerConfiguration.getInstance().getConfiguration();
+		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL,
+				DateFormat.FULL).create();
+		this.configuration = MediaServerConfiguration.getInstance()
+				.getConfiguration();
 	}
 
-
-	public void deleteMedia(String userId, String entityId, String mediaId) 
-			throws MetadataSourceException, MediaNotFoundException, UserNotAllowedException {
+	public void deleteMedia(String userId, String entityId, String mediaId)
+			throws MetadataSourceException, MediaNotFoundException,
+			UserNotAllowedException {
 
 		boolean isAvatar = isAvatar(mediaId);
 		if (isAvatar) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
 		}
 
-		boolean isUploader = dataSource.getMediaUploader(mediaId).equals(userId);
+		boolean isUploader = dataSource.getMediaUploader(mediaId)
+				.equals(userId);
 
 		if (!isUploader) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
-					new OwnerDecorator(new ModeratorDecorator()));
+			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+					entityId, new OwnerDecorator(new ModeratorDecorator()));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId + "' not allowed to peform delete operation on: " + mediaId);
+				LOGGER.debug("User '" + userId
+						+ "' not allowed to peform delete operation on: "
+						+ mediaId);
 				throw new UserNotAllowedException(userId);
 			}
 		}
@@ -122,7 +126,8 @@ public class MediaDAO {
 		dataSource.deleteMedia(mediaId);
 	}
 
-	protected void deletePreviews(String mediaId, String dirPath) throws MetadataSourceException {
+	protected void deletePreviews(String mediaId, String dirPath)
+			throws MetadataSourceException {
 		List<String> previews = dataSource.getPreviewsFromMedia(mediaId);
 
 		if (!previews.isEmpty()) {
@@ -135,15 +140,18 @@ public class MediaDAO {
 		}
 	}
 
-	public String getMediasInfo(String userId, String entityId, DateTime since) 
+	public String getMediasInfo(String userId, String entityId, DateTime since)
 			throws UserNotAllowedException, MetadataSourceException {
 
 		if (userId != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
-					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+					entityId, new OwnerDecorator(new ModeratorDecorator(
+							new PublisherDecorator(new MemberDecorator()))));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId + "' not allowed to peform get info operation on: " + entityId);
+				LOGGER.debug("User '" + userId
+						+ "' not allowed to peform get info operation on: "
+						+ entityId);
 				throw new UserNotAllowedException(userId);
 			}
 		}
@@ -155,19 +163,23 @@ public class MediaDAO {
 		return gson.toJson(medias);
 	}
 
-	public File getMedia(String userId, String entityId, String mediaId) 
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
+	public File getMedia(String userId, String entityId, String mediaId)
+			throws MetadataSourceException, MediaNotFoundException,
+			IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatar(entityId);
 		}
 
 		if (userId != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
-					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+					entityId, new OwnerDecorator(new ModeratorDecorator(
+							new PublisherDecorator(new MemberDecorator()))));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId + "' not allowed to peform get operation on: " + entityId);
+				LOGGER.debug("User '" + userId
+						+ "' not allowed to peform get operation on: "
+						+ entityId);
 				throw new UserNotAllowedException(userId);
 			}
 		}
@@ -184,8 +196,8 @@ public class MediaDAO {
 		return media;
 	}
 
-	public File getAvatar(String entityId)
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+	public File getAvatar(String entityId) throws MetadataSourceException,
+			MediaNotFoundException, IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar. Entity ID: " + entityId);
@@ -201,44 +213,55 @@ public class MediaDAO {
 		return media;
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer size) 
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
+	public byte[] getMediaPreview(String userId, String entityId,
+			String mediaId, Integer size) throws MetadataSourceException,
+			MediaNotFoundException, IOException, InvalidPreviewFormatException,
+			UserNotAllowedException {
 
 		return getMediaPreview(userId, entityId, mediaId, size, size);
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId, String mediaId, Integer maxHeight, Integer maxWidth) 
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException, UserNotAllowedException {
+	public byte[] getMediaPreview(String userId, String entityId,
+			String mediaId, Integer maxHeight, Integer maxWidth)
+			throws MetadataSourceException, MediaNotFoundException,
+			IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
 		}
 
 		if (userId != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
-					new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator(new MemberDecorator()))));
+			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+					entityId, new OwnerDecorator(new ModeratorDecorator(
+							new PublisherDecorator(new MemberDecorator()))));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId + "' not allowed to get media on: " + entityId);
+				LOGGER.debug("User '" + userId
+						+ "' not allowed to get media on: " + entityId);
 				throw new UserNotAllowedException(userId);
 			}
 		}
 
 		LOGGER.debug("Getting media preview. Media ID: " + mediaId);
 
-		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
+		return getPreview(entityId, mediaId, maxHeight, maxWidth,
+				getDirectory(entityId));
 	}
 
-	public byte[] getAvatarPreview(String userId, String entityId, Integer maxHeight, Integer maxWidth)
-			throws MetadataSourceException, MediaNotFoundException, IOException, InvalidPreviewFormatException {
+	public byte[] getAvatarPreview(String userId, String entityId,
+			Integer maxHeight, Integer maxWidth)
+			throws MetadataSourceException, MediaNotFoundException,
+			IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar preview. Avatar ID: " + entityId);
 
-		return getPreview(entityId, mediaId, maxHeight, maxWidth, getDirectory(entityId));
+		return getPreview(entityId, mediaId, maxHeight, maxWidth,
+				getDirectory(entityId));
 	}
 
-	public String getMediaType(String entityId, String mediaId) throws MetadataSourceException {
+	public String getMediaType(String entityId, String mediaId)
+			throws MetadataSourceException {
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
 		}
@@ -246,28 +269,35 @@ public class MediaDAO {
 		return dataSource.getMediaMimeType(mediaId);
 	}
 
-	public String updateMedia(String userId, String entityId, String mediaId, Request request) 
-			throws FileUploadException, MetadataSourceException, FormFieldException, MediaNotFoundException, UserNotAllowedException {
+	public String updateMedia(String userId, String entityId, String mediaId,
+			Request request) throws FileUploadException,
+			MetadataSourceException, FormFieldException,
+			MediaNotFoundException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
 		}
 
-		boolean isUploader = dataSource.getMediaUploader(mediaId).equals(userId);
-		boolean isMember = pubsub.matchUserCapability(userId, entityId, new MemberDecorator());
+		boolean isUploader = dataSource.getMediaUploader(mediaId)
+				.equals(userId);
+		boolean isMember = pubsub.matchUserCapability(userId, entityId,
+				new MemberDecorator());
 
 		if (!(isUploader && isMember)) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
-					new OwnerDecorator(new ModeratorDecorator()));
+			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+					entityId, new OwnerDecorator(new ModeratorDecorator()));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId + "' not allowed to peform delete operation on: " + mediaId);
+				LOGGER.debug("User '" + userId
+						+ "' not allowed to peform delete operation on: "
+						+ mediaId);
 				throw new UserNotAllowedException(userId);
 			}
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
+		factory.setSizeThreshold(Integer.valueOf(configuration
+				.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
@@ -298,23 +328,27 @@ public class MediaDAO {
 		dataSource.updateMediaLastUpdated(mediaId);
 		LOGGER.debug("Media sucessfully updated. Media ID: " + media.getId());
 
-		return gson.toJson(media); 
+		return gson.toJson(media);
 	}
 
+	public String insertMedia(String userId, String entityId, Request request,
+			boolean isAvatar) throws FileUploadException,
+			MetadataSourceException, FormFieldException,
+			UserNotAllowedException {
 
-	public String insertMedia(String userId, String entityId, Request request, boolean isAvatar) 
-			throws FileUploadException, MetadataSourceException, FormFieldException, UserNotAllowedException {
-
-		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId, 
-				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
+		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
+				new OwnerDecorator(new ModeratorDecorator(
+						new PublisherDecorator())));
 
 		if (!isUserAllowed) {
-			LOGGER.debug("User '" + userId + "' not allowed to uploade file on: " + entityId);
+			LOGGER.debug("User '" + userId
+					+ "' not allowed to uploade file on: " + entityId);
 			throw new UserNotAllowedException(userId);
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(Integer.valueOf(configuration.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
+		factory.setSizeThreshold(Integer.valueOf(configuration
+				.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
@@ -325,7 +359,8 @@ public class MediaDAO {
 		String author = getFormFieldContent(items, Constants.AUTHOR_FIELD);
 
 		if (!author.equals(userId)) {
-			new FormFieldException("User '" + userId + "' tried to upload media as '" + author + "'");
+			new FormFieldException("User '" + userId
+					+ "' tried to upload media as '" + author + "'");
 		}
 
 		FileItem fileField = getFileFormField(items);
@@ -337,15 +372,18 @@ public class MediaDAO {
 			throw new FileUploadException("Error to get file input stream");
 		}
 
-		Media media = storeMedia(fileName, title, description, author, entityId, fileField.getContentType(), inputStream, isAvatar);
+		Media media = storeMedia(fileName, title, description, author,
+				entityId, fileField.getContentType(), inputStream, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 
-		return gson.toJson(media); 
+		return gson.toJson(media);
 	}
 
-	protected Media storeMedia(String fileName, String title, String description, String author,
-			String entityId, String mimeType, InputStream inputStream, final boolean isAvatar) throws FileUploadException {
+	protected Media storeMedia(String fileName, String title,
+			String description, String author, String entityId,
+			String mimeType, InputStream inputStream, final boolean isAvatar)
+			throws FileUploadException {
 
 		String directory = getDirectory(entityId);
 		mkdir(directory);
@@ -376,7 +414,7 @@ public class MediaDAO {
 			throw new FileUploadException(e.getMessage());
 		}
 
-		final Media media = createMedia(mediaId, fileName, title, description, 
+		final Media media = createMedia(mediaId, fileName, title, description,
 				author, entityId, mimeType, file);
 
 		// store media metadata
@@ -385,7 +423,8 @@ public class MediaDAO {
 				try {
 					if (isAvatar) {
 						if (dataSource.getEntityAvatarId(media.getEntityId()) != null) {
-							dataSource.updateEntityAvatar(media.getEntityId(), media.getId());
+							dataSource.updateEntityAvatar(media.getEntityId(),
+									media.getId());
 						} else {
 							dataSource.storeAvatar(media);
 						}
@@ -400,15 +439,18 @@ public class MediaDAO {
 		return media;
 	}
 
-	protected byte[] getPreview(String entityId, String mediaId, Integer maxHeight, Integer maxWidth, String mediaDirectory)  
-			throws MetadataSourceException, IOException, InvalidPreviewFormatException, MediaNotFoundException {
+	protected byte[] getPreview(String entityId, String mediaId,
+			Integer maxHeight, Integer maxWidth, String mediaDirectory)
+			throws MetadataSourceException, IOException,
+			InvalidPreviewFormatException, MediaNotFoundException {
 		File media = new File(mediaDirectory + File.separator + mediaId);
 
 		if (!media.exists()) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
 
-		String previewId = dataSource.getPreviewId(mediaId, maxHeight, maxWidth);
+		String previewId = dataSource
+				.getPreviewId(mediaId, maxHeight, maxWidth);
 
 		if (previewId != null) {
 			File preview = new File(mediaDirectory + File.separator + previewId);
@@ -427,15 +469,18 @@ public class MediaDAO {
 		BufferedImage previewImg = null;
 
 		if (ImageUtils.isImage(extension)) {
-			previewImg = ImageUtils.createImagePreview(media, maxWidth, maxHeight);
-		} else if (VideoUtils.isVideo(extension)){
-			previewImg = new VideoUtils(media).createVideoPreview(maxWidth, maxHeight);
+			previewImg = ImageUtils.createImagePreview(media, maxWidth,
+					maxHeight);
+		} else if (VideoUtils.isVideo(extension)) {
+			previewImg = new VideoUtils(media).createVideoPreview(maxWidth,
+					maxHeight);
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
 
 		// store preview in another flow
-		new StorePreviewThread(previewId, mediaDirectory, mediaId, maxHeight, maxWidth, extension, previewImg).start();
+		new StorePreviewThread(previewId, mediaDirectory, mediaId, maxHeight,
+				maxWidth, extension, previewImg).start();
 
 		return ImageUtils.imageToBytes(previewImg, extension);
 	}
@@ -444,7 +489,8 @@ public class MediaDAO {
 		return mediaId.equals(Constants.AVATAR_ARG);
 	}
 
-	protected String getFormFieldContent(List<FileItem> items, String fieldName) throws FormMissingFieldException {
+	protected String getFormFieldContent(List<FileItem> items, String fieldName)
+			throws FormMissingFieldException {
 		String field = null;
 
 		for (int i = 0; i < items.size(); i++) {
@@ -464,7 +510,8 @@ public class MediaDAO {
 		return field;
 	}
 
-	protected FileItem getFileFormField(List<FileItem> items) throws FormMissingFieldException, FileUploadException {
+	protected FileItem getFileFormField(List<FileItem> items)
+			throws FormMissingFieldException, FileUploadException {
 		FileItem field = null;
 
 		for (int i = 0; i < items.size(); i++) {
@@ -483,7 +530,8 @@ public class MediaDAO {
 	}
 
 	protected Media createMedia(String mediaId, String fileName, String title,
-			String description, String author, String entityId, String mimeType, File file) {
+			String description, String author, String entityId,
+			String mimeType, File file) {
 		Media media = new Media();
 		media.setId(mediaId);
 		media.setFileName(fileName);
@@ -498,7 +546,8 @@ public class MediaDAO {
 		String fileExtension = getFileExtension(fileName);
 		media.setFileExtension(fileExtension);
 
-		//XXX adds a lot of delay to the server side, maybe the client should send those information
+		// XXX adds a lot of delay to the server side, maybe the client should
+		// send those information
 		try {
 			if (ImageUtils.isImage(fileExtension)) {
 				BufferedImage img = ImageIO.read(file);
@@ -519,7 +568,8 @@ public class MediaDAO {
 		return media;
 	}
 
-	protected Preview createPreview(String previewId, String mediaId, Integer height, Integer width, File file) {
+	protected Preview createPreview(String previewId, String mediaId,
+			Integer height, Integer width, File file) {
 		Preview preview = new Preview();
 		preview.setFileSize(file.length());
 		preview.setHeight(height);
@@ -551,8 +601,9 @@ public class MediaDAO {
 	}
 
 	public String getDirectory(String entityId) {
-		return configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) +
-				File.separator + entityId;
+		return configuration
+				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+				+ File.separator + entityId;
 	}
 
 	private class StorePreviewThread extends Thread {
@@ -564,9 +615,9 @@ public class MediaDAO {
 		private String extension;
 		private BufferedImage img;
 
-
-		StorePreviewThread(String previewId, String directory, String mediaId, Integer height, Integer width, 
-				String extension, BufferedImage img) {
+		StorePreviewThread(String previewId, String directory, String mediaId,
+				Integer height, Integer width, String extension,
+				BufferedImage img) {
 			this.previewId = previewId;
 			this.directory = directory;
 			this.mediaId = mediaId;
@@ -576,17 +627,18 @@ public class MediaDAO {
 			this.img = img;
 		}
 
-
 		public void start() {
 			try {
-				File previewFile = ImageUtils.storeImageIntoFile(img, extension, 
-						directory + File.separator + previewId);
+				File previewFile = ImageUtils.storeImageIntoFile(img,
+						extension, directory + File.separator + previewId);
 
-				Preview preview = createPreview(previewId, mediaId, height, width, previewFile);
+				Preview preview = createPreview(previewId, mediaId, height,
+						width, previewFile);
 
 				dataSource.storePreview(preview);
 			} catch (Exception e) {
-				LOGGER.error("Error while storing preview: " + previewId + ". Media ID: " + mediaId, e);
+				LOGGER.error("Error while storing preview: " + previewId
+						+ ". Media ID: " + mediaId, e);
 			}
 		}
 	}

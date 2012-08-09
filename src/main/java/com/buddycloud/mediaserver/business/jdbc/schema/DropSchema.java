@@ -21,7 +21,8 @@ import java.sql.SQLException;
 
 public class DropSchema {
 
-	public static void main(String[] args) throws PropertyVetoException, IOException, SQLException {
+	public static void main(String[] args) throws PropertyVetoException,
+			IOException, SQLException {
 		new Schema().drop();
 	}
 }

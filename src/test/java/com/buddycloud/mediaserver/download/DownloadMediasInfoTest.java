@@ -33,72 +33,87 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class DownloadMediasInfoTest extends MediaServerTest {
-	
+
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + 
-				File.separator + BASE_CHANNEL));
-		
+		FileUtils
+				.cleanDirectory(new File(
+						configuration
+								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+								+ File.separator + BASE_CHANNEL));
+
 		dataSource.deleteMedia(MEDIA_ID);
 	}
-	
+
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
+		File destDir = new File(
+				configuration
+						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+						+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
-		
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTIMAGE_NAME), new File(destDir + File.separator + MEDIA_ID));
-		
+
+		FileUtils.copyFile(new File(TESTFILE_PATH + TESTIMAGE_NAME), new File(
+				destDir + File.separator + MEDIA_ID));
+
 		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTIMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media");
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
-		
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media");
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
+
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulDownloadParamAuth() throws Exception {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
-		
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media" +
-				"?auth=" + new String(encoder.encode(authStr.getBytes())));
-		
+
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media" + "?auth="
+				+ new String(encoder.encode(authStr.getBytes())));
+
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulDownloadSince() throws Exception {
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.add(Calendar.HOUR, -1);
-		
+
 		DateFormat dateFormat = ISO8601DateFormat.getInstance();
-		
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media?since=" + dateFormat.format(calendar.getTime()));
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
-		
+
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media?since="
+				+ dateFormat.format(calendar.getTime()));
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
+
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulDownloadSinceParamAuth() throws Exception {
 		Calendar calendar = GregorianCalendar.getInstance();
 		calendar.add(Calendar.HOUR, -1);
-		
+
 		DateFormat dateFormat = ISO8601DateFormat.getInstance();
 
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
-		
-		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL + "/media?since=" + dateFormat.format(calendar.getTime()) +
-				"?auth=" + new String(encoder.encode(authStr.getBytes())));
-		
+
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/media?since="
+				+ dateFormat.format(calendar.getTime()) + "?auth="
+				+ new String(encoder.encode(authStr.getBytes())));
+
 		client.get(MediaType.APPLICATION_JSON).write(System.out);
 	}
 

@@ -40,11 +40,11 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class Main {
 	private static Logger LOGGER = Logger.getLogger(Main.class);
-	
-	
-	public static void main(String[] args) {  
-		Properties configuration = MediaServerConfiguration.getInstance().getConfiguration();
-		
+
+	public static void main(String[] args) {
+		Properties configuration = MediaServerConfiguration.getInstance()
+				.getConfiguration();
+
 		try {
 			startRestletComponent(configuration);
 			startXMPPToolBox(configuration);
@@ -52,43 +52,60 @@ public class Main {
 			LOGGER.fatal(e.getMessage(), e);
 			System.exit(1);
 		}
-	} 
-	
-	
-	private static void startRestletComponent(Properties configuration) throws Exception {
-	    Component component = new Component();  
-	    
-	    if (Boolean.valueOf(configuration.getProperty("https.enabled"))) {
-	    	Server server = component.getServers().add(Protocol.HTTPS, 
-	    			Integer.valueOf(configuration.getProperty("https.port")));
-	    	
-	    	server.getContext().getParameters().add("sslContextFactory","org.restlet.ext.ssl.PkixSslContextFactory");
-	    	server.getContext().getParameters().add("keystorePath", configuration.getProperty("https.keystore.path"));
-	    	server.getContext().getParameters().add("keystorePassword", configuration.getProperty("https.keystore.password"));
-	    	server.getContext().getParameters().add("keyPassword", configuration.getProperty("https.key.password"));
-	    	server.getContext().getParameters().add("keystoreType", configuration.getProperty("https.keystore.type"));
-	    } else {
-	    	component.getServers().add(Protocol.HTTP, 
-	    			Integer.valueOf(configuration.getProperty("http.port")));
-	    }
-	    
-	    Context context = component.getContext().createChildContext();
-		component.getDefaultHost().attach(new MediaServerApplication(context));
-		
-	    component.start(); 
 	}
 
+	private static void startRestletComponent(Properties configuration)
+			throws Exception {
+		Component component = new Component();
 
-	private static void startXMPPToolBox(Properties configuration) throws Exception {
+		if (Boolean.valueOf(configuration.getProperty("https.enabled"))) {
+			Server server = component.getServers().add(Protocol.HTTPS,
+					Integer.valueOf(configuration.getProperty("https.port")));
+
+			server.getContext()
+					.getParameters()
+					.add("sslContextFactory",
+							"org.restlet.ext.ssl.PkixSslContextFactory");
+			server.getContext()
+					.getParameters()
+					.add("keystorePath",
+							configuration.getProperty("https.keystore.path"));
+			server.getContext()
+					.getParameters()
+					.add("keystorePassword",
+							configuration
+									.getProperty("https.keystore.password"));
+			server.getContext()
+					.getParameters()
+					.add("keyPassword",
+							configuration.getProperty("https.key.password"));
+			server.getContext()
+					.getParameters()
+					.add("keystoreType",
+							configuration.getProperty("https.keystore.type"));
+		} else {
+			component.getServers().add(Protocol.HTTP,
+					Integer.valueOf(configuration.getProperty("http.port")));
+		}
+
+		Context context = component.getContext().createChildContext();
+		component.getDefaultHost().attach(new MediaServerApplication(context));
+
+		component.start();
+	}
+
+	private static void startXMPPToolBox(Properties configuration)
+			throws Exception {
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
-		
+
 		MediaServerComponent component = createXMPPComponent(configuration);
 
-		String[] servers = configuration.getProperty("bc.channels.server").split(";");
-		
+		String[] servers = configuration.getProperty("bc.channels.server")
+				.split(";");
+
 		XMPPToolBox.getInstance().start(component, connection, servers);
-		
+
 		while (true) {
 			try {
 				Thread.sleep(10000);
@@ -97,14 +114,17 @@ public class Main {
 			}
 		}
 	}
-	
-	private static MediaServerComponent createXMPPComponent(Properties configuration) throws Exception {
+
+	private static MediaServerComponent createXMPPComponent(
+			Properties configuration) throws Exception {
 		ExternalComponentManager componentManager = new ExternalComponentManager(
 				configuration.getProperty("xmpp.component.host"),
-				Integer.valueOf(configuration.getProperty("xmpp.component.port")));
+				Integer.valueOf(configuration
+						.getProperty("xmpp.component.port")));
 
-		String subdomain = configuration.getProperty("xmpp.component.subdomain");
-		componentManager.setSecretKey(subdomain, 
+		String subdomain = configuration
+				.getProperty("xmpp.component.subdomain");
+		componentManager.setSecretKey(subdomain,
 				configuration.getProperty("xmpp.component.secretkey"));
 
 		MediaServerComponent mediaServer = new MediaServerComponent();
@@ -115,10 +135,10 @@ public class Main {
 			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
 			throw e;
 		}
-		
+
 		return mediaServer;
 	}
-	
+
 	private static void addTraceListeners(XMPPConnection connection) {
 		PacketFilter iqFilter = new PacketFilter() {
 			@Override
@@ -143,28 +163,30 @@ public class Main {
 		}, iqFilter);
 	}
 
-	private static XMPPConnection createAndStartConnection(Properties configuration) {
-		
-		String serviceName = configuration.getProperty("xmpp.connection.servicename");
+	private static XMPPConnection createAndStartConnection(
+			Properties configuration) {
+
+		String serviceName = configuration
+				.getProperty("xmpp.connection.servicename");
 		String host = configuration.getProperty("xmpp.connection.host");
 		String userName = configuration.getProperty("xmpp.connection.username");
-		
-		ConnectionConfiguration cc = new ConnectionConfiguration(
-				host,
-				Integer.parseInt(configuration.getProperty("xmpp.connection.port")),
-				serviceName);
-		
+
+		ConnectionConfiguration cc = new ConnectionConfiguration(host,
+				Integer.parseInt(configuration
+						.getProperty("xmpp.connection.port")), serviceName);
+
 		XMPPConnection connection = new XMPPConnection(cc);
 		try {
 			connection.connect();
-			connection.login(userName, configuration.getProperty("xmpp.connection.password"));
+			connection.login(userName,
+					configuration.getProperty("xmpp.connection.password"));
 		} catch (XMPPException e) {
 			LOGGER.fatal("XMPP connection coudn't be started", e);
 			throw new CreateXMPPConnectionException(e.getMessage(), e);
 		}
-		
+
 		addTraceListeners(connection);
-		
+
 		return connection;
 	}
 }

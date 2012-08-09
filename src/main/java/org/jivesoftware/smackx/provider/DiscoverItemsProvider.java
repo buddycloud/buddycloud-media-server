@@ -27,49 +27,51 @@ import org.jivesoftware.smackx.packet.RSMSet;
 import org.xmlpull.v1.XmlPullParser;
 
 /**
-* The DiscoverInfoProvider parses Service Discovery items packets.
-*
-* @author Gaston Dombiak
-*/
+ * The DiscoverInfoProvider parses Service Discovery items packets.
+ * 
+ * @author Gaston Dombiak
+ */
 public class DiscoverItemsProvider implements IQProvider {
 
-    public IQ parseIQ(XmlPullParser parser) throws Exception {
-        DiscoverItems discoverItems = new DiscoverItems();
-        boolean done = false;
-        DiscoverItems.Item item;
-        String jid = "";
-        String name = "";
-        String action = "";
-        String node = "";
-        discoverItems.setNode(parser.getAttributeValue("", "node"));
-        
-        while (!done) {
-            int eventType = parser.next();
-            
-            if (eventType == XmlPullParser.START_TAG && "item".equals(parser.getName())) {
-                // Initialize the variables from the parsed XML
-                jid = parser.getAttributeValue("", "jid");
-                name = parser.getAttributeValue("", "name");
-                node = parser.getAttributeValue("", "node");
-                action = parser.getAttributeValue("", "action");
-            }
-            else if (eventType == XmlPullParser.END_TAG && "item".equals(parser.getName())) {
-                // Create a new Item and add it to DiscoverItems.
-                item = new DiscoverItems.Item(jid);
-                item.setName(name);
-                item.setNode(node);
-                item.setAction(action);
-                discoverItems.addItem(item);
-            } else if (eventType == XmlPullParser.START_TAG && "set".equals(parser.getName())) {
-            	RSMSet rsmSet = RSMSet.parse(parser);
-            	discoverItems.setRsmSet(rsmSet);
-            } 
-            else if (eventType == XmlPullParser.END_TAG && "query".equals(parser.getName())) {
-                done = true;
-            }
-        }
+	public IQ parseIQ(XmlPullParser parser) throws Exception {
+		DiscoverItems discoverItems = new DiscoverItems();
+		boolean done = false;
+		DiscoverItems.Item item;
+		String jid = "";
+		String name = "";
+		String action = "";
+		String node = "";
+		discoverItems.setNode(parser.getAttributeValue("", "node"));
 
-        return discoverItems;
-    }
+		while (!done) {
+			int eventType = parser.next();
+
+			if (eventType == XmlPullParser.START_TAG
+					&& "item".equals(parser.getName())) {
+				// Initialize the variables from the parsed XML
+				jid = parser.getAttributeValue("", "jid");
+				name = parser.getAttributeValue("", "name");
+				node = parser.getAttributeValue("", "node");
+				action = parser.getAttributeValue("", "action");
+			} else if (eventType == XmlPullParser.END_TAG
+					&& "item".equals(parser.getName())) {
+				// Create a new Item and add it to DiscoverItems.
+				item = new DiscoverItems.Item(jid);
+				item.setName(name);
+				item.setNode(node);
+				item.setAction(action);
+				discoverItems.addItem(item);
+			} else if (eventType == XmlPullParser.START_TAG
+					&& "set".equals(parser.getName())) {
+				RSMSet rsmSet = RSMSet.parse(parser);
+				discoverItems.setRsmSet(rsmSet);
+			} else if (eventType == XmlPullParser.END_TAG
+					&& "query".equals(parser.getName())) {
+				done = true;
+			}
+		}
+
+		return discoverItems;
+	}
 
 }

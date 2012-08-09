@@ -30,45 +30,52 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class DeleteAvatarTest extends MediaServerTest {
-	
+
 	private File fileToDelete;
-	
-	
-	public void testTearDown() throws Exception {}
-	
+
+	public void testTearDown() throws Exception {
+	}
+
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY) + File.separator + BASE_CHANNEL);
+		File destDir = new File(
+				configuration
+						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+						+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
-		
+
 		fileToDelete = new File(destDir + File.separator + MEDIA_ID);
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME), fileToDelete);
-		
+		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME),
+				fileToDelete);
+
 		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTAVATAR_NAME);
 		dataSource.storeMedia(media);
 		dataSource.storeAvatar(media);
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulDelete() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + BASE_CHANNEL + "/media/avatar");
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER, BASE_TOKEN);
-		
+		ClientResource client = new ClientResource(BASE_URL + BASE_CHANNEL
+				+ "/media/avatar");
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
+
 		client.delete();
 
 		Assert.assertFalse(fileToDelete.exists());
 	}
-	
+
 	@Test
 	public void anonymousSuccessfulDeleteParamAuth() throws Exception {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
-		
-		ClientResource client = new ClientResource(BASE_URL + BASE_CHANNEL + "/media/avatar" +
-				"?auth=" + new String(encoder.encode(authStr.getBytes())));
-		
+
+		ClientResource client = new ClientResource(BASE_URL + BASE_CHANNEL
+				+ "/media/avatar" + "?auth="
+				+ new String(encoder.encode(authStr.getBytes())));
+
 		client.delete();
 
 		Assert.assertFalse(fileToDelete.exists());

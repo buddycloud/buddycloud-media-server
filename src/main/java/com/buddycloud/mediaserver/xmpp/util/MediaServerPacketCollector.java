@@ -24,103 +24,102 @@ import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 
 public class MediaServerPacketCollector {
 
-    private static final int MAX_PACKETS = 5000;
+	private static final int MAX_PACKETS = 5000;
 
-    private MediaServerComponent component;
-    private MediaServerPacketFilter packetFilter;
-    private LinkedList<IQ> resultQueue;
-    private boolean cancelled = false;
+	private MediaServerComponent component;
+	private MediaServerPacketFilter packetFilter;
+	private LinkedList<IQ> resultQueue;
+	private boolean cancelled = false;
 
-    public MediaServerPacketCollector(MediaServerComponent component, MediaServerPacketFilter packetFilter) {
-        this.component = component;
-        this.packetFilter = packetFilter;
-        this.resultQueue = new LinkedList<IQ>();
-    }
+	public MediaServerPacketCollector(MediaServerComponent component,
+			MediaServerPacketFilter packetFilter) {
+		this.component = component;
+		this.packetFilter = packetFilter;
+		this.resultQueue = new LinkedList<IQ>();
+	}
 
+	public void cancel() {
+		// If the packet collector has already been cancelled, do nothing.
+		if (!cancelled) {
+			cancelled = true;
+			component.removePacketCollector(this);
+		}
+	}
 
-    public void cancel() {
-        // If the packet collector has already been cancelled, do nothing.
-        if (!cancelled) {
-            cancelled = true;
-            component.removePacketCollector(this);
-        }
-    }
+	public MediaServerPacketFilter getPacketFilter() {
+		return packetFilter;
+	}
 
-    public MediaServerPacketFilter getPacketFilter() {
-        return packetFilter;
-    }
+	public synchronized Packet pollResult() {
+		if (resultQueue.isEmpty()) {
+			return null;
+		} else {
+			return resultQueue.removeLast();
+		}
+	}
 
-    public synchronized Packet pollResult() {
-        if (resultQueue.isEmpty()) {
-            return null;
-        }
-        else {
-            return resultQueue.removeLast();
-        }
-    }
+	public synchronized Packet nextResult() {
+		// Wait indefinitely until there is a result to return.
+		while (resultQueue.isEmpty()) {
+			try {
+				wait();
+			} catch (InterruptedException ie) {
+				// Ignore.
+			}
+		}
+		return resultQueue.removeLast();
+	}
 
-    public synchronized Packet nextResult() {
-        // Wait indefinitely until there is a result to return.
-        while (resultQueue.isEmpty()) {
-            try {
-                wait();
-            }
-            catch (InterruptedException ie) {
-                // Ignore.
-            }
-        }
-        return resultQueue.removeLast();
-    }
+	public synchronized IQ nextResult(long timeout) {
+		// Wait up to the specified amount of time for a result.
+		if (resultQueue.isEmpty()) {
+			long waitTime = timeout;
+			long start = System.currentTimeMillis();
+			try {
+				// Keep waiting until the specified amount of time has elapsed,
+				// or
+				// a packet is available to return.
+				while (resultQueue.isEmpty()) {
+					if (waitTime <= 0) {
+						break;
+					}
+					wait(waitTime);
+					long now = System.currentTimeMillis();
+					waitTime -= (now - start);
+					start = now;
+				}
+			} catch (InterruptedException ie) {
+				// Ignore.
+			}
+			// Still haven't found a result, so return null.
+			if (resultQueue.isEmpty()) {
+				return null;
+			}
+			// Return the packet that was found.
+			else {
+				return resultQueue.removeLast();
+			}
+		}
+		// There's already a packet waiting, so return it.
+		else {
+			return resultQueue.removeLast();
+		}
+	}
 
-    public synchronized IQ nextResult(long timeout) {
-        // Wait up to the specified amount of time for a result.
-        if (resultQueue.isEmpty()) {
-            long waitTime = timeout;
-            long start = System.currentTimeMillis();
-            try {
-                // Keep waiting until the specified amount of time has elapsed, or
-                // a packet is available to return.
-                while (resultQueue.isEmpty()) {
-                    if (waitTime <= 0) {
-                        break;
-                    }
-                    wait(waitTime);
-                    long now = System.currentTimeMillis();
-                    waitTime -= (now - start);
-                    start = now;
-                }
-            }
-            catch (InterruptedException ie) {
-                // Ignore.
-            }
-            // Still haven't found a result, so return null.
-            if (resultQueue.isEmpty()) {
-                return null;
-            }
-            // Return the packet that was found.
-            else {
-                return resultQueue.removeLast();
-            }
-        }
-        // There's already a packet waiting, so return it.
-        else {
-            return resultQueue.removeLast();
-        }
-    }
-
-    public synchronized void processPacket(IQ packet) {
-        if (packet == null) {
-            return;
-        }
-        if (packetFilter == null || packetFilter.accept(packet)) {
-            // If the max number of packets has been reached, remove the oldest one.
-            if (resultQueue.size() == MAX_PACKETS) {
-                resultQueue.removeLast();
-            }
-            // Add the new packet.
-            resultQueue.addFirst(packet);
-            // Notify waiting threads a result is available.
-            notifyAll();
-        }
-    }
+	public synchronized void processPacket(IQ packet) {
+		if (packet == null) {
+			return;
+		}
+		if (packetFilter == null || packetFilter.accept(packet)) {
+			// If the max number of packets has been reached, remove the oldest
+			// one.
+			if (resultQueue.size() == MAX_PACKETS) {
+				resultQueue.removeLast();
+			}
+			// Add the new packet.
+			resultQueue.addFirst(packet);
+			// Notify waiting threads a result is available.
+			notifyAll();
+		}
+	}
 }

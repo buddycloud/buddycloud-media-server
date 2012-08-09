@@ -19,98 +19,102 @@ import org.jivesoftware.smackx.packet.RSMSet;
 import org.jivesoftware.smackx.pubsub.PubSubElementType;
 
 /**
- * The standard PubSub extension of an {@link IQ} packet.  This is the topmost
- * element of all pubsub requests and replies as defined in the <a href="http://xmpp.org/extensions/xep-0060">Publish-Subscribe</a> 
+ * The standard PubSub extension of an {@link IQ} packet. This is the topmost
+ * element of all pubsub requests and replies as defined in the <a
+ * href="http://xmpp.org/extensions/xep-0060">Publish-Subscribe</a>
  * specification.
  * 
  * @author Robin Collier
  */
-public class PubSub extends IQ
-{
+public class PubSub extends IQ {
 	private PubSubNamespace ns = PubSubNamespace.BASIC;
 	private RSMSet rsmSet;
-	
+
 	/**
-    * Returns the XML element name of the extension sub-packet root element.
-    *
-    * @return the XML element name of the packet extension.
-    */
-    public String getElementName() {
-        return "pubsub";
-    }
+	 * Returns the XML element name of the extension sub-packet root element.
+	 * 
+	 * @return the XML element name of the packet extension.
+	 */
+	public String getElementName() {
+		return "pubsub";
+	}
 
-    /** 
-     * Returns the XML namespace of the extension sub-packet root element.
-     * According the specification the namespace is 
-     * http://jabber.org/protocol/pubsub with a specific fragment depending
-     * on the request.  The namespace is defined at <a href="http://xmpp.org/registrar/namespaces.html">XMPP Registrar</a> at
-     * 
-     * The default value has no fragment.
-     * 
-     * @return the XML namespace of the packet extension.
-     */
-    public String getNamespace() 
-    {
-        return ns.getXmlns();
-    }
+	/**
+	 * Returns the XML namespace of the extension sub-packet root element.
+	 * According the specification the namespace is
+	 * http://jabber.org/protocol/pubsub with a specific fragment depending on
+	 * the request. The namespace is defined at <a
+	 * href="http://xmpp.org/registrar/namespaces.html">XMPP Registrar</a> at
+	 * 
+	 * The default value has no fragment.
+	 * 
+	 * @return the XML namespace of the packet extension.
+	 */
+	public String getNamespace() {
+		return ns.getXmlns();
+	}
 
-    /**
-     * Set the namespace for the packet if it something other than the default
-     * case of {@link PubSubNamespace#BASIC}.  The {@link #getNamespace()} method will return 
-     * the result of calling {@link PubSubNamespace#getXmlns()} on the specified enum.
-     * 
-     * @param ns - The new value for the namespace.
-     */
-	public void setPubSubNamespace(PubSubNamespace ns)
-	{
+	/**
+	 * Set the namespace for the packet if it something other than the default
+	 * case of {@link PubSubNamespace#BASIC}. The {@link #getNamespace()} method
+	 * will return the result of calling {@link PubSubNamespace#getXmlns()} on
+	 * the specified enum.
+	 * 
+	 * @param ns
+	 *            - The new value for the namespace.
+	 */
+	public void setPubSubNamespace(PubSubNamespace ns) {
 		this.ns = ns;
 	}
 
-	public PacketExtension getExtension(PubSubElementType elem)
-	{
-		return getExtension(elem.getElementName(), elem.getNamespace().getXmlns());
+	public PacketExtension getExtension(PubSubElementType elem) {
+		return getExtension(elem.getElementName(), elem.getNamespace()
+				.getXmlns());
 	}
 
 	/**
-	 * Returns the current value of the namespace.  The {@link #getNamespace()} method will return 
-     * the result of calling {@link PubSubNamespace#getXmlns()} this value.
+	 * Returns the current value of the namespace. The {@link #getNamespace()}
+	 * method will return the result of calling
+	 * {@link PubSubNamespace#getXmlns()} this value.
 	 * 
 	 * @return The current value of the namespace.
 	 */
-	public PubSubNamespace getPubSubNamespace()
-	{
+	public PubSubNamespace getPubSubNamespace() {
 		return ns;
 	}
-    /**
-     * Returns the XML representation of a pubsub element according the specification.
-     * 
-     * The XML representation will be inside of an iq packet like
-     * in the following example:
-     * <pre>
-     * &lt;iq type='set' id="MlIpV-4" to="pubsub.gato.home" from="gato3@gato.home/Smack"&gt;
-     *     &lt;pubsub xmlns="http://jabber.org/protocol/pubsub"&gt;
-     *                      :
-     *         Specific request extension
-     *                      :
-     *     &lt;/pubsub&gt;
-     * &lt;/iq&gt;
-     * </pre>
-     * 
-     */
-    public String getChildElementXML() {
-        StringBuilder buf = new StringBuilder();
-        buf.append("<").append(getElementName()).append(" xmlns=\"").append(getNamespace()).append("\">");
-        buf.append(getExtensionsXML());
-        
-        if (rsmSet != null) {
-        	buf.append(rsmSet.toXML());
-        }
-        
-        buf.append("</").append(getElementName()).append(">");
-        
-        
-        return buf.toString();
-    }
+
+	/**
+	 * Returns the XML representation of a pubsub element according the
+	 * specification.
+	 * 
+	 * The XML representation will be inside of an iq packet like in the
+	 * following example:
+	 * 
+	 * <pre>
+	 * &lt;iq type='set' id="MlIpV-4" to="pubsub.gato.home" from="gato3@gato.home/Smack"&gt;
+	 *     &lt;pubsub xmlns="http://jabber.org/protocol/pubsub"&gt;
+	 *                      :
+	 *         Specific request extension
+	 *                      :
+	 *     &lt;/pubsub&gt;
+	 * &lt;/iq&gt;
+	 * </pre>
+	 * 
+	 */
+	public String getChildElementXML() {
+		StringBuilder buf = new StringBuilder();
+		buf.append("<").append(getElementName()).append(" xmlns=\"")
+				.append(getNamespace()).append("\">");
+		buf.append(getExtensionsXML());
+
+		if (rsmSet != null) {
+			buf.append(rsmSet.toXML());
+		}
+
+		buf.append("</").append(getElementName()).append(">");
+
+		return buf.toString();
+	}
 
 	public RSMSet getRsmSet() {
 		return rsmSet;
