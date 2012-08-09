@@ -247,6 +247,8 @@
 					<descriptors>
 						<descriptor>src/main/assembly/${assembly-config}</descriptor>
 					</descriptors>
+					<finalName>${project.artifactId}-${project.version}</finalName>
+					<appendAssemblyId>false</appendAssemblyId>
 				</configuration>
 			</plugin>
 			<!-- Jetty -->
