@@ -15,51 +15,65 @@
  */
 package com.buddycloud.mediaserver.download;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.io.File;
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.helpers.ISO8601DateFormat;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
+import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.google.gson.reflect.TypeToken;
 
 public class DownloadMediasInfoTest extends MediaServerTest {
 
-	public void testTearDown() throws Exception {
-		FileUtils
-				.cleanDirectory(new File(
-						configuration
-								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-								+ File.separator + BASE_CHANNEL));
+	private static final String MEDIA_ID1 = generateRandomString();
+	private static final String MEDIA_ID2 = generateRandomString();
 
-		dataSource.deleteMedia(MEDIA_ID);
+
+	public void testTearDown() throws Exception {
+		deleteFile(MEDIA_ID1);
+		deleteFile(MEDIA_ID2);
 	}
 
 	@Override
 	protected void testSetUp() throws Exception {
+		storeFile(MEDIA_ID1);
+		storeFile(MEDIA_ID2);
+	}
+
+	private void storeFile(String id) throws Exception {
 		File destDir = new File(
 				configuration
-						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-						+ File.separator + BASE_CHANNEL);
+				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+				+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
 
 		FileUtils.copyFile(new File(TESTFILE_PATH + TESTIMAGE_NAME), new File(
-				destDir + File.separator + MEDIA_ID));
+				destDir + File.separator + id));
 
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTIMAGE_NAME);
+		Media media = buildMedia(id, TESTFILE_PATH + TESTIMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
+
+	private void deleteFile(String id) throws Exception {
+		FileUtils.cleanDirectory(new File(configuration
+				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+				+ File.separator + BASE_CHANNEL));
+
+		dataSource.deleteMedia(MEDIA_ID);
+	}
+
 
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
@@ -68,7 +82,10 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		client.get(MediaType.APPLICATION_JSON).write(System.out);
+		Representation result = client.get(MediaType.APPLICATION_JSON);
+		List<Media> medias = gson.fromJson(result.getText(),  new TypeToken<List<Media>>(){}.getType());
+
+		assertTrue(medias.size() == 2);
 	}
 
 	@Test
@@ -80,41 +97,38 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 				+ BASE_CHANNEL + "/media" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
-		client.get(MediaType.APPLICATION_JSON).write(System.out);
+		Representation result = client.get(MediaType.APPLICATION_JSON);
+		List<Media> medias = gson.fromJson(result.getText(),  new TypeToken<List<Media>>(){}.getType());
+
+		assertTrue(medias.size() == 2);
 	}
 
 	@Test
-	public void anonymousSuccessfulDownloadSince() throws Exception {
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.add(Calendar.HOUR, -1);
-
-		DateFormat dateFormat = ISO8601DateFormat.getInstance();
-
+	public void anonymousSuccessfulDownloadMax() throws Exception {
+		int max = 1;
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media?since="
-				+ dateFormat.format(calendar.getTime()));
+				+ BASE_CHANNEL + "/media?max=" + max);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		client.get(MediaType.APPLICATION_JSON).write(System.out);
+		Representation result = client.get(MediaType.APPLICATION_JSON);
+		List<Media> medias = gson.fromJson(result.getText(),  new TypeToken<List<Media>>(){}.getType());
+
+		assertTrue(medias.size() == 1);
 	}
 
 	@Test
-	public void anonymousSuccessfulDownloadSinceParamAuth() throws Exception {
-		Calendar calendar = GregorianCalendar.getInstance();
-		calendar.add(Calendar.HOUR, -1);
-
-		DateFormat dateFormat = ISO8601DateFormat.getInstance();
-
-		Base64 encoder = new Base64(true);
-		String authStr = BASE_USER + ":" + BASE_TOKEN;
-
+	public void anonymousSuccessfulDownloadAfter() throws Exception {
+		int max = 1;
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media?since="
-				+ dateFormat.format(calendar.getTime()) + "?auth="
-				+ new String(encoder.encode(authStr.getBytes())));
+				+ BASE_CHANNEL + "/media?max=" + max + "&after=" + MEDIA_ID1);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
 
-		client.get(MediaType.APPLICATION_JSON).write(System.out);
+		Representation result = client.get(MediaType.APPLICATION_JSON);
+		List<Media> medias = gson.fromJson(result.getText(),  new TypeToken<List<Media>>(){}.getType());
+
+		assertTrue(medias.size() == 1);
 	}
 
 }

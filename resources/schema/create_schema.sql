@@ -34,6 +34,8 @@ CREATE TABLE medias(
 	PRIMARY KEY(id)
 );
 
+CREATE INDEX entityUpdated_idx ON medias (lastUpdatedDate, entityId);
+
 -- {
 --   "id": string,
 --   "shaChecksum": string,
@@ -61,3 +63,4 @@ CREATE TABLE avatars(
 );
 
 CREATE UNIQUE INDEX entity_idx ON avatars (entityId);
+

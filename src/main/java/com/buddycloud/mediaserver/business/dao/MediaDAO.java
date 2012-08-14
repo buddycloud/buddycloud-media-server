@@ -34,7 +34,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 import org.restlet.Request;
 import org.restlet.ext.fileupload.RestletFileUpload;
 
@@ -140,7 +139,7 @@ public class MediaDAO {
 		}
 	}
 
-	public String getMediasInfo(String userId, String entityId, DateTime since)
+	public String getMediasInfo(String userId, String entityId, Integer max, String after)
 			throws UserNotAllowedException, MetadataSourceException {
 
 		if (userId != null) {
@@ -158,7 +157,7 @@ public class MediaDAO {
 
 		LOGGER.debug("Getting medias info from: " + entityId);
 
-		List<Media> medias = dataSource.getMediasInfo(entityId, since);
+		List<Media> medias = dataSource.getMediasInfo(entityId, max, after);
 
 		return gson.toJson(medias);
 	}

@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.joda.time.DateTime;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
@@ -147,7 +146,7 @@ public class MetaDataSource {
 		return media;
 	}
 
-	public List<Media> getMediasInfo(String entityId, DateTime since)
+	public List<Media> getMediasInfo(String entityId, Integer max, String after)
 			throws MetadataSourceException {
 		LOGGER.debug("Get medias info from: " + entityId);
 
@@ -155,15 +154,19 @@ public class MetaDataSource {
 
 		PreparedStatement statement = null;
 		try {
-			if (since != null) {
-				Timestamp timestamp = new Timestamp(since.getMillis());
-
-				statement = prepareStatement(Queries.GET_MEDIAS_INFO_SINCE,
-						entityId, timestamp);
+			if (max != null) {
+				String sql = null;
+				if (after != null) {
+					sql = Queries.GET_MEDIAS_INFO_AFTER.replaceAll("#", max.toString());
+					statement = prepareStatement(sql, entityId, after);
+				} else {
+					sql = Queries.GET_MEDIAS_INFO_MAX.replaceAll("#", max.toString());
+					statement = prepareStatement(sql, entityId);
+				}
 			} else {
 				statement = prepareStatement(Queries.GET_MEDIAS_INFO, entityId);
 			}
-
+			
 			ResultSet result = statement.executeQuery();
 			while (result.next()) {
 				medias.add(resultToMedia(result));

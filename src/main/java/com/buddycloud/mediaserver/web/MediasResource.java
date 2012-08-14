@@ -16,8 +16,6 @@
 package com.buddycloud.mediaserver.web;
 
 import org.apache.commons.fileupload.FileUploadException;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
 import org.restlet.Request;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -143,15 +141,17 @@ public class MediasResource extends MediaServerResource {
 						MediaType.APPLICATION_JSON);
 			}
 		}
-
-		DateTime since = null;
+		
+		Integer max = null;
+		String after = null;
 
 		try {
-			String queryValue = getQueryValue(Constants.SINCE_QUERY);
-
+			String queryValue = getQueryValue(Constants.MAX_QUERY);
 			if (queryValue != null) {
-				since = ISODateTimeFormat.dateTime().parseDateTime(queryValue);
+				max = Integer.valueOf(queryValue);
 			}
+
+			after = getQueryValue(Constants.AFTER_QUERY);
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return new StringRepresentation(t.getLocalizedMessage(),
@@ -162,7 +162,7 @@ public class MediasResource extends MediaServerResource {
 
 		try {
 			return new StringRepresentation(mediaDAO.getMediasInfo(userId,
-					entityId, since), MediaType.APPLICATION_JSON);
+					entityId, max, after), MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(),

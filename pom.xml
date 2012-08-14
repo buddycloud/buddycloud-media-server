@@ -184,13 +184,6 @@
 			<version>1.1.4c</version>
 		</dependency>
 
-		<!-- Joda -->
-		<dependency>
-			<groupId>joda-time</groupId>
-			<artifactId>joda-time</artifactId>
-			<version>2.1</version>
-		</dependency>
-
 		<!-- JBcrypt -->
 		<dependency>
 			<groupId>org.mindrot</groupId>

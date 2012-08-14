@@ -30,9 +30,13 @@ public class Queries {
 			+ " VALUES(?, ?, ?, ?, ?, ?)";
 
 	// Select
+	public static final String GET_MEDIAS_INFO = "SELECT * FROM medias WHERE entityId = ? ORDER BY lastUpdatedDate DESC";
+	public static final String GET_MEDIAS_INFO_MAX = "SELECT * FROM medias WHERE entityId = ? ORDER BY lastUpdatedDate DESC FETCH FIRST # ROWS ONLY";
+	public static final String GET_MEDIAS_INFO_AFTER = "SELECT * FROM medias WHERE entityId = ? AND " +
+			"lastUpdatedDate > (SELECT lastUpdatedDate FROM medias WHERE id = ?) " +
+			"ORDER BY lastUpdatedDate DESC " +
+			"FETCH FIRST # ROWS ONLY";
 	public static final String GET_MEDIA = "SELECT * FROM medias WHERE id = ?";
-	public static final String GET_MEDIAS_INFO = "SELECT * FROM medias WHERE entityId = ?";
-	public static final String GET_MEDIAS_INFO_SINCE = "SELECT * FROM medias WHERE entityId = ? AND lastUpdatedDate >= ? ";
 	public static final String GET_MEDIA_UPLOADER = "SELECT author FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_MIME_TYPE = "SELECT mimeType FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_EXTENSION = "SELECT fileExtension FROM medias WHERE id = ?";
