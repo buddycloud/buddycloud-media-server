@@ -66,7 +66,7 @@ public class DownloadAvatarTest extends MediaServerTest {
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media/avatar");
+				+ BASE_CHANNEL + "/avatar");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -88,7 +88,7 @@ public class DownloadAvatarTest extends MediaServerTest {
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media/avatar" + "?auth="
+				+ BASE_CHANNEL + "/avatar" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		File file = new File(TEST_OUTPUT_DIR + File.separator
@@ -107,7 +107,7 @@ public class DownloadAvatarTest extends MediaServerTest {
 	public void anonymousPreviewSuccessfulDownload() throws Exception {
 		int height = 50;
 		int width = 50;
-		String url = BASE_URL + "/" + BASE_CHANNEL + "/media/avatar?maxheight="
+		String url = BASE_URL + "/" + BASE_CHANNEL + "/avatar?maxheight="
 				+ height + "&maxwidth=" + width;
 
 		ClientResource client = new ClientResource(url);
@@ -139,7 +139,7 @@ public class DownloadAvatarTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
-		String url = BASE_URL + "/" + BASE_CHANNEL + "/media/avatar?maxheight="
+		String url = BASE_URL + "/" + BASE_CHANNEL + "/avatar?maxheight="
 				+ height + "&maxwidth=" + width + "?auth="
 				+ new String(encoder.encode(authStr.getBytes()));
 

@@ -51,13 +51,13 @@ public class UploadAvatarTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulUpload() throws Exception {
+	public void uploadMedia() throws Exception {
 		// file fields
 		String title = "Test Avatar";
 		String description = "My Test Avatar";
 
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media/avatar");
+				+ BASE_CHANNEL + "/avatar");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -94,7 +94,7 @@ public class UploadAvatarTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulUploadParamAuth() throws Exception {
+	public void uploadMediaParamAuth() throws Exception {
 		// file fields
 		String title = "Test Avatar";
 		String description = "My Test Avatar";
@@ -103,7 +103,7 @@ public class UploadAvatarTest extends MediaServerTest {
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media/avatar" + "?auth="
+				+ BASE_CHANNEL + "/avatar" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = new FormDataSet();

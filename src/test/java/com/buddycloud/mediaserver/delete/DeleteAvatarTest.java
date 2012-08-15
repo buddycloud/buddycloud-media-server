@@ -56,9 +56,9 @@ public class DeleteAvatarTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulDelete() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + BASE_CHANNEL
-				+ "/media/avatar");
+	public void deleteAvatar() throws Exception {
+		ClientResource client = new ClientResource(BASE_URL + "/" + BASE_CHANNEL
+				+ "/avatar");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -68,12 +68,12 @@ public class DeleteAvatarTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulDeleteParamAuth() throws Exception {
+	public void deleteAvatarParamAuth() throws Exception {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
-		ClientResource client = new ClientResource(BASE_URL + BASE_CHANNEL
-				+ "/media/avatar" + "?auth="
+		ClientResource client = new ClientResource(BASE_URL + "/"  + BASE_CHANNEL
+				+ "/avatar" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		client.delete();

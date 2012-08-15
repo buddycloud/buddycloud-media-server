@@ -72,7 +72,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 		String description = "New Avatar Description";
 
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media/avatar");
+				+ BASE_CHANNEL + "/avatar");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -103,7 +103,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media/avatar" + "?auth="
+				+ BASE_CHANNEL + "/avatar" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = new FormDataSet();

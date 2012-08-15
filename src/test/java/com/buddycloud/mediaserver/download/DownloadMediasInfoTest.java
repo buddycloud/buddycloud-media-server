@@ -76,9 +76,9 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 
 
 	@Test
-	public void anonymousSuccessfulDownload() throws Exception {
+	public void downloadMediasInfo() throws Exception {
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media");
+				+ BASE_CHANNEL + "");
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -89,12 +89,12 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulDownloadParamAuth() throws Exception {
+	public void downloadMediasInfoParamAuth() throws Exception {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media" + "?auth="
+				+ BASE_CHANNEL + "" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		Representation result = client.get(MediaType.APPLICATION_JSON);
@@ -104,10 +104,10 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulDownloadMax() throws Exception {
+	public void downloadMediasInfoMax() throws Exception {
 		int max = 1;
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media?max=" + max);
+				+ BASE_CHANNEL + "?max=" + max);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -118,10 +118,10 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	}
 
 	@Test
-	public void anonymousSuccessfulDownloadAfter() throws Exception {
+	public void downloadMediasInfoAfter() throws Exception {
 		int max = 1;
 		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/media?max=" + max + "&after=" + MEDIA_ID1);
+				+ BASE_CHANNEL + "?max=" + max + "&after=" + MEDIA_ID1);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 

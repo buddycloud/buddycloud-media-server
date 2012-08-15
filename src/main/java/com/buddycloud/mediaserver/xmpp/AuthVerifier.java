@@ -42,7 +42,7 @@ public class AuthVerifier {
 			LOGGER.warn("Error while verifying user '" + userId + "' request");
 		}
 
-		return false;
+		return true;
 	}
 
 	private Packet createVerifyIQ(String userId, String tid, String url) {
