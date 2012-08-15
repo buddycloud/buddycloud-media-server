@@ -80,7 +80,7 @@ public class UploadAvatarTest extends MediaServerTest {
 				.add(new FormData(Constants.FILE_FIELD, new FileRepresentation(
 						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
 
-		Representation result = client.post(form);
+		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
@@ -90,6 +90,7 @@ public class UploadAvatarTest extends MediaServerTest {
 		assertEquals(BASE_USER, media.getAuthor());
 
 		// delete metadata
+		dataSource.deleteEntityAvatar(media.getEntityId());
 		dataSource.deleteMedia(media.getId());
 	}
 
@@ -135,6 +136,7 @@ public class UploadAvatarTest extends MediaServerTest {
 		assertEquals(BASE_USER, media.getAuthor());
 
 		// delete metadata
+		dataSource.deleteEntityAvatar(media.getEntityId());
 		dataSource.deleteMedia(media.getId());
 	}
 }

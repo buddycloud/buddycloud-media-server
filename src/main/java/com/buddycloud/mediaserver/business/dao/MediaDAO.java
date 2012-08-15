@@ -420,6 +420,8 @@ public class MediaDAO {
 		new Thread() {
 			public void start() {
 				try {
+					dataSource.storeMedia(media);
+
 					if (isAvatar) {
 						if (dataSource.getEntityAvatarId(media.getEntityId()) != null) {
 							dataSource.updateEntityAvatar(media.getEntityId(),
@@ -428,7 +430,6 @@ public class MediaDAO {
 							dataSource.storeAvatar(media);
 						}
 					}
-					dataSource.storeMedia(media);
 				} catch (MetadataSourceException e) {
 					// do nothing
 				}
