@@ -36,6 +36,8 @@ public class MediasResource extends MediaServerResource {
 
 	@Post
 	public Representation postMedia(Representation entity) {
+		addCORSHeader();
+		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		Request request = getRequest();
 
@@ -105,6 +107,8 @@ public class MediasResource extends MediaServerResource {
 
 	@Get
 	public Representation getMediasInfo() {
+		addCORSHeader();
+		
 		Request request = getRequest();
 
 		String userId = null;

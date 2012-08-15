@@ -45,6 +45,8 @@ public class MediaResource extends MediaServerResource {
 
 	@Put
 	public Representation putAvatar(Representation entity) {
+		addCORSHeader();
+		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		Request request = getRequest();
 
@@ -120,6 +122,8 @@ public class MediaResource extends MediaServerResource {
 
 	@Delete
 	public Representation deleteMedia() {
+		addCORSHeader();
+		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		Request request = getRequest();
 
@@ -176,6 +180,8 @@ public class MediaResource extends MediaServerResource {
 
 	@Post
 	public Representation updateMedia(Representation entity) {
+		addCORSHeader();
+		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		Request request = getRequest();
 
@@ -251,6 +257,8 @@ public class MediaResource extends MediaServerResource {
 
 	@Get
 	public Representation getMedia() {
+		addCORSHeader();
+		
 		Request request = getRequest();
 
 		String userId = null;

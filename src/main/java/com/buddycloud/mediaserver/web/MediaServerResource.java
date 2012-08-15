@@ -17,27 +17,56 @@ package com.buddycloud.mediaserver.web;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.codec.binary.Base64;
+import org.restlet.Message;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.engine.header.Header;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
 
 import com.buddycloud.mediaserver.xmpp.AuthVerifier;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public abstract class MediaServerResource extends ServerResource {
 
+	protected static final String HEADERS_KEY = "org.restlet.http.headers";
+	protected static final String CORS_HEADER = "Access-Control-Allow-Origin";
 	protected static final String AUTH_SEPARATOR = ":";
+	
 
 	protected boolean verifyRequest(String userId, String token, String url) {
 		AuthVerifier authClient = XMPPToolBox.getInstance().getAuthClient();
 
 		return authClient.verifyRequest(userId, token, url);
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected Series<Header> getMessageHeaders(Message message) {
+        ConcurrentMap<String, Object> attrs = message.getAttributes();
+        Series<Header> headers = (Series<Header>) attrs.get(HEADERS_KEY);
+        
+        if (headers == null) {
+            headers = new Series<Header>(Header.class);
+            Series<Header> prev = (Series<Header>) 
+                attrs.putIfAbsent(HEADERS_KEY, headers);
+            
+            if (prev != null) { 
+            	headers = prev; 
+            }
+        }
+        
+        return headers;
+    }
+	
+	protected void addCORSHeader() {
+		getMessageHeaders(getResponse()).add(CORS_HEADER, "*");
 	}
 
 	protected Representation authenticationResponse() {
