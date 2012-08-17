@@ -37,7 +37,8 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 public abstract class MediaServerResource extends ServerResource {
 
 	protected static final String HEADERS_KEY = "org.restlet.http.headers";
-	protected static final String CORS_HEADER = "Access-Control-Allow-Origin";
+	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
+	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String AUTH_SEPARATOR = ":";
 	
 
@@ -65,8 +66,9 @@ public abstract class MediaServerResource extends ServerResource {
         return headers;
     }
 	
-	protected void addCORSHeader() {
-		getMessageHeaders(getResponse()).add(CORS_HEADER, "*");
+	protected void addCORSHeaders() {
+		getMessageHeaders(getResponse()).add(CORS_ORIGIN_HEADER, "*");
+		getMessageHeaders(getResponse()).add(CORS_METHODS_HEADER, "GET, POST, PUT, DELETE");
 	}
 
 	protected Representation authenticationResponse() {
