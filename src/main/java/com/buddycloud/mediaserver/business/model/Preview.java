@@ -22,7 +22,8 @@ public class Preview {
 	// "mediaId": string,
 	// "fileSize": long,
 	// "height": int,
-	// "width": int
+	// "width": int,
+	// "mimeType": string
 	// }
 
 	private String id;
@@ -31,6 +32,7 @@ public class Preview {
 	private String mediaId;
 	private Integer height;
 	private Integer width;
+	private String mimeType;
 
 	public String getId() {
 		return id;
@@ -78,5 +80,13 @@ public class Preview {
 
 	public void setShaChecksum(String shaChecksum) {
 		this.shaChecksum = shaChecksum;
+	}
+
+	public String getMimeType() {
+		return mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
 	}
 }

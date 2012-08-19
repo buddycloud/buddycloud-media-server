@@ -368,7 +368,7 @@ public class MetaDataSource {
 			statement = prepareStatement(Queries.SAVE_PREVIEW, preview.getId(),
 					preview.getMediaId(), preview.getShaChecksum(),
 					preview.getFileSize(), preview.getHeight(),
-					preview.getWidth());
+					preview.getWidth(), preview.getMimeType());
 
 			statement.execute();
 
@@ -438,6 +438,35 @@ public class MetaDataSource {
 		}
 
 		return previewId;
+	}
+	
+	public String getPreviewMimeType(String previewId)
+			throws MetadataSourceException {
+		LOGGER.debug("Getting previw mime type. Preview ID: " + previewId);
+
+		String mimeType = null;
+
+		PreparedStatement statement = null;
+		try {
+			statement = prepareStatement(Queries.GET_PREVIEW_MIME_TYPE, previewId);
+
+			ResultSet result = statement.executeQuery();
+			if (result.next()) {
+				mimeType = result.getString(1);
+				LOGGER.debug("Preview metadata successfully fetched. Preview ID: "
+						+ previewId);
+			} else {
+				LOGGER.debug("No preview with id '" + previewId + "' found.");
+			}
+		} catch (SQLException e) {
+			LOGGER.error(
+					"Error while fetching preview metadata: " + e.getMessage(), e);
+			throw new MetadataSourceException(e.getMessage(), e);
+		} finally {
+			close(statement);
+		}
+
+		return mimeType;
 	}
 
 	public void deletePreview(String previewId) throws MetadataSourceException {

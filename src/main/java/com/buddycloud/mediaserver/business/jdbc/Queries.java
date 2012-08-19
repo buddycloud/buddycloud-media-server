@@ -26,8 +26,8 @@ public class Queries {
 	public static final String SAVE_AVATAR = "INSERT INTO avatars"
 			+ " (mediaId, entityId)" + " VALUES(?, ?)";
 	public static final String SAVE_PREVIEW = "INSERT INTO previews"
-			+ " (id, mediaId, shaChecksum, fileSize, height, width)"
-			+ " VALUES(?, ?, ?, ?, ?, ?)";
+			+ " (id, mediaId, shaChecksum, fileSize, height, width, mimeType)"
+			+ " VALUES(?, ?, ?, ?, ?, ?, ?)";
 
 	// Select
 	public static final String GET_MEDIAS_INFO = "SELECT * FROM medias WHERE entityId = ? ORDER BY lastUpdatedDate DESC";
@@ -39,6 +39,7 @@ public class Queries {
 	public static final String GET_MEDIA = "SELECT * FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_UPLOADER = "SELECT author FROM medias WHERE id = ?";
 	public static final String GET_MEDIA_MIME_TYPE = "SELECT mimeType FROM medias WHERE id = ?";
+	public static final String GET_PREVIEW_MIME_TYPE = "SELECT mimeType FROM previews WHERE id = ?";
 	public static final String GET_MEDIA_EXTENSION = "SELECT fileExtension FROM medias WHERE id = ?";
 	public static final String GET_ENTITY_AVATAR_ID = "SELECT mediaId FROM avatars WHERE entityId = ?";
 	public static final String GET_MEDIA_PREVIEW = "SELECT id FROM previews WHERE mediaId = ? AND height = ? AND width = ?";

@@ -52,6 +52,7 @@ CREATE TABLE previews(
 	fileSize BIGINT,
 	height INT,
 	width INT,
+	mimeType TEXT NOT NULL,
 	PRIMARY KEY(id)
 );
 

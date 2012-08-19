@@ -459,7 +459,7 @@ public class MediaDAO {
 			if (!preview.exists()) {
 				dataSource.deletePreview(previewId);
 			} else {
-				return new Thumbnail(dataSource.getMediaMimeType(mediaId), 
+				return new Thumbnail(dataSource.getPreviewMimeType(mediaId), 
 						IOUtils.toByteArray(FileUtils.openInputStream(preview)));
 			}
 		} else {
@@ -488,7 +488,7 @@ public class MediaDAO {
 		}
 		
 		// store preview in another flow
-		new StorePreviewThread(previewId, mediaDirectory, mediaId, maxHeight,
+		new StorePreviewThread(previewId, mediaDirectory, thumbnail.getMimeType(), mediaId, maxHeight,
 				maxWidth, extension, previewImg).start();
 		
 		return thumbnail;
@@ -578,7 +578,7 @@ public class MediaDAO {
 	}
 
 	protected Preview createPreview(String previewId, String mediaId,
-			Integer height, Integer width, File file) {
+			String mimeType, Integer height, Integer width, File file) {
 		Preview preview = new Preview();
 		preview.setFileSize(file.length());
 		preview.setHeight(height);
@@ -586,6 +586,7 @@ public class MediaDAO {
 		preview.setId(previewId);
 		preview.setMediaId(mediaId);
 		preview.setShaChecksum(getFileShaChecksum(file));
+		preview.setMimeType(mimeType);
 
 		return preview;
 	}
@@ -622,10 +623,11 @@ public class MediaDAO {
 		private Integer width;
 		private String directory;
 		private String extension;
+		private String mimeType;
 		private BufferedImage img;
 
 		StorePreviewThread(String previewId, String directory, String mediaId,
-				Integer height, Integer width, String extension,
+				String mimeType, Integer height, Integer width, String extension,
 				BufferedImage img) {
 			this.previewId = previewId;
 			this.directory = directory;
@@ -633,6 +635,7 @@ public class MediaDAO {
 			this.height = height;
 			this.width = width;
 			this.extension = extension;
+			this.mimeType = mimeType;
 			this.img = img;
 		}
 
@@ -641,8 +644,8 @@ public class MediaDAO {
 				File previewFile = ImageUtils.storeImageIntoFile(img,
 						extension, directory + File.separator + previewId);
 
-				Preview preview = createPreview(previewId, mediaId, height,
-						width, previewFile);
+				Preview preview = createPreview(previewId, mediaId, mimeType,
+						height, width, previewFile);
 
 				dataSource.storePreview(preview);
 			} catch (Exception e) {
