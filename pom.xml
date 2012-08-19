@@ -170,11 +170,11 @@
 			<artifactId>tinder</artifactId>
 			<version>1.2.3</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.wave-protocol</groupId>
 			<artifactId>whack</artifactId>
 			<version>1.0.0</version>
-		</dependency>
+		</dependency>  -->
 		<dependency>
 			<groupId>xpp3</groupId>
 			<artifactId>xpp3</artifactId>
@@ -258,10 +258,6 @@
 			<id>maven-restlet</id>
 			<name>Public online Restlet repository</name>
 			<url>http://maven.restlet.org</url>
-		</repository>
-		<repository>
-			<id>maven-teabot</id>
-			<url>http://maven.teabot.org</url>
 		</repository>
 		<repository>
 			<id>xuggle repo</id>
