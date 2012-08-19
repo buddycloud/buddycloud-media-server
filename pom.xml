@@ -156,18 +156,15 @@
 
 		<!-- XMPP -->
 		<dependency>
-			<groupId>jivesoftware</groupId>
+			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack</artifactId>
-			<version>3.2.2</version>
+			<version>3.2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>jivesoftware</groupId>
+			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smackx</artifactId>
-			<version>3.2.2</version>
+			<version>3.2.1</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.igniterealtime.smack</groupId> <artifactId>smack</artifactId> 
-			<version>3.2.1</version> </dependency> <dependency> <groupId>org.igniterealtime.smack</groupId> 
-			<artifactId>smackx</artifactId> <version>3.2.1</version> </dependency> -->
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>tinder</artifactId>
@@ -265,10 +262,6 @@
 		<repository>
 			<id>maven-teabot</id>
 			<url>http://maven.teabot.org</url>
-		</repository>
-		<repository>
-			<id>maven-kune</id>
-			<url>http://kune.ourproject.org/mavenrepo/</url>
 		</repository>
 		<repository>
 			<id>xuggle repo</id>

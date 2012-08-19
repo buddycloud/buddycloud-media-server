@@ -33,7 +33,7 @@ import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class MediasResource extends MediaServerResource {
-
+	
 	@Post
 	public Representation postMedia(Representation entity) {
 		addCORSHeaders();

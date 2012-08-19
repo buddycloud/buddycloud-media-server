@@ -27,7 +27,9 @@ import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.engine.header.Header;
+import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.resource.Options;
 import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
 
@@ -41,6 +43,11 @@ public abstract class MediaServerResource extends ServerResource {
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String AUTH_SEPARATOR = ":";
 	
+	@Options
+	public Representation getOptions() {
+		addCORSHeaders();
+		return new EmptyRepresentation();
+	}
 
 	protected boolean verifyRequest(String userId, String token, String url) {
 		AuthVerifier authClient = XMPPToolBox.getInstance().getAuthClient();

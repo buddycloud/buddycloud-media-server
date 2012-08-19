@@ -45,6 +45,7 @@ import com.buddycloud.mediaserver.business.util.ImageUtils;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.commons.Thumbnail;
 import com.buddycloud.mediaserver.commons.exception.FormFieldException;
 import com.buddycloud.mediaserver.commons.exception.FormInvalidFieldException;
 import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
@@ -212,7 +213,7 @@ public class MediaDAO {
 		return media;
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId,
+	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer size) throws MetadataSourceException,
 			MediaNotFoundException, IOException, InvalidPreviewFormatException,
 			UserNotAllowedException {
@@ -220,7 +221,7 @@ public class MediaDAO {
 		return getMediaPreview(userId, entityId, mediaId, size, size);
 	}
 
-	public byte[] getMediaPreview(String userId, String entityId,
+	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
 			throws MetadataSourceException, MediaNotFoundException,
 			IOException, InvalidPreviewFormatException, UserNotAllowedException {
@@ -247,7 +248,7 @@ public class MediaDAO {
 				getDirectory(entityId));
 	}
 
-	public byte[] getAvatarPreview(String userId, String entityId,
+	public Thumbnail getAvatarPreview(String userId, String entityId,
 			Integer maxHeight, Integer maxWidth)
 			throws MetadataSourceException, MediaNotFoundException,
 			IOException, InvalidPreviewFormatException {
@@ -439,7 +440,7 @@ public class MediaDAO {
 		return media;
 	}
 
-	protected byte[] getPreview(String entityId, String mediaId,
+	protected Thumbnail getPreview(String entityId, String mediaId,
 			Integer maxHeight, Integer maxWidth, String mediaDirectory)
 			throws MetadataSourceException, IOException,
 			InvalidPreviewFormatException, MediaNotFoundException {
@@ -458,31 +459,39 @@ public class MediaDAO {
 			if (!preview.exists()) {
 				dataSource.deletePreview(previewId);
 			} else {
-				return IOUtils.toByteArray(FileUtils.openInputStream(preview));
+				return new Thumbnail(dataSource.getMediaMimeType(mediaId), 
+						IOUtils.toByteArray(FileUtils.openInputStream(preview)));
 			}
 		} else {
 			// generate random id
 			previewId = RandomStringUtils.randomAlphanumeric(20);
 		}
-
 		String extension = dataSource.getMediaExtension(mediaId);
-		BufferedImage previewImg = null;
 
+		BufferedImage previewImg = null;
+		Thumbnail thumbnail = null;
+		
 		if (ImageUtils.isImage(extension)) {
 			previewImg = ImageUtils.createImagePreview(media, maxWidth,
 					maxHeight);
+			
+			thumbnail = new Thumbnail(dataSource.getMediaMimeType(mediaId), 
+					ImageUtils.imageToBytes(previewImg, extension));
 		} else if (VideoUtils.isVideo(extension)) {
 			previewImg = new VideoUtils(media).createVideoPreview(maxWidth,
 					maxHeight);
+			
+			thumbnail = new Thumbnail(VideoUtils.PREVIEW_MIME_TYPE, 
+					ImageUtils.imageToBytes(previewImg, VideoUtils.PREVIEW_TYPE));
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
-
+		
 		// store preview in another flow
 		new StorePreviewThread(previewId, mediaDirectory, mediaId, maxHeight,
 				maxWidth, extension, previewImg).start();
-
-		return ImageUtils.imageToBytes(previewImg, extension);
+		
+		return thumbnail;
 	}
 
 	protected boolean isAvatar(String mediaId) {

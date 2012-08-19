@@ -30,6 +30,10 @@ import com.xuggle.xuggler.video.ConverterFactory;
 import com.xuggle.xuggler.video.IConverter;
 
 public class VideoUtils {
+	
+	public static final String PREVIEW_MIME_TYPE = "image/jpeg";
+	public static final String PREVIEW_TYPE = "jpg";
+	
 
 	private IContainer container;
 	private IStreamCoder coder;

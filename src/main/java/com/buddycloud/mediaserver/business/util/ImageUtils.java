@@ -75,7 +75,7 @@ public class ImageUtils {
 			int width, int height) {
 		final BufferedImage thumbnail = Scalr.resize(img, width, height);
 		img.flush();
-
+		
 		return thumbnail;
 	}
 

@@ -27,13 +27,13 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
-import org.restlet.resource.Options;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.Thumbnail;
 import com.buddycloud.mediaserver.commons.exception.FormFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
@@ -43,12 +43,6 @@ import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class MediaResource extends MediaServerResource {
-
-	@Options
-	public Representation getOptions() {
-		addCORSHeaders();
-		return new EmptyRepresentation();
-	}
 
 	@Put
 	public Representation putAvatar(Representation entity) {
@@ -327,28 +321,29 @@ public class MediaResource extends MediaServerResource {
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
-			MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId,
-					mediaId));
-
 			if (maxHeight == null && maxWidth == null) {
+				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId,
+						mediaId));
+
 				File media = mediaDAO.getMedia(userId, entityId, mediaId);
 				return new FileRepresentation(media, mediaType);
 			}
-
-			byte[] preview = null;
+			
+			Thumbnail thumbnail = null;
 
 			if (maxHeight != null && maxWidth == null) {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId,
+				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId,
 						maxHeight);
 			} else if (maxHeight == null && maxWidth != null) {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId,
+				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId,
 						maxWidth);
 			} else {
-				preview = mediaDAO.getMediaPreview(userId, entityId, mediaId,
+				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId,
 						maxHeight, maxWidth);
 			}
-
-			return new DynamicFileRepresentation(mediaType, preview);
+			
+			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), 
+					thumbnail.getImg());
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(),
