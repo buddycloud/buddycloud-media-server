@@ -27,6 +27,7 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
+import org.restlet.resource.Options;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 
@@ -42,6 +43,12 @@ import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class MediaResource extends MediaServerResource {
+
+	@Options
+	public Representation getOptions() {
+		addCORSHeaders();
+		return new EmptyRepresentation();
+	}
 
 	@Put
 	public Representation putAvatar(Representation entity) {
