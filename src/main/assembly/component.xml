@@ -29,6 +29,13 @@
   			<include>log4j.properties</include>
   		</includes>
   	</fileSet>
+  	<fileSet>
+  		<outputDirectory>/lib</outputDirectory>
+  		<directory>lib</directory>
+  		<includes>
+  			<include>**</include>
+  		</includes>
+  	</fileSet>
   </fileSets>
   
 </component>
