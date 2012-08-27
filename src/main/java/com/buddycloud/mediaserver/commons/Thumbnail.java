@@ -1,5 +1,10 @@
 package com.buddycloud.mediaserver.commons;
 
+/**
+ * Thumbnail bean class.
+ *
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class Thumbnail {
 	private byte[] img;
 	private String mimeType;

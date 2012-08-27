@@ -15,6 +15,11 @@
  */
 package com.buddycloud.mediaserver.business.dao;
 
+/**
+ * Factory that abstracts DAO's instance creation.
+ * 
+ * @author Rodrigo Duarte Sousa - rodrigodsosua@gmail.com
+ */
 public class DAOFactory {
 
 	private MediaDAO mediaDAO;
@@ -28,15 +33,15 @@ public class DAOFactory {
 		return instance;
 	}
 
+	/**
+	 * Creates and returns a {@link MediaDAO} instance. 
+	 * @return the {@link MediaDAO} instance.
+	 */
 	public MediaDAO getDAO() {
 		if (mediaDAO == null) {
 			mediaDAO = new MediaDAO();
 		}
 
 		return mediaDAO;
-	}
-
-	public void setDAO(MediaDAO mediaDAO) {
-		this.mediaDAO = mediaDAO;
 	}
 }

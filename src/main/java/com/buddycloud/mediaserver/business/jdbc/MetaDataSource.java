@@ -37,6 +37,12 @@ import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+/**
+ * Responsible for creating and handling database connections
+ * and operations.
+ *
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class MetaDataSource {
 	private static Logger LOGGER = Logger.getLogger(MetaDataSource.class);
 
@@ -66,7 +72,7 @@ public class MetaDataSource {
 		return prepareStatement;
 	}
 
-	public static void close(Statement statement) {
+	private void close(Statement statement) {
 		if (statement == null) {
 			return;
 		}
@@ -80,12 +86,13 @@ public class MetaDataSource {
 		}
 	}
 
+	/**
+	 * Returns the database connection.
+	 * @return the connection.
+	 * @throws SQLException if an error occurs while getting the connection object.
+	 */
 	public Connection getConnection() throws SQLException {
 		return dataSource.getConnection();
-	}
-
-	public ComboPooledDataSource getDataSource() {
-		return dataSource;
 	}
 
 	private void createDataSource() throws PropertyVetoException {

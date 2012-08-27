@@ -15,6 +15,11 @@
  */
 package com.buddycloud.mediaserver.business.model;
 
+/**
+ * Preview's metadata model.
+ * 
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class Preview {
 	// {
 	// "id": string,

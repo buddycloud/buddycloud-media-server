@@ -17,6 +17,11 @@ package com.buddycloud.mediaserver.business.model;
 
 import java.util.Date;
 
+/**
+ * Media's metadata model.
+ *
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class Media {
 	// {
 	// "id": string,

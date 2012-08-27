@@ -28,7 +28,9 @@ import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
 
 /**
  * Media Server XMPP Component Follows the XEP-0114
- * (http://xmpp.org/extensions/xep-0114.html)
+ * @see (http://xmpp.org/extensions/xep-0114.html)
+ * 
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
  */
 public class MediaServerComponent extends AbstractComponent {
 

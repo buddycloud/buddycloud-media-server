@@ -15,6 +15,11 @@
  */
 package com.buddycloud.mediaserver.business.jdbc;
 
+/**
+ * Media's metadata queries.
+ *
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class Queries {
 	private Queries() {
 	}

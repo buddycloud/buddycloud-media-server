@@ -62,6 +62,12 @@ import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.PublisherDecorator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * Provides a Data Access Object to metadata
+ * database and media file system.
+ *
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class MediaDAO {
 
 	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
@@ -80,6 +86,15 @@ public class MediaDAO {
 				.getConfiguration();
 	}
 
+	/**
+	 * Deletes a media file ant its metadata.
+	 * @param userId the user that is trying to delete media.
+	 * @param entityId media channel's id.
+	 * @param mediaId media to be deleted.
+	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 * @throws MediaNotFoundException there is no media with such id.
+	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 */
 	public void deleteMedia(String userId, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
 			UserNotAllowedException {
@@ -140,6 +155,13 @@ public class MediaDAO {
 		}
 	}
 
+	/**
+	 * Gets an information list from all medias in a channel.
+	 * @param userId the user that is trying to request the media lsit.
+	 * @param entityId media channel's id.
+	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 */
 	public String getMediasInfo(String userId, String entityId, Integer max, String after)
 			throws UserNotAllowedException, MetadataSourceException {
 
@@ -163,9 +185,20 @@ public class MediaDAO {
 		return gson.toJson(medias);
 	}
 
+	/**
+	 * Gets a media file.
+	 * @param userId the user that is trying to get the media.
+	 * @param entityId media channel's id.
+	 * @param mediaId media to be fetched.
+	 * @return media file.
+	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 * @throws MediaNotFoundException there is no media with such id.
+	 * @throws IOException if something goes wrong while getting media file.
+	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 */
 	public File getMedia(String userId, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
-			IOException, InvalidPreviewFormatException, UserNotAllowedException {
+			IOException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatar(entityId);
@@ -196,8 +229,15 @@ public class MediaDAO {
 		return media;
 	}
 
+	/**
+	 * Gets a channel avatar.
+	 * @param entityId avatar's channel.
+	 * @return avatar file.
+	 * @throws MetadataSourceException if something goes wrong while retrieving avatar's metadata.
+	 * @throws MediaNotFoundException there is no media representing {@link entityId} avatar.
+	 */
 	public File getAvatar(String entityId) throws MetadataSourceException,
-			MediaNotFoundException, IOException, InvalidPreviewFormatException {
+			MediaNotFoundException, IOException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar. Entity ID: " + entityId);
@@ -213,6 +253,19 @@ public class MediaDAO {
 		return media;
 	}
 
+	/**
+	 * Gets a media preview.
+	 * @param userId user that is requesting the preview.
+	 * @param entityId media's channel.
+	 * @param mediaId media to be fetched.
+	 * @param size preview size limit.
+	 * @return media's {@link Thumbnail}
+	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 * @throws MediaNotFoundException there is no media with such id.
+	 * @throws IOException if something goes wrong while getting preview file.
+	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
+	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 */
 	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer size) throws MetadataSourceException,
 			MediaNotFoundException, IOException, InvalidPreviewFormatException,
@@ -221,6 +274,20 @@ public class MediaDAO {
 		return getMediaPreview(userId, entityId, mediaId, size, size);
 	}
 
+	/**
+	 * Gets a media preview.
+	 * @param userId user that is requesting the preview.
+	 * @param entityId media's channel.
+	 * @param mediaId media to be fetched.
+	 * @param maxHeight preview height limit.
+	 * @param maxWidth preview width limit.
+	 * @return media's {@link Thumbnail}
+	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 * @throws MediaNotFoundException there is no media with such id.
+	 * @throws IOException if something goes wrong while getting preview file.
+	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
+	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 */	
 	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
 			throws MetadataSourceException, MediaNotFoundException,
@@ -248,7 +315,7 @@ public class MediaDAO {
 				getDirectory(entityId));
 	}
 
-	public Thumbnail getAvatarPreview(String userId, String entityId,
+	private Thumbnail getAvatarPreview(String userId, String entityId,
 			Integer maxHeight, Integer maxWidth)
 			throws MetadataSourceException, MediaNotFoundException,
 			IOException, InvalidPreviewFormatException {
@@ -260,6 +327,13 @@ public class MediaDAO {
 				getDirectory(entityId));
 	}
 
+	/**
+	 * Gets a media MIME type.
+	 * @param entityId media's channel.
+	 * @param mediaId media's unique id.
+	 * @return media's MIME type.
+	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 */		
 	public String getMediaType(String entityId, String mediaId)
 			throws MetadataSourceException {
 		if (isAvatar(mediaId)) {
@@ -269,6 +343,19 @@ public class MediaDAO {
 		return dataSource.getMediaMimeType(mediaId);
 	}
 
+	/**
+	 * Updates media's metadata.
+	 * @param userId the user that is requesting the update.
+	 * @param entityId media's channel.
+	 * @param mediaId media to be updated.
+	 * @param request contains which are the metadata to be updated.
+	 * @return media's new metadata.
+	 * @throws FileUploadException if something goes wrong during request parsing.
+	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 * @throws FormFieldException the field to be updated is invalid.
+	 * @throws MediaNotFoundException there is no media with such id.
+	 * @throws UserNotAllowedException the @{link userId} is not allowed to perform this operation.
+	 */
 	public String updateMedia(String userId, String entityId, String mediaId,
 			Request request) throws FileUploadException,
 			MetadataSourceException, FormFieldException,
@@ -331,6 +418,18 @@ public class MediaDAO {
 		return gson.toJson(media);
 	}
 
+	/**
+	 * Uploads media.
+	 * @param userId user that is uploading the media.
+	 * @param entityId channel where the media will belong.
+	 * @param request media file and required upload fields.
+	 * @param isAvatar if the media to be uploaded is an avatar.
+	 * @return media's metadata, if the upload ends with success
+	 * @throws FileUploadException the is something wrong with the request.
+	 * @throws MetadataSourceException if something goes wrong while creating media's metadata.
+	 * @throws FormFieldException required upload field is not present.
+	 * @throws UserNotAllowedException the user {@link userId} is now allowed to upload media in this channel.
+	 */
 	public String insertMedia(String userId, String entityId, Request request,
 			boolean isAvatar) throws FileUploadException,
 			MetadataSourceException, FormFieldException,
@@ -417,7 +516,7 @@ public class MediaDAO {
 		final Media media = createMedia(mediaId, fileName, title, description,
 				author, entityId, mimeType, file);
 
-		// store media metadata
+		// store media's metadata
 		new Thread() {
 			public void start() {
 				try {
@@ -610,12 +709,13 @@ public class MediaDAO {
 		return directory.mkdir();
 	}
 
-	public String getDirectory(String entityId) {
+	private String getDirectory(String entityId) {
 		return configuration
 				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 				+ File.separator + entityId;
 	}
 
+	// Thread responsible to store preview's file and metadata
 	private class StorePreviewThread extends Thread {
 		private String previewId;
 		private String mediaId;

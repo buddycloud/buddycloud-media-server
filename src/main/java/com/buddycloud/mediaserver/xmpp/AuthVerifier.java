@@ -23,6 +23,13 @@ import org.xmpp.packet.Packet;
 import com.buddycloud.mediaserver.xmpp.util.HTTPAuthIQ;
 import com.buddycloud.mediaserver.xmpp.util.SyncPacketSendUtil;
 
+/**
+ * Authentication class that uses an XMPP component to 
+ * handle the XEP-0070 implementation.
+ * @see <a href="http://xmpp.org/extensions/xep-0070.html">XEP-0070</a>
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ *
+ */
 public class AuthVerifier {
 
 	private static Logger LOGGER = Logger.getLogger(AuthVerifier.class);
@@ -32,6 +39,13 @@ public class AuthVerifier {
 		this.component = component;
 	}
 
+	/**
+	 * Verifies if the client has really sent this request.
+	 * @param userId client's user id.
+	 * @param tid transaction id provided by the client.
+	 * @param url URL that the client is trying to access.
+	 * @return if the client has really sent the request.
+	 */
 	public boolean verifyRequest(String userId, String tid, String url) {
 		try {
 			IQ reply = SyncPacketSendUtil.getReply(component,
