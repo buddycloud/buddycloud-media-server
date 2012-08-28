@@ -32,8 +32,16 @@ import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
+/**
+ * Resource that represents /<channel> endpoint.
+ *
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class MediasResource extends MediaServerResource {
 	
+	/**
+	 * Uploads media (POST /<channel>) 
+	 */
 	@Post
 	public Representation postMedia(Representation entity) {
 		addCORSHeaders();
@@ -105,6 +113,9 @@ public class MediasResource extends MediaServerResource {
 				MediaType.APPLICATION_JSON);
 	}
 
+	/**
+	 * Gets media's information list (GET /<channel>) 
+	 */
 	@Get
 	public Representation getMediasInfo() {
 		addCORSHeaders();

@@ -42,8 +42,16 @@ import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
+/**
+ * Resource that represents /<channel>/<mediaId> endpoint.
+ *
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ */
 public class MediaResource extends MediaServerResource {
 
+	/**
+	 * Uploads avatar (PUT /<channel>/avatar) 
+	 */
 	@Put
 	public Representation putAvatar(Representation entity) {
 		addCORSHeaders();
@@ -121,6 +129,9 @@ public class MediaResource extends MediaServerResource {
 				MediaType.APPLICATION_JSON);
 	}
 
+	/**
+	 * Deletes media (DELETE /<channel>/<mediaId>) 
+	 */
 	@Delete
 	public Representation deleteMedia() {
 		addCORSHeaders();
@@ -179,6 +190,9 @@ public class MediaResource extends MediaServerResource {
 		}
 	}
 
+	/**
+	 * Updates media (POST /<channel>/<mediaId>) 
+	 */
 	@Post
 	public Representation updateMedia(Representation entity) {
 		addCORSHeaders();
@@ -256,6 +270,9 @@ public class MediaResource extends MediaServerResource {
 				MediaType.APPLICATION_JSON);
 	}
 
+	/**
+	 * Downloads media (GET /<channel>/<mediaId>) 
+	 */
 	@Get
 	public Representation getMedia() {
 		addCORSHeaders();

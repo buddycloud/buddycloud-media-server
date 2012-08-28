@@ -37,6 +37,12 @@ import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
+/**
+ * XMPP client that handles PubSub (XEP-0060) operations.
+ * @see <a href="http://xmpp.org/extensions/xep-0060.html">XEP-0060</a>
+ * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
+ *
+ */
 public class PubSubClient {
 
 	private static Logger LOGGER = Logger.getLogger(PubSubClient.class);
@@ -122,6 +128,14 @@ public class PubSubClient {
 		return null;
 	}
 
+	/**
+	 * Verifies if an user has the desired capability (member, moderator,
+	 * owner or publisher).
+	 * @param userId the user Jabber Id.
+	 * @param entityId channel id.
+	 * @param capability decorator that represents the desired capabilities.
+	 * @return if the user has the desired capabilities.
+	 */
 	public boolean matchUserCapability(String userId, String entityId,
 			CapabilitiesDecorator capability) {
 		Node node = getNode(entityId);
@@ -147,6 +161,11 @@ public class PubSubClient {
 		return false;
 	}
 
+	/**
+	 * Verifies if a channel is public.
+	 * @param entityId channel to be verified.
+	 * @return if {@link entityId} is public.
+	 */
 	public boolean isChannelPublic(String entityId) {
 		Node node = getNode(entityId);
 
