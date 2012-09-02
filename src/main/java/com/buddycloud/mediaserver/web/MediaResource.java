@@ -289,8 +289,10 @@ public class MediaResource extends MediaServerResource {
 
 		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient()
 				.isChannelPublic(entityId);
-
-		if (!isChannelPublic) {
+		
+		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
+		
+		if (!isChannelPublic && !mediaDAO.isAvatar(mediaId)) {
 			String auth = getQueryValue(Constants.AUTH_QUERY);
 
 			try {
@@ -334,8 +336,6 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation(t.getLocalizedMessage(),
 					MediaType.APPLICATION_JSON);
 		}
-
-		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
 			if (maxHeight == null && maxWidth == null) {

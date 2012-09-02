@@ -593,7 +593,7 @@ public class MediaDAO {
 		return thumbnail;
 	}
 
-	protected boolean isAvatar(String mediaId) {
+	public boolean isAvatar(String mediaId) {
 		return mediaId.equals(Constants.AVATAR_ARG);
 	}
 
