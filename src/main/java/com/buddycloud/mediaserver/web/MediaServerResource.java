@@ -42,10 +42,24 @@ public abstract class MediaServerResource extends ServerResource {
 	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String AUTH_SEPARATOR = ":";
+	protected static final String REQUEST_METHOD_HEADER = " Access-Control-Request-Method";
 	
 	@Options
 	public Representation getOptions() {
-		addCORSHeaders();
+		Request request = getRequest();
+		
+		Series<Header> messageHeaders = getMessageHeaders(request);
+		Header header = messageHeaders.getFirst(REQUEST_METHOD_HEADER);
+		
+		String origin = null;
+		
+		if (header != null) {
+			if (header.getValue().equals("PUT") || header.getValue().equals("POST")) {
+				origin = request.getResourceRef().getHostIdentifier();
+			}
+		}
+		
+		addCORSHeaders(origin);
 		return new EmptyRepresentation();
 	}
 
@@ -73,8 +87,8 @@ public abstract class MediaServerResource extends ServerResource {
         return headers;
     }
 	
-	protected void addCORSHeaders() {
-		getMessageHeaders(getResponse()).add(CORS_ORIGIN_HEADER, "*");
+	protected void addCORSHeaders(String origin) {
+		getMessageHeaders(getResponse()).add(CORS_ORIGIN_HEADER, (origin == null ? "*" : origin));
 		getMessageHeaders(getResponse()).add(CORS_METHODS_HEADER, "GET, POST, PUT, DELETE");
 	}
 

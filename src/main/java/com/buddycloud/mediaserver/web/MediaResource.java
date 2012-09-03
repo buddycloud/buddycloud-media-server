@@ -54,10 +54,10 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Put
 	public Representation putAvatar(Representation entity) {
-		addCORSHeaders();
+		Request request = getRequest();
+		addCORSHeaders(request.getResourceRef().getHostIdentifier());
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
-		Request request = getRequest();
 
 		String userId = null;
 		String token = null;
@@ -134,11 +134,10 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Delete
 	public Representation deleteMedia() {
-		addCORSHeaders();
+		Request request = getRequest();
+		addCORSHeaders(request.getResourceRef().getHostIdentifier());
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
-		Request request = getRequest();
-
 		String userId = null;
 		String token = null;
 
@@ -195,11 +194,10 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Post
 	public Representation updateMedia(Representation entity) {
-		addCORSHeaders();
+		Request request = getRequest();
+		addCORSHeaders(request.getResourceRef().getHostIdentifier());
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
-		Request request = getRequest();
-
 		String userId = null;
 		String token = null;
 
@@ -275,7 +273,7 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Get
 	public Representation getMedia() {
-		addCORSHeaders();
+		addCORSHeaders(null);
 		
 		Request request = getRequest();
 

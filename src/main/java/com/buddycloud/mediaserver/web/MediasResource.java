@@ -44,11 +44,10 @@ public class MediasResource extends MediaServerResource {
 	 */
 	@Post
 	public Representation postMedia(Representation entity) {
-		addCORSHeaders();
+		Request request = getRequest();
+		addCORSHeaders(request.getResourceRef().getHostIdentifier());
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
-		Request request = getRequest();
-
 		String userId = null;
 		String token = null;
 
@@ -118,7 +117,7 @@ public class MediasResource extends MediaServerResource {
 	 */
 	@Get
 	public Representation getMediasInfo() {
-		addCORSHeaders();
+		addCORSHeaders(null);
 		
 		Request request = getRequest();
 
