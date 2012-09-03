@@ -42,7 +42,7 @@ public abstract class MediaServerResource extends ServerResource {
 	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String AUTH_SEPARATOR = ":";
-	protected static final String REQUEST_METHOD_HEADER = " Access-Control-Request-Method";
+	protected static final String REQUEST_METHOD_HEADER = "Access-Control-Request-Method";
 	
 	@Options
 	public Representation getOptions() {
@@ -54,7 +54,8 @@ public abstract class MediaServerResource extends ServerResource {
 		String origin = null;
 		
 		if (header != null) {
-			if (header.getValue().equals("PUT") || header.getValue().equals("POST")) {
+			if (header.getValue().toUpperCase().equals("PUT") || 
+					header.getValue().toUpperCase().equals("POST")) {
 				origin = request.getResourceRef().getHostIdentifier();
 			}
 		}
