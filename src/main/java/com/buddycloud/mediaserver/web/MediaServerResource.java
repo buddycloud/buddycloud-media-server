@@ -38,25 +38,30 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public abstract class MediaServerResource extends ServerResource {
 
+	protected static final String AUTH_SEPARATOR = ":";
 	protected static final String HEADERS_KEY = "org.restlet.http.headers";
 	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
-	protected static final String AUTH_SEPARATOR = ":";
 	protected static final String REQUEST_METHOD_HEADER = "Access-Control-Request-Method";
+	protected static final String ORIGIN_HEADER = "Origin";
 	
 	@Options
 	public Representation getOptions() {
 		Request request = getRequest();
 		
 		Series<Header> messageHeaders = getMessageHeaders(request);
-		Header header = messageHeaders.getFirst(REQUEST_METHOD_HEADER);
+		Header requestMethod = messageHeaders.getFirst(REQUEST_METHOD_HEADER);
 		
 		String origin = null;
 		
-		if (header != null) {
-			if (header.getValue().toUpperCase().equals("PUT") || 
-					header.getValue().toUpperCase().equals("POST")) {
-				origin = request.getResourceRef().getHostIdentifier();
+		if (requestMethod != null) {
+			if (requestMethod.getValue().toUpperCase().equals("PUT") || 
+					requestMethod.getValue().toUpperCase().equals("POST")) {
+				Header originHeader = messageHeaders.getFirst(ORIGIN_HEADER);
+				
+				if (originHeader != null) {
+					origin = originHeader.getValue();
+				}
 			}
 		}
 		
