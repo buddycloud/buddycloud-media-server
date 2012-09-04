@@ -124,7 +124,7 @@ public class MediaResource extends MediaServerResource {
 					return new StringRepresentation(e.getMessage(),
 							MediaType.APPLICATION_JSON);
 				} catch (Throwable t) {
-					LOGGER.error("Unexpected error.", t);
+					LOGGER.error("Unexpected error: " + t.getLocalizedMessage(), t);
 					
 					setStatus(Status.SERVER_ERROR_INTERNAL);
 					return new StringRepresentation("Unexpected error.",
@@ -197,7 +197,7 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation(e.getMessage(),
 					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
-			LOGGER.error("Unexpected error.", t);
+			LOGGER.error("Unexpected error: " + t.getLocalizedMessage(), t);
 			
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation("Unexpected error.",
@@ -275,7 +275,7 @@ public class MediaResource extends MediaServerResource {
 					return new StringRepresentation(e.getMessage(),
 							MediaType.APPLICATION_JSON);
 				} catch (Throwable t) {
-					LOGGER.error("Unexpected error.", t);
+					LOGGER.error("Unexpected error: " + t.getLocalizedMessage(), t);
 					
 					setStatus(Status.SERVER_ERROR_INTERNAL);
 					return new StringRepresentation("Unexpected error.",
@@ -402,7 +402,7 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation(e.getMessage(),
 					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
-			LOGGER.error("Unexpected error.", t);
+			LOGGER.error("Unexpected error: " + t.getLocalizedMessage(), t);
 			
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation("Unexpected error.",
