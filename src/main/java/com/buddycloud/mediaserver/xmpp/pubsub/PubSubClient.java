@@ -36,6 +36,7 @@ import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.buddycloud.mediaserver.business.util.XMPPUtils;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
 /**
@@ -145,7 +146,7 @@ public class PubSubClient {
 			Affiliation affiliation = null;
 
 			try {
-				affiliation = getAffiliation(node, getBareId(userId));
+				affiliation = getAffiliation(node, XMPPUtils.getBareId(userId));
 			} catch (XMPPException e) {
 				LOGGER.warn("Could not read node '" + node.getId() + "' "
 						+ "affiliation for '" + userId + "'", e);
@@ -182,9 +183,5 @@ public class PubSubClient {
 		}
 
 		return false;
-	}
-
-	private String getBareId(String userId) {
-		return userId.split("/")[0];
 	}
 }

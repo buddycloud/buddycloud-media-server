@@ -55,7 +55,7 @@ public class MediaResource extends MediaServerResource {
 	@Put
 	public Representation putAvatar(Representation entity) {
 		Request request = getRequest();
-		addCORSHeaders(request.getResourceRef().getHostIdentifier());
+		addCORSHeaders(request);
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 
@@ -135,7 +135,7 @@ public class MediaResource extends MediaServerResource {
 	@Delete
 	public Representation deleteMedia() {
 		Request request = getRequest();
-		addCORSHeaders(request.getResourceRef().getHostIdentifier());
+		addCORSHeaders(request);
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		String userId = null;
@@ -195,7 +195,7 @@ public class MediaResource extends MediaServerResource {
 	@Post
 	public Representation updateMedia(Representation entity) {
 		Request request = getRequest();
-		addCORSHeaders(request.getResourceRef().getHostIdentifier());
+		addCORSHeaders(request);
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		String userId = null;
@@ -288,9 +288,7 @@ public class MediaResource extends MediaServerResource {
 		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient()
 				.isChannelPublic(entityId);
 		
-		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-		
-		if (!isChannelPublic && !mediaDAO.isAvatar(mediaId)) {
+		if (!isChannelPublic && !mediaId.equals(Constants.AVATAR_ARG)) {
 			String auth = getQueryValue(Constants.AUTH_QUERY);
 
 			try {
@@ -336,6 +334,8 @@ public class MediaResource extends MediaServerResource {
 		}
 
 		try {
+			MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
+			
 			if (maxHeight == null && maxWidth == null) {
 				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId,
 						mediaId));

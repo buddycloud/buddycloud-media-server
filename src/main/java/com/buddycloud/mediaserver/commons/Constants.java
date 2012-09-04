@@ -39,7 +39,6 @@ public class Constants {
 			+ MEDIA_ARG + "}";
 
 	// Storage constants
-	public static final String AUTHOR_FIELD = "author";
 	public static final String TITLE_FIELD = "title"; // optional
 	public static final String FILE_FIELD = "binaryfile";
 	public static final String NAME_FIELD = "filename";

@@ -72,9 +72,6 @@ public class UploadMediaTest extends MediaServerTest {
 		form.getEntries().add(
 				new FormData(Constants.DESC_FIELD, new StringRepresentation(
 						description)));
-		form.getEntries().add(
-				new FormData(Constants.AUTHOR_FIELD, new StringRepresentation(
-						BASE_USER)));
 
 		form.getEntries().add(
 				new FormData(Constants.FILE_FIELD, new FileRepresentation(
@@ -117,9 +114,6 @@ public class UploadMediaTest extends MediaServerTest {
 		form.getEntries().add(
 				new FormData(Constants.DESC_FIELD, new StringRepresentation(
 						description)));
-		form.getEntries().add(
-				new FormData(Constants.AUTHOR_FIELD, new StringRepresentation(
-						BASE_USER)));
 
 		form.getEntries().add(
 				new FormData(Constants.FILE_FIELD, new FileRepresentation(
@@ -160,9 +154,6 @@ public class UploadMediaTest extends MediaServerTest {
 		form.getEntries().add(
 				new FormData(Constants.DESC_FIELD, new StringRepresentation(
 						description)));
-		form.getEntries().add(
-				new FormData(Constants.AUTHOR_FIELD, new StringRepresentation(
-						BASE_USER)));
 
 		form.getEntries().add(
 				new FormData(Constants.FILE_FIELD, new FileRepresentation(

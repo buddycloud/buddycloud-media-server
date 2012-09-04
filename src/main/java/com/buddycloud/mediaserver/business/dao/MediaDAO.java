@@ -44,6 +44,7 @@ import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.business.util.AudioUtils;
 import com.buddycloud.mediaserver.business.util.ImageUtils;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
+import com.buddycloud.mediaserver.business.util.XMPPUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.Thumbnail;
@@ -456,12 +457,6 @@ public class MediaDAO {
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);
 		String description = getFormFieldContent(items, Constants.DESC_FIELD);
-		String author = getFormFieldContent(items, Constants.AUTHOR_FIELD);
-
-		if (!author.equals(userId)) {
-			new FormFieldException("User '" + userId
-					+ "' tried to upload media as '" + author + "'");
-		}
 
 		FileItem fileField = getFileFormField(items);
 
@@ -472,7 +467,7 @@ public class MediaDAO {
 			throw new FileUploadException("Error to get file input stream");
 		}
 
-		Media media = storeMedia(fileName, title, description, author,
+		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
 				entityId, fileField.getContentType(), inputStream, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());

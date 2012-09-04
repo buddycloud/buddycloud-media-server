@@ -45,7 +45,7 @@ public class MediasResource extends MediaServerResource {
 	@Post
 	public Representation postMedia(Representation entity) {
 		Request request = getRequest();
-		addCORSHeaders(request.getResourceRef().getHostIdentifier());
+		addCORSHeaders(request);
 		
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		String userId = null;

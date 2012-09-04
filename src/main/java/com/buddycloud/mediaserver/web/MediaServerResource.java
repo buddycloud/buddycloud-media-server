@@ -40,6 +40,7 @@ public abstract class MediaServerResource extends ServerResource {
 
 	protected static final String AUTH_SEPARATOR = ":";
 	protected static final String HEADERS_KEY = "org.restlet.http.headers";
+	protected static final String CORS_ALLOW_HEADER = "Access-Control-Allow-Headers";
 	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String CORS_CREDENTIALS_HEADER = "Access-Control-Allow-Credentials";
@@ -53,20 +54,15 @@ public abstract class MediaServerResource extends ServerResource {
 		Series<Header> messageHeaders = getMessageHeaders(request);
 		Header requestMethod = messageHeaders.getFirst(REQUEST_METHOD_HEADER);
 		
-		String origin = null;
-		
 		if (requestMethod != null) {
 			if (requestMethod.getValue().toUpperCase().equals("PUT") || 
 					requestMethod.getValue().toUpperCase().equals("POST")) {
-				Header originHeader = messageHeaders.getFirst(ORIGIN_HEADER);
-				
-				if (originHeader != null) {
-					origin = originHeader.getValue();
-				}
+				addCORSHeaders(request);
 			}
+		} else {
+			addCORSHeaders();
 		}
 		
-		addCORSHeaders(origin);
 		return new EmptyRepresentation();
 	}
 
@@ -94,7 +90,22 @@ public abstract class MediaServerResource extends ServerResource {
         return headers;
     }
 	
-	protected void addCORSHeaders(String origin) {
+	protected void addCORSHeaders() {
+		addCORSHeaders(null);
+	}
+	
+	protected void addCORSHeaders(Request request) {
+		String origin = null;
+		
+		if (request != null) {
+			Series<Header> messageHeaders = getMessageHeaders(request);
+			Header originHeader = messageHeaders.getFirst(ORIGIN_HEADER);
+			
+			origin = originHeader != null ? originHeader.getValue() : null;
+		}
+		
+		getMessageHeaders(getResponse()).add(CORS_ALLOW_HEADER, "Authorization, " +
+				"Content-Type, X-Requested-With, XMLHttpRequest-specific");
 		getMessageHeaders(getResponse()).add(CORS_ORIGIN_HEADER, (origin == null ? "*" : origin));
 		getMessageHeaders(getResponse()).add(CORS_METHODS_HEADER, "GET, POST, PUT, DELETE");
 		getMessageHeaders(getResponse()).add(CORS_CREDENTIALS_HEADER, "true");
