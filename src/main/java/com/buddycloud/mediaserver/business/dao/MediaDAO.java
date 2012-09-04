@@ -33,9 +33,10 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.log4j.Logger;
 import org.restlet.Request;
 import org.restlet.ext.fileupload.RestletFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
@@ -70,7 +71,7 @@ import com.google.gson.GsonBuilder;
  */
 public class MediaDAO {
 
-	private static Logger LOGGER = Logger.getLogger(MediaDAO.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MediaDAO.class);
 
 	protected MetaDataSource dataSource;
 	protected PubSubClient pubsub;

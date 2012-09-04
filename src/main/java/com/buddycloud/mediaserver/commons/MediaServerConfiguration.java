@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buddycloud.mediaserver.commons.exception.LoadConfigurationException;
 
@@ -75,8 +76,7 @@ public class MediaServerConfiguration {
 	private static MediaServerConfiguration instance = new MediaServerConfiguration();
 
 	private static final String CONFIGURATION_FILE = "mediaserver.properties";
-	private static Logger LOGGER = Logger
-			.getLogger(MediaServerConfiguration.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MediaServerConfiguration.class);
 
 	private Properties configuration;
 
@@ -88,7 +88,7 @@ public class MediaServerConfiguration {
 			loadDefault();
 			validate();
 		} catch (IOException e) {
-			LOGGER.fatal("Configuration could not be loaded.", e);
+			LOGGER.error("Configuration could not be loaded.", e);
 			throw new LoadConfigurationException(e.getMessage(), e);
 		}
 	}

@@ -15,7 +15,8 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.Packet;
@@ -32,7 +33,7 @@ import com.buddycloud.mediaserver.xmpp.util.SyncPacketSendUtil;
  */
 public class AuthVerifier {
 
-	private static Logger LOGGER = Logger.getLogger(AuthVerifier.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(AuthVerifier.class);
 	private MediaServerComponent component;
 
 	public AuthVerifier(MediaServerComponent component) {

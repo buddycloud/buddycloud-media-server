@@ -17,7 +17,6 @@ package com.buddycloud.mediaserver;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -30,6 +29,8 @@ import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.Server;
 import org.restlet.data.Protocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
 
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
@@ -39,7 +40,7 @@ import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class Main {
-	private static Logger LOGGER = Logger.getLogger(Main.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
 	public static void main(String[] args) {
 		Properties configuration = MediaServerConfiguration.getInstance()
@@ -49,7 +50,7 @@ public class Main {
 			startRestletComponent(configuration);
 			startXMPPToolBox(configuration);
 		} catch (Exception e) {
-			LOGGER.fatal(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 			System.exit(1);
 		}
 	}
@@ -132,7 +133,7 @@ public class Main {
 		try {
 			componentManager.addComponent(subdomain, mediaServer);
 		} catch (ComponentException e) {
-			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
+			LOGGER.error("Media Server XMPP Component could not be started.", e);
 			throw e;
 		}
 
@@ -181,7 +182,7 @@ public class Main {
 			connection.login(userName,
 					configuration.getProperty("xmpp.connection.password"));
 		} catch (XMPPException e) {
-			LOGGER.fatal("XMPP connection coudn't be started", e);
+			LOGGER.error("XMPP connection coudn't be started", e);
 			throw new CreateXMPPConnectionException(e.getMessage(), e);
 		}
 

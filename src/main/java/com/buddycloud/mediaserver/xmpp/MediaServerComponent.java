@@ -18,7 +18,8 @@ package com.buddycloud.mediaserver.xmpp;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Packet;
@@ -36,8 +37,7 @@ public class MediaServerComponent extends AbstractComponent {
 
 	private static final String DESCRIPTION = "An XMPP Media Server";
 	private static final String NAME = "Media Server";
-	private static final Logger LOGGER = Logger
-			.getLogger(MediaServerComponent.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MediaServerComponent.class);
 
 	protected final Collection<MediaServerPacketCollector> collectors = new ConcurrentLinkedQueue<MediaServerPacketCollector>();
 

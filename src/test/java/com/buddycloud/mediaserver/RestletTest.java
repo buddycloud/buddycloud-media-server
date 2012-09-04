@@ -17,16 +17,17 @@ package com.buddycloud.mediaserver;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.restlet.Component;
 import org.restlet.Context;
 import org.restlet.data.Protocol;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 
 public class RestletTest implements TextExtension {
-	private static Logger LOGGER = Logger.getLogger(RestletTest.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(RestletTest.class);
 
 	private Component component;
 	private boolean started;

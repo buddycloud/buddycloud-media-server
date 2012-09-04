@@ -17,7 +17,6 @@ package com.buddycloud.mediaserver;
 
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -26,6 +25,8 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.whack.ExternalComponentManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
 
 import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
@@ -33,7 +34,7 @@ import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class XMPPTest implements TextExtension {
-	private static Logger LOGGER = Logger.getLogger(XMPPTest.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(XMPPTest.class);
 
 	private boolean started;
 	private String componentSubDomain;
@@ -86,7 +87,7 @@ public class XMPPTest implements TextExtension {
 		try {
 			componentManager.addComponent(componentSubDomain, mediaServer);
 		} catch (ComponentException e) {
-			LOGGER.fatal("Media Server XMPP Component could not be started.", e);
+			LOGGER.error("Media Server XMPP Component could not be started.", e);
 			throw e;
 		}
 
@@ -134,7 +135,7 @@ public class XMPPTest implements TextExtension {
 			connection.login(userName,
 					configuration.getProperty("xmpp.connection.password"));
 		} catch (XMPPException e) {
-			LOGGER.fatal("XMPP connection coudn't be started", e);
+			LOGGER.error("XMPP connection coudn't be started", e);
 			throw new CreateXMPPConnectionException(e.getMessage(), e);
 		}
 

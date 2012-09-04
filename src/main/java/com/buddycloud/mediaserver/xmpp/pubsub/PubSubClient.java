@@ -18,7 +18,6 @@ package com.buddycloud.mediaserver.xmpp.pubsub;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ.Type;
@@ -34,6 +33,8 @@ import org.jivesoftware.smackx.pubsub.PubSubElementType;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.packet.PubSub;
 import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
@@ -45,7 +46,7 @@ import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator
  */
 public class PubSubClient {
 
-	private static Logger LOGGER = Logger.getLogger(PubSubClient.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(PubSubClient.class);
 
 	private List<PubSubManager> pubSubManagers = new LinkedList<PubSubManager>();
 

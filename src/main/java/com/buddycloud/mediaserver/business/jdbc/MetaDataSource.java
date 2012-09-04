@@ -28,7 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
@@ -44,7 +45,7 @@ import com.mchange.v2.c3p0.ComboPooledDataSource;
  * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
  */
 public class MetaDataSource {
-	private static Logger LOGGER = Logger.getLogger(MetaDataSource.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MetaDataSource.class);
 
 	private ComboPooledDataSource dataSource;
 	private Properties configuration;
@@ -56,7 +57,7 @@ public class MetaDataSource {
 		try {
 			createDataSource();
 		} catch (PropertyVetoException e) {
-			LOGGER.fatal(
+			LOGGER.error(
 					"Error during data source creation: " + e.getMessage(), e);
 			throw new CreateDataSourceException(e.getMessage(), e);
 		}
