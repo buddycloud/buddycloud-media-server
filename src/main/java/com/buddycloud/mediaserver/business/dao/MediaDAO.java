@@ -335,11 +335,16 @@ public class MediaDAO {
 	 * @param mediaId media's unique id.
 	 * @return media's MIME type.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+	 * @throws MediaNotFoundException if there is no media for the entity's avatar.
 	 */		
 	public String getMediaType(String entityId, String mediaId)
-			throws MetadataSourceException {
+			throws MetadataSourceException, MediaNotFoundException {
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
+
+			if (mediaId == null) {
+				throw new MediaNotFoundException("avatar", entityId);
+			}
 		}
 
 		return dataSource.getMediaMimeType(mediaId);
@@ -464,6 +469,7 @@ public class MediaDAO {
 		try {
 			inputStream = fileField.getInputStream();
 		} catch (IOException e) {
+			LOGGER.error("Error to get file input stream", e);
 			throw new FileUploadException("Error to get file input stream");
 		}
 
@@ -505,7 +511,6 @@ public class MediaDAO {
 			out.close();
 		} catch (IOException e) {
 			LOGGER.error("Error while storing file: " + filePath, e);
-
 			throw new FileUploadException(e.getMessage());
 		}
 
@@ -528,6 +533,7 @@ public class MediaDAO {
 					}
 				} catch (MetadataSourceException e) {
 					// do nothing
+					LOGGER.error("Database error", e);
 				}
 			}
 		}.start();

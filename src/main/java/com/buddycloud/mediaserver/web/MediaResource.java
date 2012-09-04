@@ -29,6 +29,8 @@ import org.restlet.resource.Delete;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
@@ -48,6 +50,8 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
  * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
  */
 public class MediaResource extends MediaServerResource {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(MediaResource.class);
 
 	/**
 	 * Uploads avatar (PUT /<channel>/avatar) 
@@ -119,6 +123,12 @@ public class MediaResource extends MediaServerResource {
 					setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 					return new StringRepresentation(e.getMessage(),
 							MediaType.APPLICATION_JSON);
+				} catch (Throwable t) {
+					LOGGER.error("Unexpected error.", t);
+					
+					setStatus(Status.SERVER_ERROR_INTERNAL);
+					return new StringRepresentation("Unexpected error.",
+							MediaType.APPLICATION_JSON);
 				}
 			}
 		}
@@ -185,6 +195,12 @@ public class MediaResource extends MediaServerResource {
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation(e.getMessage(),
+					MediaType.APPLICATION_JSON);
+		} catch (Throwable t) {
+			LOGGER.error("Unexpected error.", t);
+			
+			setStatus(Status.SERVER_ERROR_INTERNAL);
+			return new StringRepresentation("Unexpected error.",
 					MediaType.APPLICATION_JSON);
 		}
 	}
@@ -257,6 +273,12 @@ public class MediaResource extends MediaServerResource {
 				} catch (UserNotAllowedException e) {
 					setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 					return new StringRepresentation(e.getMessage(),
+							MediaType.APPLICATION_JSON);
+				} catch (Throwable t) {
+					LOGGER.error("Unexpected error.", t);
+					
+					setStatus(Status.SERVER_ERROR_INTERNAL);
+					return new StringRepresentation("Unexpected error.",
 							MediaType.APPLICATION_JSON);
 				}
 			}
@@ -378,6 +400,12 @@ public class MediaResource extends MediaServerResource {
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			return new StringRepresentation(e.getMessage(),
+					MediaType.APPLICATION_JSON);
+		} catch (Throwable t) {
+			LOGGER.error("Unexpected error.", t);
+			
+			setStatus(Status.SERVER_ERROR_INTERNAL);
+			return new StringRepresentation("Unexpected error.",
 					MediaType.APPLICATION_JSON);
 		}
 	}

@@ -93,6 +93,8 @@ public class Main {
 		component.getDefaultHost().attach(new MediaServerApplication(context));
 
 		component.start();
+		
+		LOGGER.info("buddycloud Media Server HTTP server started!");
 	}
 
 	private static void startXMPPToolBox(Properties configuration)
@@ -106,6 +108,8 @@ public class Main {
 				.split(";");
 
 		XMPPToolBox.getInstance().start(component, connection, servers);
+		
+		LOGGER.info("buddycloud Media Server XMPP component started!");
 
 		while (true) {
 			try {
