@@ -469,12 +469,18 @@ public class MediaDAO {
 		try {
 			inputStream = fileField.getInputStream();
 		} catch (IOException e) {
-			LOGGER.error("Error to get file input stream", e);
+			LOGGER.debug("Error to get file input stream", e);
 			throw new FileUploadException("Error to get file input stream");
+		}
+		
+		String contentType = fileField.getContentType();
+		if (contentType == null) {
+			LOGGER.debug("Error to get file Content-Type");
+			throw new FileUploadException("Must provide a Content-Type for the uploaded file.");
 		}
 
 		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
-				entityId, fileField.getContentType(), inputStream, isAvatar);
+				entityId, contentType, inputStream, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 
