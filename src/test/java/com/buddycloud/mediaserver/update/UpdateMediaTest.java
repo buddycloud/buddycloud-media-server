@@ -56,10 +56,10 @@ public class UpdateMediaTest extends MediaServerTest {
 			FileUtils.cleanDirectory(destDir);
 		}
 
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTIMAGE_NAME), new File(
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TESTIMAGE_NAME), new File(
 				destDir + File.separator + MEDIA_ID));
 
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTIMAGE_NAME);
+		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TESTIMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
 

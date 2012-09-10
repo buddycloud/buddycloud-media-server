@@ -29,12 +29,18 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.restlet.data.MediaType;
+import org.restlet.ext.html.FormData;
+import org.restlet.ext.html.FormDataSet;
+import org.restlet.representation.FileRepresentation;
+import org.restlet.representation.StringRepresentation;
 
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.util.AudioUtils;
 import com.buddycloud.mediaserver.business.util.ImageUtils;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
+import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,8 +50,8 @@ public abstract class MediaServerTest {
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
 	protected static final String TESTIMAGE_NAME = "testimage.jpg";
 	protected static final String TESTVIDEO_NAME = "testvideo.avi";
-	protected static final String TESTAVATAR_NAME = "testavatar.jpg";
-	protected static final String TESTFILE_PATH = "resources/tests/";
+	protected static final String TEST_AVATAR_NAME = "testavatar.jpg";
+	protected static final String TEST_FILE_PATH = "resources/tests/";
 
 	protected static final String TEST_OUTPUT_DIR = "test";
 	protected static final String MEDIA_ID = generateRandomString();
@@ -134,6 +140,22 @@ public abstract class MediaServerTest {
 
 	protected static String generateRandomString() {
 		return RandomStringUtils.random(20, true, true);
+	}
+	
+	protected FormDataSet createMultipartFormData(String name, String title, 
+			String description, String filePath) {
+		FormDataSet form = new FormDataSet();
+		form.setMultipart(true);
+		form.getEntries().add(new FormData(Constants.NAME_FIELD, new StringRepresentation(
+						TEST_AVATAR_NAME)));
+		form.getEntries().add(new FormData(Constants.TITLE_FIELD, new StringRepresentation(
+						title)));
+		form.getEntries().add(new FormData(Constants.DESC_FIELD, new StringRepresentation(
+						description)));
+		form.getEntries().add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
+						filePath, MediaType.IMAGE_JPEG)));
+		
+		return form;
 	}
 
 	protected abstract void testSetUp() throws Exception;

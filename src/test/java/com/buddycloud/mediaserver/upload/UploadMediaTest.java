@@ -39,9 +39,7 @@ import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 public class UploadMediaTest extends MediaServerTest {
 
 	public void testTearDown() throws Exception {
-		FileUtils
-				.cleanDirectory(new File(
-						configuration
+		FileUtils.cleanDirectory(new File(configuration
 								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 								+ File.separator + BASE_CHANNEL));
 	}
@@ -75,7 +73,7 @@ public class UploadMediaTest extends MediaServerTest {
 
 		form.getEntries().add(
 				new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TESTFILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
+						TEST_FILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -117,7 +115,7 @@ public class UploadMediaTest extends MediaServerTest {
 
 		form.getEntries().add(
 				new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TESTFILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
+						TEST_FILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -157,7 +155,7 @@ public class UploadMediaTest extends MediaServerTest {
 
 		form.getEntries().add(
 				new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TESTFILE_PATH + TESTVIDEO_NAME, MediaType.VIDEO_AVI)));
+						TEST_FILE_PATH + TESTVIDEO_NAME, MediaType.VIDEO_AVI)));
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);

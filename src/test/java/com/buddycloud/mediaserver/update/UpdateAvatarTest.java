@@ -57,10 +57,10 @@ public class UpdateAvatarTest extends MediaServerTest {
 			FileUtils.cleanDirectory(destDir);
 		}
 
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME), new File(
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_AVATAR_NAME), new File(
 				destDir + File.separator + MEDIA_ID));
 
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTAVATAR_NAME);
+		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_AVATAR_NAME);
 		dataSource.storeMedia(media);
 		dataSource.storeAvatar(media);
 	}

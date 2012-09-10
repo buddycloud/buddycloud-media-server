@@ -47,10 +47,10 @@ public class DeleteAvatarTest extends MediaServerTest {
 		}
 
 		fileToDelete = new File(destDir + File.separator + MEDIA_ID);
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTAVATAR_NAME),
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_AVATAR_NAME),
 				fileToDelete);
 
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTAVATAR_NAME);
+		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_AVATAR_NAME);
 		dataSource.storeMedia(media);
 		dataSource.storeAvatar(media);
 	}

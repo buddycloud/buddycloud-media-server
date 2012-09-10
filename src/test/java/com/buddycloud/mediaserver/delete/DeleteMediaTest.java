@@ -47,10 +47,10 @@ public class DeleteMediaTest extends MediaServerTest {
 		}
 
 		fileToDelete = new File(destDir + File.separator + MEDIA_ID);
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTIMAGE_NAME),
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TESTIMAGE_NAME),
 				fileToDelete);
 
-		Media media = buildMedia(MEDIA_ID, TESTFILE_PATH + TESTIMAGE_NAME);
+		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TESTIMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
 

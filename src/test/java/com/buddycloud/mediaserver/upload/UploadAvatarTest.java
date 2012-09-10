@@ -23,25 +23,18 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.MediaType;
-import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
-import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public class UploadAvatarTest extends MediaServerTest {
 
 	public void testTearDown() throws Exception {
-		FileUtils
-				.cleanDirectory(new File(
-						configuration
+		FileUtils.cleanDirectory(new File(configuration
 								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 								+ File.separator + BASE_CHANNEL));
 	}
@@ -49,9 +42,9 @@ public class UploadAvatarTest extends MediaServerTest {
 	@Override
 	protected void testSetUp() throws Exception {
 	}
-
+	
 	@Test
-	public void uploadMedia() throws Exception {
+	public void uploadAvatarMultipartFormData() throws Exception {
 		// file fields
 		String title = "Test Avatar";
 		String description = "My Test Avatar";
@@ -61,27 +54,14 @@ public class UploadAvatarTest extends MediaServerTest {
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		FormDataSet form = new FormDataSet();
-		form.setMultipart(true);
-		form.getEntries().add(
-				new FormData(Constants.NAME_FIELD, new StringRepresentation(
-						TESTAVATAR_NAME)));
-		form.getEntries().add(
-				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
-						title)));
-		form.getEntries().add(
-				new FormData(Constants.DESC_FIELD, new StringRepresentation(
-						description)));
-
-		form.getEntries()
-				.add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
+		FormDataSet form = createMultipartFormData(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
-		assertEquals(TESTAVATAR_NAME, media.getFileName());
+		assertEquals(TEST_AVATAR_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
 		assertEquals(BASE_USER, media.getAuthor());
@@ -92,7 +72,7 @@ public class UploadAvatarTest extends MediaServerTest {
 	}
 
 	@Test
-	public void uploadMediaParamAuth() throws Exception {
+	public void uploadAvatarMultipartFormDataParamAuth() throws Exception {
 		// file fields
 		String title = "Test Avatar";
 		String description = "My Test Avatar";
@@ -104,27 +84,14 @@ public class UploadAvatarTest extends MediaServerTest {
 				+ BASE_CHANNEL + "/avatar" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
-		FormDataSet form = new FormDataSet();
-		form.setMultipart(true);
-		form.getEntries().add(
-				new FormData(Constants.NAME_FIELD, new StringRepresentation(
-						TESTAVATAR_NAME)));
-		form.getEntries().add(
-				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
-						title)));
-		form.getEntries().add(
-				new FormData(Constants.DESC_FIELD, new StringRepresentation(
-						description)));
-
-		form.getEntries()
-				.add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
+		FormDataSet form = createMultipartFormData(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
-		assertEquals(TESTAVATAR_NAME, media.getFileName());
+		assertEquals(TEST_AVATAR_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
 		assertEquals(BASE_USER, media.getAuthor());
