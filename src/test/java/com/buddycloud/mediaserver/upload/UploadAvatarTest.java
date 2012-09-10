@@ -74,7 +74,7 @@ public class UploadAvatarTest extends MediaServerTest {
 						description)));
 
 		form.getEntries()
-				.add(new FormData(Constants.FILE_FIELD, new FileRepresentation(
+				.add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
 						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
 
 		Representation result = client.put(form);
@@ -117,7 +117,7 @@ public class UploadAvatarTest extends MediaServerTest {
 						description)));
 
 		form.getEntries()
-				.add(new FormData(Constants.FILE_FIELD, new FileRepresentation(
+				.add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
 						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
 
 		Representation result = client.put(form);

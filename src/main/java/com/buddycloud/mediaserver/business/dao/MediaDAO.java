@@ -19,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.Properties;
@@ -34,6 +33,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.restlet.Request;
+import org.restlet.data.Form;
+import org.restlet.engine.util.Base64;
 import org.restlet.ext.fileupload.RestletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +44,12 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.business.util.AudioUtils;
 import com.buddycloud.mediaserver.business.util.ImageUtils;
+import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.business.util.XMPPUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.Thumbnail;
-import com.buddycloud.mediaserver.commons.exception.FormFieldException;
-import com.buddycloud.mediaserver.commons.exception.FormInvalidFieldException;
-import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -359,14 +358,12 @@ public class MediaDAO {
 	 * @return media's new metadata.
 	 * @throws FileUploadException if something goes wrong during request parsing.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
-	 * @throws FormFieldException the field to be updated is invalid.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws UserNotAllowedException the @{link userId} is not allowed to perform this operation.
 	 */
 	public String updateMedia(String userId, String entityId, String mediaId,
-			Request request) throws FileUploadException,
-			MetadataSourceException, FormFieldException,
-			MediaNotFoundException, UserNotAllowedException {
+			Form form) throws MetadataSourceException, MediaNotFoundException, 
+			UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
@@ -389,31 +386,26 @@ public class MediaDAO {
 			}
 		}
 
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(Integer.valueOf(configuration
-				.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
-
-		RestletFileUpload upload = new RestletFileUpload(factory);
-		List<FileItem> items = upload.parseRequest(request);
-
 		Media media = dataSource.getMedia(mediaId);
 
 		if (media == null) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
-
-		for (FileItem item : items) {
-			final String fieldName = item.getFieldName();
-
-			if (fieldName.equals(Constants.NAME_FIELD)) {
-				media.setFileName(item.getString());
-			} else if (fieldName.equals(Constants.TITLE_FIELD)) {
-				media.setTitle(item.getString());
-			} else if (fieldName.equals(Constants.DESC_FIELD)) {
-				media.setDescription(item.getString());
-			} else {
-				throw new FormInvalidFieldException(fieldName);
-			}
+		
+		// get form fields
+		String fileName = form.getFirstValue(Constants.NAME_FIELD);
+		if (fileName != null) {
+			media.setFileName(fileName);
+		}
+		
+		String title = form.getFirstValue(Constants.TITLE_FIELD);
+		if (title != null) {
+			media.setTitle(title);
+		}
+		
+		String description = form.getFirstValue(Constants.DESC_FIELD);
+		if (description != null) {
+			media.setDescription(description);
 		}
 
 		dataSource.updateMediaFields(media);
@@ -421,6 +413,51 @@ public class MediaDAO {
 		// Update last updated date
 		dataSource.updateMediaLastUpdated(mediaId);
 		LOGGER.debug("Media sucessfully updated. Media ID: " + media.getId());
+
+		return gson.toJson(media);
+	}
+	
+	/**
+	 * Uploads media from web form.
+	 * @param userId user that is uploading the media.
+	 * @param entityId channel where the media will belong.
+	 * @param form web form containing the media.
+	 * @param isAvatar if the media to be uploaded is an avatar.
+	 * @return media's metadata, if the upload ends with success
+	 * @throws FileUploadException the is something wrong with the request.
+	 * @throws UserNotAllowedException the user {@link userId} is now allowed to upload media in this channel.
+	 */
+	public String insertWebFormMedia(String userId, String entityId, Form form,
+			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
+		
+		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
+				new OwnerDecorator(new ModeratorDecorator(
+						new PublisherDecorator())));
+		if (!isUserAllowed) {
+			LOGGER.debug("User '" + userId
+					+ "' not allowed to uploade file on: " + entityId);
+			throw new UserNotAllowedException(userId);
+		}
+
+		// get form fields
+		String fileName = form.getFirstValue(Constants.NAME_FIELD);
+		String title = form.getFirstValue(Constants.TITLE_FIELD);
+		String description = form.getFirstValue(Constants.DESC_FIELD);
+		
+		String data = form.getFirstValue(Constants.DATA_FIELD);
+		byte[] dataArray = Base64.decode(data);		
+		
+		String contentType = form.getFirstValue(Constants.TYPE_FIELD);
+		if (contentType == null) {
+			LOGGER.debug("Error to get file Content-Type");
+			throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + " for the uploaded file.");
+		}
+		
+		// storing
+		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
+				entityId, contentType, dataArray, isAvatar);
+
+		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 
 		return gson.toJson(media);
 	}
@@ -433,14 +470,10 @@ public class MediaDAO {
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws MetadataSourceException if something goes wrong while creating media's metadata.
-	 * @throws FormFieldException required upload field is not present.
 	 * @throws UserNotAllowedException the user {@link userId} is now allowed to upload media in this channel.
 	 */
-	public String insertMedia(String userId, String entityId, Request request,
-			boolean isAvatar) throws FileUploadException,
-			MetadataSourceException, FormFieldException,
-			UserNotAllowedException {
+	public String insertFormDataMedia(String userId, String entityId, Request request,
+			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
 
 		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
 				new OwnerDecorator(new ModeratorDecorator(
@@ -459,19 +492,14 @@ public class MediaDAO {
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
 
+		// get form fields
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);
 		String description = getFormFieldContent(items, Constants.DESC_FIELD);
 
 		FileItem fileField = getFileFormField(items);
 
-		InputStream inputStream = null;
-		try {
-			inputStream = fileField.getInputStream();
-		} catch (IOException e) {
-			LOGGER.debug("Error to get file input stream", e);
-			throw new FileUploadException("Error to get file input stream");
-		}
+		byte[] dataArray = fileField.get();
 		
 		String contentType = fileField.getContentType();
 		if (contentType == null) {
@@ -479,8 +507,9 @@ public class MediaDAO {
 			throw new FileUploadException("Must provide a Content-Type for the uploaded file.");
 		}
 
+		// storing
 		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
-				entityId, contentType, inputStream, isAvatar);
+				entityId, contentType, dataArray, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 
@@ -489,7 +518,7 @@ public class MediaDAO {
 
 	protected Media storeMedia(String fileName, String title,
 			String description, String author, String entityId,
-			String mimeType, InputStream inputStream, final boolean isAvatar)
+			String mimeType, byte[] data, final boolean isAvatar)
 			throws FileUploadException {
 
 		String directory = getDirectory(entityId);
@@ -505,15 +534,7 @@ public class MediaDAO {
 		try {
 			FileOutputStream out = FileUtils.openOutputStream(file);
 
-			int length = 0;
-			byte[] bytes = new byte[1024];
-
-			while ((length = inputStream.read(bytes)) != -1) {
-				out.write(bytes, 0, length);
-			}
-
-			inputStream.close();
-			out.flush();
+			out.write(data);
 			out.close();
 		} catch (IOException e) {
 			LOGGER.error("Error while storing file: " + filePath, e);
@@ -605,8 +626,7 @@ public class MediaDAO {
 		return mediaId.equals(Constants.AVATAR_ARG);
 	}
 
-	protected String getFormFieldContent(List<FileItem> items, String fieldName)
-			throws FormMissingFieldException {
+	protected String getFormFieldContent(List<FileItem> items, String fieldName) {
 		String field = null;
 
 		for (int i = 0; i < items.size(); i++) {
@@ -619,27 +639,18 @@ public class MediaDAO {
 			}
 		}
 
-		if (field == null) {
-			throw new FormMissingFieldException(fieldName);
-		}
-
 		return field;
 	}
 
-	protected FileItem getFileFormField(List<FileItem> items)
-			throws FormMissingFieldException, FileUploadException {
+	protected FileItem getFileFormField(List<FileItem> items) {
 		FileItem field = null;
 
 		for (int i = 0; i < items.size(); i++) {
 			FileItem item = items.get(i);
-			if (Constants.FILE_FIELD.equals(item.getFieldName().toLowerCase())) {
+			if (Constants.DATA_FIELD.equals(item.getFieldName().toLowerCase())) {
 				field = item;
 				break;
 			}
-		}
-
-		if (field == null) {
-			throw new FormMissingFieldException(Constants.FILE_FIELD);
 		}
 
 		return field;
@@ -658,12 +669,10 @@ public class MediaDAO {
 		media.setFileSize(file.length());
 		media.setShaChecksum(getFileShaChecksum(file));
 		media.setMimeType(mimeType);
-
-		String fileExtension = getFileExtension(fileName);
+		
+		String fileExtension = getFileExtension(fileName, mimeType);
 		media.setFileExtension(fileExtension);
-
-		// XXX adds a lot of delay to the server side, maybe the client should
-		// send those information
+		
 		try {
 			if (ImageUtils.isImage(fileExtension)) {
 				BufferedImage img = ImageIO.read(file);
@@ -683,6 +692,14 @@ public class MediaDAO {
 
 		return media;
 	}
+	
+	protected String getFileExtension(String fileName, String mimeType) {
+		if (fileName != null) {
+			return fileName.substring(fileName.indexOf(".") + 1);
+		}
+		
+		return MimeTypeMapping.lookupExtension(mimeType);
+	}
 
 	protected Preview createPreview(String previewId, String mediaId,
 			String mimeType, Integer height, Integer width, File file) {
@@ -696,10 +713,6 @@ public class MediaDAO {
 		preview.setMimeType(mimeType);
 
 		return preview;
-	}
-
-	protected String getFileExtension(String fileName) {
-		return fileName.substring(fileName.lastIndexOf(".") + 1);
 	}
 
 	protected String getFileShaChecksum(File file) {

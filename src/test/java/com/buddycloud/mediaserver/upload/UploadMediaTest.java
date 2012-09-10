@@ -74,7 +74,7 @@ public class UploadMediaTest extends MediaServerTest {
 						description)));
 
 		form.getEntries().add(
-				new FormData(Constants.FILE_FIELD, new FileRepresentation(
+				new FormData(Constants.DATA_FIELD, new FileRepresentation(
 						TESTFILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
 
 		Representation result = client.post(form);
@@ -116,7 +116,7 @@ public class UploadMediaTest extends MediaServerTest {
 						description)));
 
 		form.getEntries().add(
-				new FormData(Constants.FILE_FIELD, new FileRepresentation(
+				new FormData(Constants.DATA_FIELD, new FileRepresentation(
 						TESTFILE_PATH + TESTIMAGE_NAME, MediaType.IMAGE_JPEG)));
 
 		Representation result = client.post(form);
@@ -156,7 +156,7 @@ public class UploadMediaTest extends MediaServerTest {
 						description)));
 
 		form.getEntries().add(
-				new FormData(Constants.FILE_FIELD, new FileRepresentation(
+				new FormData(Constants.DATA_FIELD, new FileRepresentation(
 						TESTFILE_PATH + TESTVIDEO_NAME, MediaType.VIDEO_AVI)));
 
 		Representation result = client.post(form);
