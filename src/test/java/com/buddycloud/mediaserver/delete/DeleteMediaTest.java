@@ -38,8 +38,7 @@ public class DeleteMediaTest extends MediaServerTest {
 
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(
-				configuration
+		File destDir = new File(configuration
 						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 						+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
@@ -47,10 +46,10 @@ public class DeleteMediaTest extends MediaServerTest {
 		}
 
 		fileToDelete = new File(destDir + File.separator + MEDIA_ID);
-		FileUtils.copyFile(new File(TEST_FILE_PATH + TESTIMAGE_NAME),
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME),
 				fileToDelete);
 
-		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TESTIMAGE_NAME);
+		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
 

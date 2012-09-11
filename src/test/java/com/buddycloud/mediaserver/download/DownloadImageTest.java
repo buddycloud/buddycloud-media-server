@@ -35,11 +35,9 @@ public class DownloadImageTest extends MediaServerTest {
 	private static final String TEST_OUTPUT_DIR = "test";
 
 	public void testTearDown() throws Exception {
-		FileUtils
-				.cleanDirectory(new File(
-						configuration
-								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-								+ File.separator + BASE_CHANNEL));
+		FileUtils.cleanDirectory(new File(configuration
+				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+				+ File.separator + BASE_CHANNEL));
 
 		dataSource.deleteMedia(MEDIA_ID);
 	}
@@ -54,10 +52,10 @@ public class DownloadImageTest extends MediaServerTest {
 			FileUtils.cleanDirectory(destDir);
 		}
 
-		FileUtils.copyFile(new File(TEST_FILE_PATH + TESTIMAGE_NAME), new File(
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
 				destDir + File.separator + MEDIA_ID));
 
-		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TESTIMAGE_NAME);
+		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
 

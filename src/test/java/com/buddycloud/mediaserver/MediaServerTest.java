@@ -48,8 +48,8 @@ import com.google.gson.GsonBuilder;
 public abstract class MediaServerTest {
 
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
-	protected static final String TESTIMAGE_NAME = "testimage.jpg";
-	protected static final String TESTVIDEO_NAME = "testvideo.avi";
+	protected static final String TEST_IMAGE_NAME = "testimage.jpg";
+	protected static final String TEST_VIDEO_NAME = "testvideo.avi";
 	protected static final String TEST_AVATAR_NAME = "testavatar.jpg";
 	protected static final String TEST_FILE_PATH = "resources/tests/";
 
@@ -67,6 +67,7 @@ public abstract class MediaServerTest {
 	protected MetaDataSource dataSource;
 	protected Gson gson;
 
+	
 	@Before
 	public void setUp() throws Exception {
 		configuration = MediaServerConfiguration.getInstance()
@@ -142,18 +143,27 @@ public abstract class MediaServerTest {
 		return RandomStringUtils.random(20, true, true);
 	}
 	
-	protected FormDataSet createMultipartFormData(String name, String title, 
-			String description, String filePath) {
+	protected FormDataSet createFormData(String name, String title, 
+			String description, String filePath, boolean isMultipart) {
 		FormDataSet form = new FormDataSet();
-		form.setMultipart(true);
-		form.getEntries().add(new FormData(Constants.NAME_FIELD, new StringRepresentation(
-						TEST_AVATAR_NAME)));
-		form.getEntries().add(new FormData(Constants.TITLE_FIELD, new StringRepresentation(
-						title)));
-		form.getEntries().add(new FormData(Constants.DESC_FIELD, new StringRepresentation(
-						description)));
-		form.getEntries().add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						filePath, MediaType.IMAGE_JPEG)));
+		form.setMultipart(isMultipart);
+
+		if (name != null) {
+			form.getEntries().add(new FormData(Constants.NAME_FIELD, new StringRepresentation(name)));
+		}
+		
+		if (title != null) {
+			form.getEntries().add(new FormData(Constants.TITLE_FIELD, new StringRepresentation(title)));
+		}
+		
+		if (description != null) {
+			form.getEntries().add(new FormData(Constants.DESC_FIELD, new StringRepresentation(description)));
+		}
+		
+		if (filePath != null) {
+			form.getEntries().add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
+					filePath, MediaType.IMAGE_JPEG)));
+		}
 		
 		return form;
 	}

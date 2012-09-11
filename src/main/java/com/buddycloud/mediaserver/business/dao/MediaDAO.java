@@ -431,14 +431,14 @@ public class MediaDAO {
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
 		
 		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
-				new OwnerDecorator(new ModeratorDecorator(
-						new PublisherDecorator())));
+				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
+		
 		if (!isUserAllowed) {
 			LOGGER.debug("User '" + userId
 					+ "' not allowed to uploade file on: " + entityId);
 			throw new UserNotAllowedException(userId);
 		}
-
+		
 		// get form fields
 		String fileName = form.getFirstValue(Constants.NAME_FIELD);
 		String title = form.getFirstValue(Constants.TITLE_FIELD);
@@ -491,7 +491,7 @@ public class MediaDAO {
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
-
+		
 		// get form fields
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);

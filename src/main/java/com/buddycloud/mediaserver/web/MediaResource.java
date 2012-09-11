@@ -52,7 +52,7 @@ public class MediaResource extends MediaServerResource {
 	/**
 	 * Uploads avatar (PUT /<channel>/avatar) 
 	 */
-	@Put("application/x-www-form-urlencoded")
+	@Put("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation putWebFormAvatar(Representation entity) {
 		Request request = getRequest();
 		addCORSHeaders(request);
@@ -90,71 +90,17 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation("",
 					MediaType.APPLICATION_JSON);
 		}
-
-		try {
-			return new StringRepresentation(mediaDAO.insertWebFormMedia(
-					userId, entityId,  new Form(entity), true),
-					MediaType.APPLICATION_JSON);
-		} catch (FileUploadException e) {
-			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
-		} catch (UserNotAllowedException e) {
-			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
-		} catch (Throwable t) {
-			return unexpectedError(t);
-		}
-	}
-
-	/**
-	 * Uploads avatar (PUT /<channel>/avatar) 
-	 */
-	@Put("multipart/form-data")
-	public Representation putFormDataAvatar(Representation entity) {
-		Request request = getRequest();
-
-		String auth = getQueryValue(Constants.AUTH_QUERY);
-
-		String userId = null;
-		String token = null;
-
-		try {
-			userId = getUserId(request, auth);
-			token = getTransactionId(request, auth);
-		} catch (Throwable t) {
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
-		}
 		
-		Representation verifyRequest = verifyRequest(userId, token, 
-				request.getResourceRef().getIdentifier());
-		if (verifyRequest != null) {
-			return verifyRequest;
-		}
-
-		addCORSHeaders(request);
-
-		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
-		String mediaId = (String) request.getAttributes().get(
-				Constants.MEDIA_ARG);
-
-		if (!mediaId.equals(Constants.AVATAR_ARG)) {
-			setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
-			return new StringRepresentation("",
-					MediaType.APPLICATION_JSON);
-		}
-
 		try {
-			return new StringRepresentation(mediaDAO.insertFormDataMedia(
-					userId, entityId, getRequest(), true),
-					MediaType.APPLICATION_JSON);
+			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
+				return new StringRepresentation(mediaDAO.insertFormDataMedia(
+						userId, entityId, getRequest(), true),
+						MediaType.APPLICATION_JSON);
+			} else {
+				return new StringRepresentation(mediaDAO.insertWebFormMedia(
+						userId, entityId, new Form(entity), true),
+						MediaType.APPLICATION_JSON);
+			}
 		} catch (FileUploadException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(),
@@ -164,7 +110,7 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation(e.getMessage(),
 					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
-			return unexpectedError(t);
+			return unexpectedError(t);	
 		}
 	}
 

@@ -23,7 +23,6 @@ import org.restlet.data.Status;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
-import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
@@ -39,8 +38,8 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
  * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
  */
 public class MediasResource extends MediaServerResource {
-	
-	@Put("application/x-www-form-urlencoded")
+
+	@Put("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation postWebFormMedia(Representation entity) {
 		Request request = getRequest();
 		addCORSHeaders(request);
@@ -71,11 +70,16 @@ public class MediasResource extends MediaServerResource {
 		String entityId = (String) request.getAttributes().get(
 				Constants.ENTITY_ARG);
 
-		Form form = new Form(entity);
 		try {
-			return new StringRepresentation(mediaDAO.insertWebFormMedia(
-					userId, entityId, form, false),
-					MediaType.APPLICATION_JSON);
+			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
+				return new StringRepresentation(mediaDAO.insertFormDataMedia(
+						userId, entityId, getRequest(), false),
+						MediaType.APPLICATION_JSON);
+			} else {
+				return new StringRepresentation(mediaDAO.insertWebFormMedia(
+						userId, entityId, new Form(entity), false),
+						MediaType.APPLICATION_JSON);
+			}
 		} catch (FileUploadException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(),
@@ -85,57 +89,7 @@ public class MediasResource extends MediaServerResource {
 			return new StringRepresentation(e.getMessage(),
 					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
-			return unexpectedError(t);
-		}
-	}
-	
-	
-	/**
-	 * Uploads media (POST /<channel>) 
-	 */
-	@Post("multipart/form-data")
-	public Representation postMedia(Representation entity) {
-		Request request = getRequest();
-		addCORSHeaders(request);
-		
-		String auth = getQueryValue(Constants.AUTH_QUERY);
-		String userId = null;
-		String token = null;
-
-		try {
-			userId = getUserId(request, auth);
-			token = getTransactionId(request, auth);
-		} catch (Throwable t) {
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
-		}
-
-		Representation verifyRequest = verifyRequest(userId, token, 
-				request.getResourceRef().getIdentifier());
-		if (verifyRequest != null) {
-			return verifyRequest;
-		}
-
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
-
-		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-		
-		try {
-			return new StringRepresentation(mediaDAO.insertFormDataMedia(
-					userId, entityId, getRequest(), false),
-					MediaType.APPLICATION_JSON);
-		} catch (FileUploadException e) {
-			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
-		} catch (UserNotAllowedException e) {
-			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
-		} catch (Throwable t) {
-			return unexpectedError(t);
+			return unexpectedError(t);	
 		}
 	}
 
@@ -145,7 +99,7 @@ public class MediasResource extends MediaServerResource {
 	@Get
 	public Representation getMediasInfo() {
 		addCORSHeaders(null);
-		
+
 		Request request = getRequest();
 
 		String userId = null;
@@ -175,7 +129,7 @@ public class MediasResource extends MediaServerResource {
 				return verifyRequest;
 			}
 		}
-		
+
 		Integer max = null;
 		String after = null;
 

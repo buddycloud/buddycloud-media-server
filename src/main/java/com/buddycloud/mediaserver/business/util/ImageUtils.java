@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
 
 public class ImageUtils {
 
@@ -56,7 +57,7 @@ public class ImageUtils {
 	public static BufferedImage createImagePreview(File image, int size)
 			throws IOException {
 		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, size);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.QUALITY, size);
 		img.flush();
 
 		return thumbnail;
@@ -65,7 +66,7 @@ public class ImageUtils {
 	public static BufferedImage createImagePreview(File image, int width,
 			int height) throws IOException {
 		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, width, height);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.QUALITY, width, height);
 		img.flush();
 
 		return thumbnail;
@@ -73,7 +74,7 @@ public class ImageUtils {
 
 	public static BufferedImage createImagePreview(BufferedImage img,
 			int width, int height) {
-		final BufferedImage thumbnail = Scalr.resize(img, width, height);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.QUALITY, width, height);
 		img.flush();
 		
 		return thumbnail;

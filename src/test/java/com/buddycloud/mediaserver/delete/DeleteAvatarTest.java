@@ -38,8 +38,7 @@ public class DeleteAvatarTest extends MediaServerTest {
 
 	@Override
 	protected void testSetUp() throws Exception {
-		File destDir = new File(
-				configuration
+		File destDir = new File(configuration
 						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 						+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {

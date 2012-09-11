@@ -119,4 +119,4 @@ media's metadata and uses [JDBC](http://www.oracle.com/technetwork/java/overview
 - **jdbc.driver.class** (Optional): if someday the media server allow a different database, this
 property will be used (default is *org.postgresql.Driver*).
 - **media.storage.root** (Required): root path where the media server will store the media files.
-- **media.sizelimit** (Optional): the tolerated file size in bytes (default is *1000240*).
+- **media.sizelimit** (Optional): the tolerated file size in bytes (default is *1048576* - 1 MB) which beyond are directly stored on disk.

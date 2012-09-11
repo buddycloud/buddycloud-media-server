@@ -51,18 +51,18 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	}
 
 	private void storeFile(String id) throws Exception {
-		File destDir = new File(
-				configuration
+		File destDir = new File(configuration
 				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 				+ File.separator + BASE_CHANNEL);
+		
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
 
-		FileUtils.copyFile(new File(TEST_FILE_PATH + TESTIMAGE_NAME), new File(
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
 				destDir + File.separator + id));
 
-		Media media = buildMedia(id, TEST_FILE_PATH + TESTIMAGE_NAME);
+		Media media = buildMedia(id, TEST_FILE_PATH + TEST_IMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
 

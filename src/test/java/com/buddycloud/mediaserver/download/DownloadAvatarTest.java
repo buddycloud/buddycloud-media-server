@@ -35,9 +35,7 @@ public class DownloadAvatarTest extends MediaServerTest {
 	private static final String TEST_OUTPUT_DIR = "test";
 
 	public void testTearDown() throws Exception {
-		FileUtils
-				.cleanDirectory(new File(
-						configuration
+		FileUtils.cleanDirectory(new File(configuration
 								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 								+ File.separator + BASE_CHANNEL));
 

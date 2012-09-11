@@ -17,130 +17,47 @@ package com.buddycloud.mediaserver;
 
 import java.util.Properties;
 
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.whack.ExternalComponentManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xmpp.component.ComponentException;
+import org.easymock.EasyMock;
 
-import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
-import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 
 public class XMPPTest implements TextExtension {
-	private static Logger LOGGER = LoggerFactory.getLogger(XMPPTest.class);
-
+	
+	private PubSubClient pubSubClient;
+	private AuthVerifier authClient;
 	private boolean started;
-	private String componentSubDomain;
-	private ExternalComponentManager componentManager;
-	private MediaServerComponent component;
 
 	public XMPPTest() {
+		this.authClient = EasyMock.createMock(AuthVerifier.class);
+		this.pubSubClient = EasyMock.createMock(PubSubClient.class);
 		this.started = false;
+		XMPPToolBox.getInstance().start(authClient, pubSubClient);
 	}
 
 	public void start(Properties configuration) throws Exception {
 		if (!started) {
-			XMPPConnection connection = createAndStartConnection(configuration);
-			addTraceListeners(connection);
-
-			component = createXMPPComponent(configuration);
-
-			String[] servers = configuration.getProperty("bc.channels.server")
-					.split(";");
-
-			XMPPToolBox.getInstance().start(component, connection, servers);
-
+			EasyMock.reset(authClient);
+			EasyMock.reset(pubSubClient);
 			started = true;
 		}
 	}
-
+	
+	@Override
 	public void shutdown() throws Exception {
 		if (started) {
-			component.shutdown();
-			componentManager.removeComponent(componentSubDomain);
-
+			EasyMock.verify(authClient);
+			EasyMock.verify(pubSubClient);
 			started = false;
 		}
 	}
-
-	private MediaServerComponent createXMPPComponent(Properties configuration)
-			throws Exception {
-		componentManager = new ExternalComponentManager(
-				configuration.getProperty("xmpp.component.host"),
-				Integer.valueOf(configuration
-						.getProperty("xmpp.component.port")));
-
-		componentSubDomain = configuration
-				.getProperty("xmpp.component.subdomain");
-		componentManager.setSecretKey(componentSubDomain,
-				configuration.getProperty("xmpp.component.secretkey"));
-
-		MediaServerComponent mediaServer = new MediaServerComponent();
-
-		try {
-			componentManager.addComponent(componentSubDomain, mediaServer);
-		} catch (ComponentException e) {
-			LOGGER.error("Media Server XMPP Component could not be started.", e);
-			throw e;
-		}
-
-		return mediaServer;
+	
+	public PubSubClient getPubSubClient() {
+		return this.pubSubClient;
 	}
-
-	private void addTraceListeners(XMPPConnection connection) {
-		PacketFilter iqFilter = new PacketFilter() {
-			@Override
-			public boolean accept(Packet arg0) {
-				return arg0 instanceof IQ;
-			}
-		};
-
-		connection.addPacketSendingListener(new PacketListener() {
-			@Override
-			public void processPacket(Packet arg0) {
-				LOGGER.debug("S: " + arg0.toXML());
-			}
-		}, iqFilter);
-
-		connection.addPacketListener(new PacketListener() {
-
-			@Override
-			public void processPacket(Packet arg0) {
-				LOGGER.debug("R: " + arg0.toXML());
-			}
-		}, iqFilter);
-	}
-
-	private XMPPConnection createAndStartConnection(Properties configuration) {
-
-		String serviceName = configuration
-				.getProperty("xmpp.connection.servicename");
-		String host = configuration.getProperty("xmpp.connection.host");
-		String userName = configuration.getProperty("xmpp.connection.username");
-
-		ConnectionConfiguration cc = new ConnectionConfiguration(host,
-				Integer.parseInt(configuration
-						.getProperty("xmpp.connection.port")), serviceName);
-
-		XMPPConnection connection = new XMPPConnection(cc);
-		try {
-			connection.connect();
-			connection.login(userName,
-					configuration.getProperty("xmpp.connection.password"));
-		} catch (XMPPException e) {
-			LOGGER.error("XMPP connection coudn't be started", e);
-			throw new CreateXMPPConnectionException(e.getMessage(), e);
-		}
-
-		addTraceListeners(connection);
-
-		return connection;
+	
+	public AuthVerifier getAuthVerifier() {
+		return this.authClient;
 	}
 }
