@@ -21,6 +21,7 @@ import java.io.File;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.ext.html.FormDataSet;
@@ -30,9 +31,16 @@ import org.restlet.resource.ClientResource;
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
 public class UpdateAvatarTest extends MediaServerTest {
+	
+	private static final String URL = BASE_URL + "/"
+			+ BASE_CHANNEL + "/avatar";
 
+	
 	public void testTearDown() throws Exception {
 		FileUtils.cleanDirectory(new File(configuration
 								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
@@ -45,8 +53,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 	@Override
 	protected void testSetUp() throws Exception {
 		File destDir = new File(
-				configuration
-						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+				configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 						+ File.separator + BASE_CHANNEL);
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
@@ -58,6 +65,19 @@ public class UpdateAvatarTest extends MediaServerTest {
 		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_AVATAR_NAME);
 		dataSource.storeMedia(media);
 		dataSource.storeAvatar(media);
+		
+		// mocks
+		AuthVerifier authClient = xmppTest.getAuthVerifier();
+		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, 
+				URL)).andReturn(true);
+		
+		PubSubClient pubSubClient = xmppTest.getPubSubClient();
+		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.contains(BASE_USER), 
+				EasyMock.contains(BASE_CHANNEL), 
+				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
+		
+		EasyMock.replay(authClient);
+		EasyMock.replay(pubSubClient);
 	}
 
 	@Test
@@ -66,8 +86,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 		String title = "New Avatar";
 		String description = "New Avatar Description";
 
-		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/avatar");
+		ClientResource client = new ClientResource(URL);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -90,8 +109,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
-		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/avatar" + "?auth="
+		ClientResource client = new ClientResource(URL + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = createFormData(null, title, description, null, false);

@@ -20,6 +20,7 @@ import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
@@ -54,46 +55,37 @@ public class ChannelResource extends MediaServerResource {
 			token = getTransactionId(request, auth);
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, 
-				request.getResourceRef().getIdentifier());
+		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
 		try {
 			String result = null;
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-				result = mediaDAO.insertFormDataMedia(
-						userId, entityId, getRequest(), false);
+				result = mediaDAO.insertFormDataMedia(userId, entityId, getRequest(), false);
 			} else {
-				result = mediaDAO.insertWebFormMedia(
-						userId, entityId, new Form(entity), false);
+				result = mediaDAO.insertWebFormMedia(userId, entityId, new Form(entity), false);
 			}
 			
 			setStatus(Status.SUCCESS_CREATED);
-			return new StringRepresentation(result,
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
 			return unexpectedError(t);	
 		}
+		
+		return new EmptyRepresentation();
 	}
 
 	/**
@@ -108,11 +100,9 @@ public class ChannelResource extends MediaServerResource {
 		String userId = null;
 		String token = null;
 
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
-		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient()
-				.isChannelPublic(entityId);
+		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
 
 		if (!isChannelPublic) {
 			String auth = getQueryValue(Constants.AUTH_QUERY);
@@ -122,12 +112,10 @@ public class ChannelResource extends MediaServerResource {
 				token = getTransactionId(request, auth);
 			} catch (Throwable t) {
 				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-				return new StringRepresentation(t.getLocalizedMessage(),
-						MediaType.APPLICATION_JSON);
+				return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 			}
 
-			Representation verifyRequest = verifyRequest(userId, token, 
-					request.getResourceRef().getIdentifier());
+			Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
 			if (verifyRequest != null) {
 				return verifyRequest;
 			}
@@ -145,8 +133,7 @@ public class ChannelResource extends MediaServerResource {
 			after = getQueryValue(Constants.AFTER_QUERY);
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation("Invalid query value!", MediaType.APPLICATION_JSON);
 		}
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
@@ -156,14 +143,12 @@ public class ChannelResource extends MediaServerResource {
 					entityId, max, after), MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
 			return unexpectedError(t);
 		}
+
+		return new EmptyRepresentation();
 	}
 }

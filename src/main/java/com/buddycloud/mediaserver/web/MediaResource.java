@@ -23,6 +23,7 @@ import org.restlet.Request;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
@@ -67,56 +68,43 @@ public class MediaResource extends MediaServerResource {
 			token = getTransactionId(request, auth);
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, 
-				request.getResourceRef().getIdentifier());
+		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
 		
-		userId = "rodrigods@buddycloud.org";
-
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
-		String mediaId = (String) request.getAttributes().get(
-				Constants.MEDIA_ARG);
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
+		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
 
 		if (!mediaId.equals(Constants.AVATAR_ARG)) {
 			setStatus(Status.CLIENT_ERROR_METHOD_NOT_ALLOWED);
-			return new StringRepresentation("",
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation("Valid only for avatars!",	MediaType.APPLICATION_JSON);
 		}
 		
 		try {
 			String result = null;
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-				result = mediaDAO.insertFormDataMedia(
-						userId, entityId, getRequest(), true);
+				result = mediaDAO.insertFormDataMedia(userId, entityId, getRequest(), true);
 			} else {
-				result = mediaDAO.insertWebFormMedia(
-						userId, entityId, new Form(entity), true);
+				result = mediaDAO.insertWebFormMedia(userId, entityId, new Form(entity), true);
 			}
 			
 			setStatus(Status.SUCCESS_CREATED);
-			return new StringRepresentation(result,
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
 			return unexpectedError(t);	
 		}
+		
+		return new EmptyRepresentation();
 	}
 
 	/**
@@ -136,42 +124,33 @@ public class MediaResource extends MediaServerResource {
 			token = getTransactionId(request, auth);
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, 
-				request.getResourceRef().getIdentifier());
+		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
 
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
-		String mediaId = (String) request.getAttributes().get(
-				Constants.MEDIA_ARG);
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
+		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
 			mediaDAO.deleteMedia(userId, entityId, mediaId);
-			return new StringRepresentation("Media deleted",
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation("Media deleted!", MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (MediaNotFoundException e) {
 			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
 			return unexpectedError(t);
 		}
+		
+		return new EmptyRepresentation();
 	}
 
 	/**
@@ -191,20 +170,16 @@ public class MediaResource extends MediaServerResource {
 			token = getTransactionId(request, auth);
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, 
-				request.getResourceRef().getIdentifier());
+		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
 
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
-		String mediaId = (String) request.getAttributes().get(
-				Constants.MEDIA_ARG);
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
+		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 		
@@ -214,19 +189,15 @@ public class MediaResource extends MediaServerResource {
 					MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (MediaNotFoundException e) {
 			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
 			return unexpectedError(t);
 		}
+		
+		return new EmptyRepresentation();
 	}
 
 	/**
@@ -241,13 +212,10 @@ public class MediaResource extends MediaServerResource {
 		String userId = null;
 		String token = null;
 
-		String entityId = (String) request.getAttributes().get(
-				Constants.ENTITY_ARG);
-		String mediaId = (String) request.getAttributes().get(
-				Constants.MEDIA_ARG);
+		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
+		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
 
-		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient()
-				.isChannelPublic(entityId);
+		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
 
 		if (!isChannelPublic && !mediaId.equals(Constants.AVATAR_ARG)) {
 			String auth = getQueryValue(Constants.AUTH_QUERY);
@@ -257,12 +225,10 @@ public class MediaResource extends MediaServerResource {
 				token = getTransactionId(request, auth);
 			} catch (Throwable t) {
 				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-				return new StringRepresentation(t.getLocalizedMessage(),
-						MediaType.APPLICATION_JSON);
+				return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 			}
 
-			Representation verifyRequest = verifyRequest(userId, token, 
-					request.getResourceRef().getIdentifier());
+			Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
 			if (verifyRequest != null) {
 				return verifyRequest;
 			}
@@ -283,16 +249,14 @@ public class MediaResource extends MediaServerResource {
 			}
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation(t.getLocalizedMessage(),
-					MediaType.APPLICATION_JSON);
+			return new StringRepresentation("Invalid query value!", MediaType.APPLICATION_JSON);
 		}
 
 		try {
 			MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 			if (maxHeight == null && maxWidth == null) {
-				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId,
-						mediaId));
+				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
 
 				File media = mediaDAO.getMedia(userId, entityId, mediaId);
 				return new FileRepresentation(media, mediaType);
@@ -301,40 +265,28 @@ public class MediaResource extends MediaServerResource {
 			Thumbnail thumbnail = null;
 
 			if (maxHeight != null && maxWidth == null) {
-				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId,
-						maxHeight);
+				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight);
 			} else if (maxHeight == null && maxWidth != null) {
-				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId,
-						maxWidth);
+				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxWidth);
 			} else {
-				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId,
-						maxHeight, maxWidth);
+				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, maxWidth);
 			}
 
-			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), 
-					thumbnail.getImg());
+			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), thumbnail.getImg());
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (IOException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (MediaNotFoundException e) {
 			setStatus(Status.CLIENT_ERROR_NOT_FOUND);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (InvalidPreviewFormatException e) {
 			setStatus(Status.CLIENT_ERROR_PRECONDITION_FAILED);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			return new StringRepresentation(e.getMessage(),
-					MediaType.APPLICATION_JSON);
 		} catch (Throwable t) {
 			return unexpectedError(t);
 		}
+		
+		return new EmptyRepresentation();
 	}
 }
