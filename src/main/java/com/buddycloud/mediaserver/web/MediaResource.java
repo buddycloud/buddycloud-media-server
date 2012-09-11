@@ -77,6 +77,8 @@ public class MediaResource extends MediaServerResource {
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
+		
+		userId = "rodrigods@buddycloud.org";
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
@@ -92,15 +94,18 @@ public class MediaResource extends MediaServerResource {
 		}
 		
 		try {
+			String result = null;
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-				return new StringRepresentation(mediaDAO.insertFormDataMedia(
-						userId, entityId, getRequest(), true),
-						MediaType.APPLICATION_JSON);
+				result = mediaDAO.insertFormDataMedia(
+						userId, entityId, getRequest(), true);
 			} else {
-				return new StringRepresentation(mediaDAO.insertWebFormMedia(
-						userId, entityId, new Form(entity), true),
-						MediaType.APPLICATION_JSON);
+				result = mediaDAO.insertWebFormMedia(
+						userId, entityId, new Form(entity), true);
 			}
+			
+			setStatus(Status.SUCCESS_CREATED);
+			return new StringRepresentation(result,
+					MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(),

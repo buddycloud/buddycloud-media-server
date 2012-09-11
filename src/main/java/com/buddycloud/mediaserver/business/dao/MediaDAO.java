@@ -445,11 +445,15 @@ public class MediaDAO {
 		String description = form.getFirstValue(Constants.DESC_FIELD);
 		
 		String data = form.getFirstValue(Constants.DATA_FIELD);
+		
+		if (data == null) {
+			throw new FileUploadException("Must provide the file data.");
+		}
+		
 		byte[] dataArray = Base64.decode(data);		
 		
 		String contentType = form.getFirstValue(Constants.TYPE_FIELD);
 		if (contentType == null) {
-			LOGGER.debug("Error to get file Content-Type");
 			throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + " for the uploaded file.");
 		}
 		
@@ -496,15 +500,22 @@ public class MediaDAO {
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);
 		String description = getFormFieldContent(items, Constants.DESC_FIELD);
+		String contentType = getFormFieldContent(items, Constants.TYPE_FIELD);
 
 		FileItem fileField = getFileFormField(items);
+		
+		if (fileField == null) {
+			throw new FileUploadException("Must provide the file data.");
+		}
 
 		byte[] dataArray = fileField.get();
 		
-		String contentType = fileField.getContentType();
 		if (contentType == null) {
-			LOGGER.debug("Error to get file Content-Type");
-			throw new FileUploadException("Must provide a Content-Type for the uploaded file.");
+			if (fileField.getContentType() != null) {
+				contentType = fileField.getContentType();
+			} else {
+				throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + " for the uploaded file.");
+			}
 		}
 
 		// storing
@@ -515,7 +526,7 @@ public class MediaDAO {
 
 		return gson.toJson(media);
 	}
-
+	
 	protected Media storeMedia(String fileName, String title,
 			String description, String author, String entityId,
 			String mimeType, byte[] data, final boolean isAvatar)

@@ -40,7 +40,7 @@ public class Constants {
 
 	// Storage constants
 	public static final String DATA_FIELD = "data";
-	public static final String TYPE_FIELD = "type";
+	public static final String TYPE_FIELD = "content-type";
 	public static final String TITLE_FIELD = "title"; // optional
 	public static final String NAME_FIELD = "filename";
 	public static final String DESC_FIELD = "description"; // optional

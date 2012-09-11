@@ -37,7 +37,7 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
  *
  * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
  */
-public class MediasResource extends MediaServerResource {
+public class ChannelResource extends MediaServerResource {
 
 	@Put("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation postWebFormMedia(Representation entity) {
@@ -71,15 +71,18 @@ public class MediasResource extends MediaServerResource {
 				Constants.ENTITY_ARG);
 
 		try {
+			String result = null;
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-				return new StringRepresentation(mediaDAO.insertFormDataMedia(
-						userId, entityId, getRequest(), false),
-						MediaType.APPLICATION_JSON);
+				result = mediaDAO.insertFormDataMedia(
+						userId, entityId, getRequest(), false);
 			} else {
-				return new StringRepresentation(mediaDAO.insertWebFormMedia(
-						userId, entityId, new Form(entity), false),
-						MediaType.APPLICATION_JSON);
+				result = mediaDAO.insertWebFormMedia(
+						userId, entityId, new Form(entity), false);
 			}
+			
+			setStatus(Status.SUCCESS_CREATED);
+			return new StringRepresentation(result,
+					MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 			return new StringRepresentation(e.getMessage(),

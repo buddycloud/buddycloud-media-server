@@ -44,7 +44,7 @@ public class MediaServerApplication extends Application {
 		router.attach(Constants.MEDIA_ID_URL, MediaResource.class);
 
 		// POST /<name@domain.com>
-		router.attach(Constants.MEDIAS_URL, MediasResource.class);
+		router.attach(Constants.MEDIAS_URL, ChannelResource.class);
 
 		ChallengeAuthenticator basicAuth = getBasicAuthenticator();
 		basicAuth.setNext(router);
