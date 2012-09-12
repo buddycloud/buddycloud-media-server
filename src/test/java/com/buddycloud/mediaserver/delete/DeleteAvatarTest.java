@@ -64,8 +64,8 @@ public class DeleteAvatarTest extends MediaServerTest {
 				URL)).andReturn(true);
 		
 		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.contains(BASE_USER), 
-				EasyMock.contains(BASE_CHANNEL), 
+		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
+				EasyMock.matches(BASE_CHANNEL), 
 				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
 		
 		EasyMock.replay(authClient);

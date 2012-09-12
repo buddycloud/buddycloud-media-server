@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Form;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
@@ -49,12 +50,12 @@ public class UploadAvatarTest extends MediaServerTest {
 	@Override
 	protected void testSetUp() throws Exception {
 		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, 
-				URL)).andReturn(true);
+		EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN), 
+				EasyMock.startsWith(URL))).andReturn(true);
 		
 		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.contains(BASE_USER), 
-				EasyMock.contains(BASE_CHANNEL), 
+		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
+				EasyMock.matches(BASE_CHANNEL), 
 				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
 		
 		EasyMock.replay(authClient);
@@ -72,7 +73,8 @@ public class UploadAvatarTest extends MediaServerTest {
 				BASE_TOKEN);
 
 		FormDataSet form = createFormData(TEST_AVATAR_NAME, title, 
-				description, TEST_FILE_PATH + TEST_AVATAR_NAME, true);
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -98,8 +100,9 @@ public class UploadAvatarTest extends MediaServerTest {
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		FormDataSet form = createFormData(TEST_AVATAR_NAME, title, 
-				description, TEST_FILE_PATH + TEST_AVATAR_NAME, true);
+		Form form = createWebForm(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -129,7 +132,8 @@ public class UploadAvatarTest extends MediaServerTest {
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = createFormData(TEST_AVATAR_NAME, title, 
-				description, TEST_FILE_PATH + TEST_AVATAR_NAME, true);
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -158,8 +162,9 @@ public class UploadAvatarTest extends MediaServerTest {
 				+ BASE_CHANNEL + "/avatar" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
-		FormDataSet form = createFormData(TEST_AVATAR_NAME, title, 
-				description, TEST_FILE_PATH + TEST_AVATAR_NAME, false);
+		Form form = createWebForm(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);

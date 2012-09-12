@@ -97,7 +97,7 @@ public class MediaResource extends MediaServerResource {
 			setStatus(Status.SUCCESS_CREATED);
 			return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
-			setStatus(Status.SERVER_ERROR_INTERNAL);
+			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 		} catch (Throwable t) {

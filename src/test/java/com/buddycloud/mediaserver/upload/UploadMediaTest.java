@@ -24,16 +24,13 @@ import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.MediaType;
-import org.restlet.ext.html.FormData;
+import org.restlet.data.Form;
 import org.restlet.ext.html.FormDataSet;
-import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.xmpp.AuthVerifier;
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
@@ -53,12 +50,12 @@ public class UploadMediaTest extends MediaServerTest {
 	@Override
 	protected void testSetUp() throws Exception {
 		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, 
-				URL)).andReturn(true);
+		EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN), 
+				EasyMock.startsWith(URL))).andReturn(true);
 		
 		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.contains(BASE_USER), 
-				EasyMock.contains(BASE_CHANNEL), 
+		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
+				EasyMock.matches(BASE_CHANNEL), 
 				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
 		
 		EasyMock.replay(authClient);
@@ -77,12 +74,9 @@ public class UploadMediaTest extends MediaServerTest {
 				BASE_TOKEN);
 
 		FormDataSet form = createFormData(TEST_IMAGE_NAME, title, 
-				description, TEST_FILE_PATH + TEST_IMAGE_NAME, true);
+				description, TEST_FILE_PATH + TEST_IMAGE_NAME, 
+				TEST_IMAGE_CONTENT_TYPE);
 		
-		form.getEntries().add(
-				new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TEST_FILE_PATH + TEST_IMAGE_NAME, MediaType.IMAGE_JPEG)));
-
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
@@ -107,13 +101,10 @@ public class UploadMediaTest extends MediaServerTest {
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		FormDataSet form = createFormData(TEST_IMAGE_NAME, title, 
-				description, TEST_FILE_PATH + TEST_IMAGE_NAME, false);
+		Form form = createWebForm(TEST_IMAGE_NAME, title, 
+				description, TEST_FILE_PATH + TEST_IMAGE_NAME,
+				TEST_IMAGE_CONTENT_TYPE);
 		
-		form.getEntries().add(
-				new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TEST_FILE_PATH + TEST_IMAGE_NAME, MediaType.IMAGE_JPEG)));
-
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
@@ -141,7 +132,8 @@ public class UploadMediaTest extends MediaServerTest {
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		FormDataSet form = createFormData(TEST_IMAGE_NAME, title, 
-				description, TEST_FILE_PATH + TEST_IMAGE_NAME, true);
+				description, TEST_FILE_PATH + TEST_IMAGE_NAME,
+				TEST_IMAGE_CONTENT_TYPE);
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -169,8 +161,9 @@ public class UploadMediaTest extends MediaServerTest {
 				+ BASE_CHANNEL + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
-		FormDataSet form = createFormData(TEST_IMAGE_NAME, title, 
-				description, TEST_FILE_PATH + TEST_IMAGE_NAME, false);
+		Form form = createWebForm(TEST_IMAGE_NAME, title, 
+				description, TEST_FILE_PATH + TEST_IMAGE_NAME,
+				TEST_IMAGE_CONTENT_TYPE);
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -197,11 +190,8 @@ public class UploadMediaTest extends MediaServerTest {
 				BASE_TOKEN);
 
 		FormDataSet form = createFormData(TEST_VIDEO_NAME, title, 
-				description, TEST_FILE_PATH + TEST_VIDEO_NAME, true);
-
-		form.getEntries().add(
-				new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TEST_FILE_PATH + TEST_VIDEO_NAME, MediaType.VIDEO_AVI)));
+				description, TEST_FILE_PATH + TEST_VIDEO_NAME, 
+				TEST_VIDEO_CONTENT_TYPE);
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -227,12 +217,9 @@ public class UploadMediaTest extends MediaServerTest {
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		FormDataSet form = createFormData(TEST_VIDEO_NAME, title, 
-				description, TEST_FILE_PATH + TEST_VIDEO_NAME, false);
-
-		form.getEntries().add(
-				new FormData(Constants.DATA_FIELD, new FileRepresentation(
-						TEST_FILE_PATH + TEST_VIDEO_NAME, MediaType.VIDEO_AVI)));
+		Form form = createWebForm(TEST_VIDEO_NAME, title, 
+				description, TEST_FILE_PATH + TEST_VIDEO_NAME, 
+				TEST_VIDEO_CONTENT_TYPE);
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);

@@ -24,7 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.ext.html.FormDataSet;
+import org.restlet.data.Form;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
@@ -68,12 +68,12 @@ public class UpdateAvatarTest extends MediaServerTest {
 		
 		// mocks
 		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, 
-				URL)).andReturn(true);
+		EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN), 
+				EasyMock.startsWith(URL))).andReturn(true);
 		
 		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.contains(BASE_USER), 
-				EasyMock.contains(BASE_CHANNEL), 
+		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
+				EasyMock.matches(BASE_CHANNEL), 
 				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
 		
 		EasyMock.replay(authClient);
@@ -90,7 +90,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		FormDataSet form = createFormData(null, title, description, null, false);
+		Form form = createWebForm(null, title, description, null, null);
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
@@ -112,7 +112,7 @@ public class UpdateAvatarTest extends MediaServerTest {
 		ClientResource client = new ClientResource(URL + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
-		FormDataSet form = createFormData(null, title, description, null, false);
+		Form form = createWebForm(null, title, description, null, null);
 
 		Representation result = client.post(form);
 		Media media = gson.fromJson(result.getText(), Media.class);

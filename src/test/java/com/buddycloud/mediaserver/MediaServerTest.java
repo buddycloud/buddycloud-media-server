@@ -29,7 +29,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
 import org.junit.Before;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
+import org.restlet.engine.util.Base64;
 import org.restlet.ext.html.FormData;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.FileRepresentation;
@@ -49,8 +51,11 @@ public abstract class MediaServerTest {
 
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
 	protected static final String TEST_IMAGE_NAME = "testimage.jpg";
+	protected static final String TEST_IMAGE_CONTENT_TYPE = "image/jpeg";
 	protected static final String TEST_VIDEO_NAME = "testvideo.avi";
+	protected static final String TEST_VIDEO_CONTENT_TYPE = "video/avi";
 	protected static final String TEST_AVATAR_NAME = "testavatar.jpg";
+	protected static final String TEST_AVATAR_CONTENT_TYPE = "image/jpeg";
 	protected static final String TEST_FILE_PATH = "resources/tests/";
 
 	protected static final String TEST_OUTPUT_DIR = "test";
@@ -143,10 +148,42 @@ public abstract class MediaServerTest {
 		return RandomStringUtils.random(20, true, true);
 	}
 	
+	protected Form createWebForm(String name, String title, 
+			String description, String filePath, String contentType) {
+		Form form = new Form();
+		
+		if (name != null) {
+			form.set(Constants.NAME_FIELD, name);
+		}
+		
+		if (title != null) {
+			form.set(Constants.TITLE_FIELD, title);
+		}
+		
+		if (description != null) {
+			form.set(Constants.DESC_FIELD, description);
+		}
+		
+		if (contentType != null) {
+			form.set(Constants.TYPE_FIELD, contentType);
+		}
+		
+		if (filePath != null) {
+			try {
+				File file = new File(filePath);
+				byte[] byteArray = FileUtils.readFileToByteArray(file);
+
+				form.set(Constants.DATA_FIELD, Base64.encode(byteArray, false));
+			} catch (IOException e) {}
+		}
+		
+		return form;
+	}
+	
 	protected FormDataSet createFormData(String name, String title, 
-			String description, String filePath, boolean isMultipart) {
+			String description, String filePath, String contentType) {
 		FormDataSet form = new FormDataSet();
-		form.setMultipart(isMultipart);
+		form.setMultipart(true);
 
 		if (name != null) {
 			form.getEntries().add(new FormData(Constants.NAME_FIELD, new StringRepresentation(name)));
@@ -162,7 +199,7 @@ public abstract class MediaServerTest {
 		
 		if (filePath != null) {
 			form.getEntries().add(new FormData(Constants.DATA_FIELD, new FileRepresentation(
-					filePath, MediaType.IMAGE_JPEG)));
+					filePath, new MediaType(contentType))));
 		}
 		
 		return form;

@@ -21,7 +21,7 @@ CREATE TABLE medias(
 	entityId TEXT NOT NULL,
 	author TEXT NOT NULL,
 	title TEXT,
-	description,
+	description TEXT,
 	mimeType TEXT NOT NULL,
 	uploadedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	lastUpdatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
