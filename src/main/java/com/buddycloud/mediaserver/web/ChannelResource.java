@@ -24,7 +24,7 @@ import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
-import org.restlet.resource.Put;
+import org.restlet.resource.Post;
 
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
@@ -40,7 +40,7 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
  */
 public class ChannelResource extends MediaServerResource {
 
-	@Put("application/x-www-form-urlencoded|multipart/form-data")
+	@Post("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation postWebFormMedia(Representation entity) {
 		Request request = getRequest();
 		addCORSHeaders(request);
