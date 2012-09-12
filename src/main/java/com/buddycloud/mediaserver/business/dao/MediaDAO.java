@@ -627,7 +627,7 @@ public class MediaDAO {
 		}
 		
 		// store preview in another flow
-		new StorePreviewThread(previewId, mediaDirectory, thumbnail.getMimeType(), mediaId, maxHeight,
+		new StorePreviewThread(previewId, mediaDirectory, mediaId, thumbnail.getMimeType(), maxHeight,
 				maxWidth, extension, previewImg).start();
 		
 		return thumbnail;
