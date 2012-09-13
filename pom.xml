@@ -12,6 +12,9 @@
 			<properties>
 				<assembly-config>mediaserver-assembly.xml</assembly-config>
 			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 		</profile>
 	</profiles>
 	<dependencies>
@@ -91,9 +94,27 @@
 		</dependency>
 
 		<!-- XMPP -->
-		<!-- <dependency> <groupId>org.igniterealtime.smack</groupId> <artifactId>smack</artifactId> 
-			<version>3.2.1</version> </dependency> <dependency> <groupId>org.igniterealtime.smack</groupId> 
-			<artifactId>smackx</artifactId> <version>3.2.1</version> </dependency> -->
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<version>3.2.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/smack.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx</artifactId>
+			<version>3.2.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/smackx.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>whack</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/whack.jar</systemPath>
+		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
 			<artifactId>tinder</artifactId>
