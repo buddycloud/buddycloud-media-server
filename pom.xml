@@ -240,6 +240,7 @@
 	<properties>
 		<restlet-version>2.1-RC6</restlet-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<skipTests>true</skipTests>
 	</properties>
 	<repositories>
 		<repository>
