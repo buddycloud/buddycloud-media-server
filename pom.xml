@@ -97,14 +97,14 @@
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smack</artifactId>
-			<version>3.2.1</version>
+			<version>3.2.1-MODIFIED</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/smack.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
 			<artifactId>smackx</artifactId>
-			<version>3.2.1</version>
+			<version>3.2.1-MODIFIED</version>
 			<scope>system</scope>
 			<systemPath>${project.basedir}/lib/smackx.jar</systemPath>
 		</dependency>
