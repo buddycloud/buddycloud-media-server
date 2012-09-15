@@ -205,7 +205,7 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Get
 	public Representation getMedia() {
-		addCORSHeaders(null);
+		addCORSHeaders();
 
 		Request request = getRequest();
 

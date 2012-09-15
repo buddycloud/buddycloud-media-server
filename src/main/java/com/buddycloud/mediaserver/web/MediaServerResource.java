@@ -56,20 +56,7 @@ public abstract class MediaServerResource extends ServerResource {
 	
 	@Options
 	public Representation getOptions() {
-		Request request = getRequest();
-		
-		Series<Header> messageHeaders = getMessageHeaders(request);
-		Header requestMethod = messageHeaders.getFirst(REQUEST_METHOD_HEADER);
-		
-		if (requestMethod != null) {
-			if (requestMethod.getValue().toUpperCase().equals("PUT") || 
-					requestMethod.getValue().toUpperCase().equals("POST")) {
-				addCORSHeaders(request);
-			}
-		} else {
-			addCORSHeaders();
-		}
-		
+		addCORSHeaders(getRequest());
 		return new EmptyRepresentation();
 	}
 
@@ -119,6 +106,11 @@ public abstract class MediaServerResource extends ServerResource {
 		if (request != null) {
 			Series<Header> messageHeaders = getMessageHeaders(request);
 			Header originHeader = messageHeaders.getFirst(ORIGIN_HEADER);
+			
+			// work around for lower case origin headers
+			if (originHeader == null) {
+				messageHeaders.getFirst(ORIGIN_HEADER.toLowerCase());
+			}
 			
 			origin = originHeader != null ? originHeader.getValue() : null;
 		}
