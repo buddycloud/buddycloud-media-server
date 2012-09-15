@@ -67,8 +67,8 @@ public class ChannelResource extends MediaServerResource {
 
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
+		String result = "";
 		try {
-			String result = null;
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				result = mediaDAO.insertFormDataMedia(userId, entityId, getRequest(), false);
 			} else {
@@ -76,7 +76,6 @@ public class ChannelResource extends MediaServerResource {
 			}
 			
 			setStatus(Status.SUCCESS_CREATED);
-			return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 		} catch (UserNotAllowedException e) {
@@ -85,7 +84,7 @@ public class ChannelResource extends MediaServerResource {
 			return unexpectedError(t);	
 		}
 		
-		return new EmptyRepresentation();
+		return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 	}
 
 	/**

@@ -49,7 +49,7 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
  * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
  */
 public class MediaResource extends MediaServerResource {
-
+	
 	/**
 	 * Uploads avatar (PUT /<channel>/avatar) 
 	 */
@@ -86,8 +86,8 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation("Valid only for avatars!",	MediaType.APPLICATION_JSON);
 		}
 		
+		String result = "";
 		try {
-			String result = null;
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				result = mediaDAO.insertFormDataMedia(userId, entityId, getRequest(), true);
 			} else {
@@ -95,7 +95,6 @@ public class MediaResource extends MediaServerResource {
 			}
 			
 			setStatus(Status.SUCCESS_CREATED);
-			return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 		} catch (UserNotAllowedException e) {
@@ -104,7 +103,7 @@ public class MediaResource extends MediaServerResource {
 			return unexpectedError(t);	
 		}
 		
-		return new EmptyRepresentation();
+		return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 	}
 
 	/**
