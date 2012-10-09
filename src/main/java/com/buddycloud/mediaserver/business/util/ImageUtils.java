@@ -57,7 +57,7 @@ public class ImageUtils {
 	public static BufferedImage createImagePreview(File image, int size)
 			throws IOException {
 		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, Method.QUALITY, size);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, size);
 		img.flush();
 
 		return thumbnail;
@@ -66,7 +66,7 @@ public class ImageUtils {
 	public static BufferedImage createImagePreview(File image, int width,
 			int height) throws IOException {
 		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, Method.QUALITY, width, height);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, width, height);
 		img.flush();
 
 		return thumbnail;
@@ -74,7 +74,7 @@ public class ImageUtils {
 
 	public static BufferedImage createImagePreview(BufferedImage img,
 			int width, int height) {
-		final BufferedImage thumbnail = Scalr.resize(img, Method.QUALITY, width, height);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, width, height);
 		img.flush();
 		
 		return thumbnail;
