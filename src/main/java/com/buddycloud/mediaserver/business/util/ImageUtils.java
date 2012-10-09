@@ -81,11 +81,11 @@ public class ImageUtils {
 	}
 
 	public static BufferedImage cropMaximumSquare(BufferedImage img) {
-		int biggerSize = img.getHeight() > img.getWidth() ? img.getHeight() : img.getWidth();
-		int x = biggerSize - img.getWidth();
-		int y = biggerSize - img.getHeight();
+		int smallerSide = img.getHeight() <= img.getWidth() ? img.getHeight() : img.getWidth();
+		int x = img.getWidth() - smallerSide;
+		int y = img.getHeight() - smallerSide;
 		
-		final BufferedImage croppedImg = Scalr.crop(img, x, y, biggerSize, biggerSize);
+		final BufferedImage croppedImg = Scalr.crop(img, x, y, smallerSide, smallerSide);
 		
 		return croppedImg;
 	}

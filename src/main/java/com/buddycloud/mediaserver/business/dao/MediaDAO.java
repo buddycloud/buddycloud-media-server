@@ -539,7 +539,7 @@ public class MediaDAO {
 		String mediaId = RandomStringUtils.randomAlphanumeric(20);
 		String filePath = directory + File.separator + mediaId;
 		File file = new File(filePath);
-
+		
 		LOGGER.debug("Storing new media: " + file.getAbsolutePath());
 
 		try {
@@ -554,7 +554,7 @@ public class MediaDAO {
 
 		final Media media = createMedia(mediaId, fileName, title, description,
 				author, entityId, mimeType, file, isAvatar);
-
+		
 		// store media's metadata
 		new Thread() {
 			public void start() {
@@ -683,8 +683,6 @@ public class MediaDAO {
 		media.setAuthor(author);
 		media.setDescription(description);
 		media.setTitle(title);
-		media.setFileSize(file.length());
-		media.setShaChecksum(getFileShaChecksum(file));
 		media.setMimeType(mimeType);
 
 		String fileExtension = getFileExtension(fileName, mimeType);
@@ -696,6 +694,10 @@ public class MediaDAO {
 
 				if (isAvatar && !ImageUtils.isSquare(img)) {
 					img = ImageUtils.cropMaximumSquare(img);
+					
+					// update image file
+					file = ImageUtils.storeImageIntoFile(img, 
+							fileExtension, file.getAbsolutePath());
 				}
 
 				media.setHeight(img.getHeight());
@@ -711,6 +713,10 @@ public class MediaDAO {
 		} catch (Throwable t) {
 			LOGGER.error("Error while resolving media format properties", t);
 		}
+		
+		// set after possible cropping
+		media.setFileSize(file.length());
+		media.setShaChecksum(getFileShaChecksum(file));
 
 		return media;
 	}
