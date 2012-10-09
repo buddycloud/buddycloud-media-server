@@ -238,7 +238,7 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException there is no media representing {@link entityId} avatar.
 	 */
 	public File getAvatar(String entityId) throws MetadataSourceException,
-			MediaNotFoundException, IOException {
+	MediaNotFoundException, IOException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar. Entity ID: " + entityId);
@@ -291,8 +291,8 @@ public class MediaDAO {
 	 */	
 	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
-			throws MetadataSourceException, MediaNotFoundException,
-			IOException, InvalidPreviewFormatException, UserNotAllowedException {
+					throws MetadataSourceException, MediaNotFoundException,
+					IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
@@ -318,8 +318,8 @@ public class MediaDAO {
 
 	private Thumbnail getAvatarPreview(String userId, String entityId,
 			Integer maxHeight, Integer maxWidth)
-			throws MetadataSourceException, MediaNotFoundException,
-			IOException, InvalidPreviewFormatException {
+					throws MetadataSourceException, MediaNotFoundException,
+					IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar preview. Avatar ID: " + entityId);
@@ -391,18 +391,18 @@ public class MediaDAO {
 		if (media == null) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
-		
+
 		// get form fields
 		String fileName = form.getFirstValue(Constants.NAME_FIELD);
 		if (fileName != null) {
 			media.setFileName(fileName);
 		}
-		
+
 		String title = form.getFirstValue(Constants.TITLE_FIELD);
 		if (title != null) {
 			media.setTitle(title);
 		}
-		
+
 		String description = form.getFirstValue(Constants.DESC_FIELD);
 		if (description != null) {
 			media.setDescription(description);
@@ -416,7 +416,7 @@ public class MediaDAO {
 
 		return gson.toJson(media);
 	}
-	
+
 	/**
 	 * Uploads media from web form.
 	 * @param userId user that is uploading the media.
@@ -429,34 +429,34 @@ public class MediaDAO {
 	 */
 	public String insertWebFormMedia(String userId, String entityId, Form form,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
-		
+
 		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
-		
+
 		if (!isUserAllowed) {
 			LOGGER.debug("User '" + userId
 					+ "' not allowed to uploade file on: " + entityId);
 			throw new UserNotAllowedException(userId);
 		}
-		
+
 		// get form fields
 		String fileName = form.getFirstValue(Constants.NAME_FIELD);
 		String title = form.getFirstValue(Constants.TITLE_FIELD);
 		String description = form.getFirstValue(Constants.DESC_FIELD);
-		
+
 		String data = form.getFirstValue(Constants.DATA_FIELD);
-		
+
 		if (data == null) {
 			throw new FileUploadException("Must provide the file data.");
 		}
-		
+
 		byte[] dataArray = Base64.decode(data);		
-		
+
 		String contentType = form.getFirstValue(Constants.TYPE_FIELD);
 		if (contentType == null) {
 			throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + " for the uploaded file.");
 		}
-		
+
 		// storing
 		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
 				entityId, contentType, dataArray, isAvatar);
@@ -495,7 +495,7 @@ public class MediaDAO {
 
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
-		
+
 		// get form fields
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);
@@ -503,13 +503,13 @@ public class MediaDAO {
 		String contentType = getFormFieldContent(items, Constants.TYPE_FIELD);
 
 		FileItem fileField = getFileFormField(items);
-		
+
 		if (fileField == null) {
 			throw new FileUploadException("Must provide the file data.");
 		}
 
 		byte[] dataArray = fileField.get();
-		
+
 		if (contentType == null) {
 			if (fileField.getContentType() != null) {
 				contentType = fileField.getContentType();
@@ -526,11 +526,11 @@ public class MediaDAO {
 
 		return gson.toJson(media);
 	}
-	
+
 	protected Media storeMedia(String fileName, String title,
 			String description, String author, String entityId,
 			String mimeType, byte[] data, final boolean isAvatar)
-			throws FileUploadException {
+					throws FileUploadException {
 
 		String directory = getDirectory(entityId);
 		mkdir(directory);
@@ -553,7 +553,7 @@ public class MediaDAO {
 		}
 
 		final Media media = createMedia(mediaId, fileName, title, description,
-				author, entityId, mimeType, file);
+				author, entityId, mimeType, file, isAvatar);
 
 		// store media's metadata
 		new Thread() {
@@ -579,9 +579,8 @@ public class MediaDAO {
 		return media;
 	}
 
-	protected Thumbnail getPreview(String entityId, String mediaId,
-			Integer maxHeight, Integer maxWidth, String mediaDirectory)
-			throws MetadataSourceException, IOException,
+	protected Thumbnail getPreview(String entityId, String mediaId, Integer maxHeight, 
+			Integer maxWidth, String mediaDirectory) throws MetadataSourceException, IOException,
 			InvalidPreviewFormatException, MediaNotFoundException {
 		File media = new File(mediaDirectory + File.separator + mediaId);
 
@@ -605,31 +604,38 @@ public class MediaDAO {
 			// generate random id
 			previewId = RandomStringUtils.randomAlphanumeric(20);
 		}
+
+		return buildNewPreview(media, mediaId, previewId, mediaDirectory, maxHeight, maxWidth);
+	}
+
+	private Thumbnail buildNewPreview(File media, String mediaId, String previewId, String mediaDirectory,
+			Integer maxHeight, Integer maxWidth) throws MetadataSourceException, 
+			IOException, InvalidPreviewFormatException {
 		String extension = dataSource.getMediaExtension(mediaId);
 
 		BufferedImage previewImg = null;
 		Thumbnail thumbnail = null;
-		
+
 		if (ImageUtils.isImage(extension)) {
 			previewImg = ImageUtils.createImagePreview(media, maxWidth,
 					maxHeight);
-			
+
 			thumbnail = new Thumbnail(dataSource.getMediaMimeType(mediaId), 
 					ImageUtils.imageToBytes(previewImg, extension));
 		} else if (VideoUtils.isVideo(extension)) {
 			previewImg = new VideoUtils(media).createVideoPreview(maxWidth,
 					maxHeight);
-			
+
 			thumbnail = new Thumbnail(VideoUtils.PREVIEW_MIME_TYPE, 
 					ImageUtils.imageToBytes(previewImg, VideoUtils.PREVIEW_TYPE));
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
-		
+
 		// store preview in another flow
 		new StorePreviewThread(previewId, mediaDirectory, mediaId, thumbnail.getMimeType(), maxHeight,
 				maxWidth, extension, previewImg).start();
-		
+
 		return thumbnail;
 	}
 
@@ -669,7 +675,7 @@ public class MediaDAO {
 
 	protected Media createMedia(String mediaId, String fileName, String title,
 			String description, String author, String entityId,
-			String mimeType, File file) {
+			String mimeType, File file, boolean isAvatar) {
 		Media media = new Media();
 		media.setId(mediaId);
 		media.setFileName(fileName);
@@ -680,13 +686,18 @@ public class MediaDAO {
 		media.setFileSize(file.length());
 		media.setShaChecksum(getFileShaChecksum(file));
 		media.setMimeType(mimeType);
-		
+
 		String fileExtension = getFileExtension(fileName, mimeType);
 		media.setFileExtension(fileExtension);
-		
+
 		try {
 			if (ImageUtils.isImage(fileExtension)) {
 				BufferedImage img = ImageIO.read(file);
+
+				if (isAvatar && !ImageUtils.isSquare(img)) {
+					img = ImageUtils.cropMaximumSquare(img);
+				}
+
 				media.setHeight(img.getHeight());
 				media.setWidth(img.getWidth());
 			} else if (VideoUtils.isVideo(fileExtension)) {
@@ -703,12 +714,12 @@ public class MediaDAO {
 
 		return media;
 	}
-	
+
 	protected String getFileExtension(String fileName, String mimeType) {
 		if (fileName != null) {
 			return fileName.substring(fileName.indexOf(".") + 1);
 		}
-		
+
 		return MimeTypeMapping.lookupExtension(mimeType);
 	}
 

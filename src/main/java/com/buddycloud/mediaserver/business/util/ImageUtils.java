@@ -80,8 +80,22 @@ public class ImageUtils {
 		return thumbnail;
 	}
 
+	public static BufferedImage cropMaximumSquare(BufferedImage img) {
+		int biggerSize = img.getHeight() > img.getWidth() ? img.getHeight() : img.getWidth();
+		int x = biggerSize - img.getWidth();
+		int y = biggerSize - img.getHeight();
+		
+		final BufferedImage croppedImg = Scalr.crop(img, x, y, biggerSize, biggerSize);
+		
+		return croppedImg;
+	}
+
 	public static boolean isImage(String extension) {
 		return Arrays.binarySearch(FORMATS, extension.toLowerCase()) >= 0;
+	}
+	
+	public static boolean isSquare(BufferedImage img) {
+		return img.getHeight() == img.getWidth();
 	}
 
 	private static final String[] FORMATS = { "001", "2bp", "360", "3fr",
