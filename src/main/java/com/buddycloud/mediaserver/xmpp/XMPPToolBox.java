@@ -44,6 +44,13 @@ public class XMPPToolBox {
 			started = true;
 		}
 	}
+	
+	public void start(AuthVerifier authClient, PubSubClient pubSubClient) {
+		if (!started) {
+			this.authClient = authClient;
+			this.pubSubClient = pubSubClient;
+		}
+	}
 
 	public AuthVerifier getAuthClient() {
 		return authClient;

@@ -19,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.List;
 import java.util.Properties;
@@ -34,6 +33,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.restlet.Request;
+import org.restlet.data.Form;
+import org.restlet.engine.util.Base64;
 import org.restlet.ext.fileupload.RestletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +44,12 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.business.util.AudioUtils;
 import com.buddycloud.mediaserver.business.util.ImageUtils;
+import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.business.util.XMPPUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.Thumbnail;
-import com.buddycloud.mediaserver.commons.exception.FormFieldException;
-import com.buddycloud.mediaserver.commons.exception.FormInvalidFieldException;
-import com.buddycloud.mediaserver.commons.exception.FormMissingFieldException;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -239,7 +238,7 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException there is no media representing {@link entityId} avatar.
 	 */
 	public File getAvatar(String entityId) throws MetadataSourceException,
-			MediaNotFoundException, IOException {
+	MediaNotFoundException, IOException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar. Entity ID: " + entityId);
@@ -292,8 +291,8 @@ public class MediaDAO {
 	 */	
 	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
-			throws MetadataSourceException, MediaNotFoundException,
-			IOException, InvalidPreviewFormatException, UserNotAllowedException {
+					throws MetadataSourceException, MediaNotFoundException,
+					IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
@@ -319,8 +318,8 @@ public class MediaDAO {
 
 	private Thumbnail getAvatarPreview(String userId, String entityId,
 			Integer maxHeight, Integer maxWidth)
-			throws MetadataSourceException, MediaNotFoundException,
-			IOException, InvalidPreviewFormatException {
+					throws MetadataSourceException, MediaNotFoundException,
+					IOException, InvalidPreviewFormatException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar preview. Avatar ID: " + entityId);
@@ -359,14 +358,12 @@ public class MediaDAO {
 	 * @return media's new metadata.
 	 * @throws FileUploadException if something goes wrong during request parsing.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
-	 * @throws FormFieldException the field to be updated is invalid.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws UserNotAllowedException the @{link userId} is not allowed to perform this operation.
 	 */
 	public String updateMedia(String userId, String entityId, String mediaId,
-			Request request) throws FileUploadException,
-			MetadataSourceException, FormFieldException,
-			MediaNotFoundException, UserNotAllowedException {
+			Form form) throws MetadataSourceException, MediaNotFoundException, 
+			UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
 			mediaId = dataSource.getEntityAvatarId(entityId);
@@ -389,31 +386,26 @@ public class MediaDAO {
 			}
 		}
 
-		DiskFileItemFactory factory = new DiskFileItemFactory();
-		factory.setSizeThreshold(Integer.valueOf(configuration
-				.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
-
-		RestletFileUpload upload = new RestletFileUpload(factory);
-		List<FileItem> items = upload.parseRequest(request);
-
 		Media media = dataSource.getMedia(mediaId);
 
 		if (media == null) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
 
-		for (FileItem item : items) {
-			final String fieldName = item.getFieldName();
+		// get form fields
+		String fileName = form.getFirstValue(Constants.NAME_FIELD);
+		if (fileName != null) {
+			media.setFileName(fileName);
+		}
 
-			if (fieldName.equals(Constants.NAME_FIELD)) {
-				media.setFileName(item.getString());
-			} else if (fieldName.equals(Constants.TITLE_FIELD)) {
-				media.setTitle(item.getString());
-			} else if (fieldName.equals(Constants.DESC_FIELD)) {
-				media.setDescription(item.getString());
-			} else {
-				throw new FormInvalidFieldException(fieldName);
-			}
+		String title = form.getFirstValue(Constants.TITLE_FIELD);
+		if (title != null) {
+			media.setTitle(title);
+		}
+
+		String description = form.getFirstValue(Constants.DESC_FIELD);
+		if (description != null) {
+			media.setDescription(description);
 		}
 
 		dataSource.updateMediaFields(media);
@@ -426,6 +418,55 @@ public class MediaDAO {
 	}
 
 	/**
+	 * Uploads media from web form.
+	 * @param userId user that is uploading the media.
+	 * @param entityId channel where the media will belong.
+	 * @param form web form containing the media.
+	 * @param isAvatar if the media to be uploaded is an avatar.
+	 * @return media's metadata, if the upload ends with success
+	 * @throws FileUploadException the is something wrong with the request.
+	 * @throws UserNotAllowedException the user {@link userId} is now allowed to upload media in this channel.
+	 */
+	public String insertWebFormMedia(String userId, String entityId, Form form,
+			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
+
+		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
+				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
+
+		if (!isUserAllowed) {
+			LOGGER.debug("User '" + userId
+					+ "' not allowed to uploade file on: " + entityId);
+			throw new UserNotAllowedException(userId);
+		}
+
+		// get form fields
+		String fileName = form.getFirstValue(Constants.NAME_FIELD);
+		String title = form.getFirstValue(Constants.TITLE_FIELD);
+		String description = form.getFirstValue(Constants.DESC_FIELD);
+
+		String data = form.getFirstValue(Constants.DATA_FIELD);
+
+		if (data == null) {
+			throw new FileUploadException("Must provide the file data.");
+		}
+
+		byte[] dataArray = Base64.decode(data);		
+
+		String contentType = form.getFirstValue(Constants.TYPE_FIELD);
+		if (contentType == null) {
+			throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + " for the uploaded file.");
+		}
+
+		// storing
+		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
+				entityId, contentType, dataArray, isAvatar);
+
+		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
+
+		return gson.toJson(media);
+	}
+
+	/**
 	 * Uploads media.
 	 * @param userId user that is uploading the media.
 	 * @param entityId channel where the media will belong.
@@ -433,14 +474,10 @@ public class MediaDAO {
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws MetadataSourceException if something goes wrong while creating media's metadata.
-	 * @throws FormFieldException required upload field is not present.
 	 * @throws UserNotAllowedException the user {@link userId} is now allowed to upload media in this channel.
 	 */
-	public String insertMedia(String userId, String entityId, Request request,
-			boolean isAvatar) throws FileUploadException,
-			MetadataSourceException, FormFieldException,
-			UserNotAllowedException {
+	public String insertFormDataMedia(String userId, String entityId, Request request,
+			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
 
 		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
 				new OwnerDecorator(new ModeratorDecorator(
@@ -459,28 +496,31 @@ public class MediaDAO {
 		RestletFileUpload upload = new RestletFileUpload(factory);
 		List<FileItem> items = upload.parseRequest(request);
 
+		// get form fields
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);
 		String description = getFormFieldContent(items, Constants.DESC_FIELD);
+		String contentType = getFormFieldContent(items, Constants.TYPE_FIELD);
 
 		FileItem fileField = getFileFormField(items);
 
-		InputStream inputStream = null;
-		try {
-			inputStream = fileField.getInputStream();
-		} catch (IOException e) {
-			LOGGER.debug("Error to get file input stream", e);
-			throw new FileUploadException("Error to get file input stream");
-		}
-		
-		String contentType = fileField.getContentType();
-		if (contentType == null) {
-			LOGGER.debug("Error to get file Content-Type");
-			throw new FileUploadException("Must provide a Content-Type for the uploaded file.");
+		if (fileField == null) {
+			throw new FileUploadException("Must provide the file data.");
 		}
 
+		byte[] dataArray = fileField.get();
+
+		if (contentType == null) {
+			if (fileField.getContentType() != null) {
+				contentType = fileField.getContentType();
+			} else {
+				throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + " for the uploaded file.");
+			}
+		}
+
+		// storing
 		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
-				entityId, contentType, inputStream, isAvatar);
+				entityId, contentType, dataArray, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
 
@@ -489,8 +529,8 @@ public class MediaDAO {
 
 	protected Media storeMedia(String fileName, String title,
 			String description, String author, String entityId,
-			String mimeType, InputStream inputStream, final boolean isAvatar)
-			throws FileUploadException {
+			String mimeType, byte[] data, final boolean isAvatar)
+					throws FileUploadException {
 
 		String directory = getDirectory(entityId);
 		mkdir(directory);
@@ -499,21 +539,13 @@ public class MediaDAO {
 		String mediaId = RandomStringUtils.randomAlphanumeric(20);
 		String filePath = directory + File.separator + mediaId;
 		File file = new File(filePath);
-
+		
 		LOGGER.debug("Storing new media: " + file.getAbsolutePath());
 
 		try {
 			FileOutputStream out = FileUtils.openOutputStream(file);
 
-			int length = 0;
-			byte[] bytes = new byte[1024];
-
-			while ((length = inputStream.read(bytes)) != -1) {
-				out.write(bytes, 0, length);
-			}
-
-			inputStream.close();
-			out.flush();
+			out.write(data);
 			out.close();
 		} catch (IOException e) {
 			LOGGER.error("Error while storing file: " + filePath, e);
@@ -521,8 +553,8 @@ public class MediaDAO {
 		}
 
 		final Media media = createMedia(mediaId, fileName, title, description,
-				author, entityId, mimeType, file);
-
+				author, entityId, mimeType, file, isAvatar);
+		
 		// store media's metadata
 		new Thread() {
 			public void start() {
@@ -547,9 +579,8 @@ public class MediaDAO {
 		return media;
 	}
 
-	protected Thumbnail getPreview(String entityId, String mediaId,
-			Integer maxHeight, Integer maxWidth, String mediaDirectory)
-			throws MetadataSourceException, IOException,
+	protected Thumbnail getPreview(String entityId, String mediaId, Integer maxHeight, 
+			Integer maxWidth, String mediaDirectory) throws MetadataSourceException, IOException,
 			InvalidPreviewFormatException, MediaNotFoundException {
 		File media = new File(mediaDirectory + File.separator + mediaId);
 
@@ -573,31 +604,38 @@ public class MediaDAO {
 			// generate random id
 			previewId = RandomStringUtils.randomAlphanumeric(20);
 		}
+
+		return buildNewPreview(media, mediaId, previewId, mediaDirectory, maxHeight, maxWidth);
+	}
+
+	private Thumbnail buildNewPreview(File media, String mediaId, String previewId, String mediaDirectory,
+			Integer maxHeight, Integer maxWidth) throws MetadataSourceException, 
+			IOException, InvalidPreviewFormatException {
 		String extension = dataSource.getMediaExtension(mediaId);
 
 		BufferedImage previewImg = null;
 		Thumbnail thumbnail = null;
-		
+
 		if (ImageUtils.isImage(extension)) {
 			previewImg = ImageUtils.createImagePreview(media, maxWidth,
 					maxHeight);
-			
+
 			thumbnail = new Thumbnail(dataSource.getMediaMimeType(mediaId), 
 					ImageUtils.imageToBytes(previewImg, extension));
 		} else if (VideoUtils.isVideo(extension)) {
 			previewImg = new VideoUtils(media).createVideoPreview(maxWidth,
 					maxHeight);
-			
+
 			thumbnail = new Thumbnail(VideoUtils.PREVIEW_MIME_TYPE, 
 					ImageUtils.imageToBytes(previewImg, VideoUtils.PREVIEW_TYPE));
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
-		
+
 		// store preview in another flow
-		new StorePreviewThread(previewId, mediaDirectory, thumbnail.getMimeType(), mediaId, maxHeight,
+		new StorePreviewThread(previewId, mediaDirectory, mediaId, thumbnail.getMimeType(), maxHeight,
 				maxWidth, extension, previewImg).start();
-		
+
 		return thumbnail;
 	}
 
@@ -605,8 +643,7 @@ public class MediaDAO {
 		return mediaId.equals(Constants.AVATAR_ARG);
 	}
 
-	protected String getFormFieldContent(List<FileItem> items, String fieldName)
-			throws FormMissingFieldException {
+	protected String getFormFieldContent(List<FileItem> items, String fieldName) {
 		String field = null;
 
 		for (int i = 0; i < items.size(); i++) {
@@ -619,27 +656,18 @@ public class MediaDAO {
 			}
 		}
 
-		if (field == null) {
-			throw new FormMissingFieldException(fieldName);
-		}
-
 		return field;
 	}
 
-	protected FileItem getFileFormField(List<FileItem> items)
-			throws FormMissingFieldException, FileUploadException {
+	protected FileItem getFileFormField(List<FileItem> items) {
 		FileItem field = null;
 
 		for (int i = 0; i < items.size(); i++) {
 			FileItem item = items.get(i);
-			if (Constants.FILE_FIELD.equals(item.getFieldName().toLowerCase())) {
+			if (Constants.DATA_FIELD.equals(item.getFieldName().toLowerCase())) {
 				field = item;
 				break;
 			}
-		}
-
-		if (field == null) {
-			throw new FormMissingFieldException(Constants.FILE_FIELD);
 		}
 
 		return field;
@@ -647,7 +675,7 @@ public class MediaDAO {
 
 	protected Media createMedia(String mediaId, String fileName, String title,
 			String description, String author, String entityId,
-			String mimeType, File file) {
+			String mimeType, File file, boolean isAvatar) {
 		Media media = new Media();
 		media.setId(mediaId);
 		media.setFileName(fileName);
@@ -655,18 +683,23 @@ public class MediaDAO {
 		media.setAuthor(author);
 		media.setDescription(description);
 		media.setTitle(title);
-		media.setFileSize(file.length());
-		media.setShaChecksum(getFileShaChecksum(file));
 		media.setMimeType(mimeType);
 
-		String fileExtension = getFileExtension(fileName);
+		String fileExtension = getFileExtension(fileName, mimeType);
 		media.setFileExtension(fileExtension);
 
-		// XXX adds a lot of delay to the server side, maybe the client should
-		// send those information
 		try {
 			if (ImageUtils.isImage(fileExtension)) {
 				BufferedImage img = ImageIO.read(file);
+
+				if (isAvatar && !ImageUtils.isSquare(img)) {
+					img = ImageUtils.cropMaximumSquare(img);
+					
+					// update image file
+					file = ImageUtils.storeImageIntoFile(img, 
+							fileExtension, file.getAbsolutePath());
+				}
+
 				media.setHeight(img.getHeight());
 				media.setWidth(img.getWidth());
 			} else if (VideoUtils.isVideo(fileExtension)) {
@@ -680,8 +713,20 @@ public class MediaDAO {
 		} catch (Throwable t) {
 			LOGGER.error("Error while resolving media format properties", t);
 		}
+		
+		// set after possible cropping
+		media.setFileSize(file.length());
+		media.setShaChecksum(getFileShaChecksum(file));
 
 		return media;
+	}
+
+	protected String getFileExtension(String fileName, String mimeType) {
+		if (fileName != null) {
+			return fileName.substring(fileName.indexOf(".") + 1);
+		}
+
+		return MimeTypeMapping.lookupExtension(mimeType);
 	}
 
 	protected Preview createPreview(String previewId, String mediaId,
@@ -696,10 +741,6 @@ public class MediaDAO {
 		preview.setMimeType(mimeType);
 
 		return preview;
-	}
-
-	protected String getFileExtension(String fileName) {
-		return fileName.substring(fileName.lastIndexOf(".") + 1);
 	}
 
 	protected String getFileShaChecksum(File file) {

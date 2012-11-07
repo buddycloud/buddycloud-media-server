@@ -21,67 +21,94 @@ import java.io.File;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.MediaType;
-import org.restlet.ext.html.FormData;
+import org.restlet.data.Form;
 import org.restlet.ext.html.FormDataSet;
-import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.ClientResource;
 
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
 public class UploadAvatarTest extends MediaServerTest {
+	
+	private static final String URL = BASE_URL + "/"
+			+ BASE_CHANNEL + "/avatar";
 
 	public void testTearDown() throws Exception {
-		FileUtils
-				.cleanDirectory(new File(
-						configuration
+		FileUtils.cleanDirectory(new File(configuration
 								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 								+ File.separator + BASE_CHANNEL));
 	}
 
 	@Override
 	protected void testSetUp() throws Exception {
+		AuthVerifier authClient = xmppTest.getAuthVerifier();
+		EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN), 
+				EasyMock.startsWith(URL))).andReturn(true);
+		
+		PubSubClient pubSubClient = xmppTest.getPubSubClient();
+		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
+				EasyMock.matches(BASE_CHANNEL), 
+				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
+		
+		EasyMock.replay(authClient);
+		EasyMock.replay(pubSubClient);
 	}
-
+	
 	@Test
-	public void uploadMedia() throws Exception {
+	public void uploadAvatarMultipartFormData() throws Exception {
 		// file fields
 		String title = "Test Avatar";
 		String description = "My Test Avatar";
 
-		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "/avatar");
+		ClientResource client = new ClientResource(URL);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
-		FormDataSet form = new FormDataSet();
-		form.setMultipart(true);
-		form.getEntries().add(
-				new FormData(Constants.NAME_FIELD, new StringRepresentation(
-						TESTAVATAR_NAME)));
-		form.getEntries().add(
-				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
-						title)));
-		form.getEntries().add(
-				new FormData(Constants.DESC_FIELD, new StringRepresentation(
-						description)));
-
-		form.getEntries()
-				.add(new FormData(Constants.FILE_FIELD, new FileRepresentation(
-						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
+		FormDataSet form = createFormData(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
-		assertEquals(TESTAVATAR_NAME, media.getFileName());
+		assertEquals(TEST_AVATAR_NAME, media.getFileName());
+		assertEquals(title, media.getTitle());
+		assertEquals(description, media.getDescription());
+		assertEquals(BASE_USER, media.getAuthor());
+
+		// delete metadata
+		dataSource.deleteEntityAvatar(media.getEntityId());
+		dataSource.deleteMedia(media.getId());
+	}
+	
+	@Test
+	public void uploadAvatarWebFormData() throws Exception {
+		// file fields
+		String title = "Test Avatar";
+		String description = "My Test Avatar";
+
+		ClientResource client = new ClientResource(URL);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
+
+		Form form = createWebForm(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
+
+		Representation result = client.put(form);
+		Media media = gson.fromJson(result.getText(), Media.class);
+
+		// verify if resultant media has the passed attributes
+		assertEquals(TEST_AVATAR_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
 		assertEquals(BASE_USER, media.getAuthor());
@@ -92,7 +119,7 @@ public class UploadAvatarTest extends MediaServerTest {
 	}
 
 	@Test
-	public void uploadMediaParamAuth() throws Exception {
+	public void uploadAvatarMultipartFormDataParamAuth() throws Exception {
 		// file fields
 		String title = "Test Avatar";
 		String description = "My Test Avatar";
@@ -104,27 +131,46 @@ public class UploadAvatarTest extends MediaServerTest {
 				+ BASE_CHANNEL + "/avatar" + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
-		FormDataSet form = new FormDataSet();
-		form.setMultipart(true);
-		form.getEntries().add(
-				new FormData(Constants.NAME_FIELD, new StringRepresentation(
-						TESTAVATAR_NAME)));
-		form.getEntries().add(
-				new FormData(Constants.TITLE_FIELD, new StringRepresentation(
-						title)));
-		form.getEntries().add(
-				new FormData(Constants.DESC_FIELD, new StringRepresentation(
-						description)));
-
-		form.getEntries()
-				.add(new FormData(Constants.FILE_FIELD, new FileRepresentation(
-						TESTFILE_PATH + TESTAVATAR_NAME, MediaType.IMAGE_JPEG)));
+		FormDataSet form = createFormData(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
 
 		Representation result = client.put(form);
 		Media media = gson.fromJson(result.getText(), Media.class);
 
 		// verify if resultant media has the passed attributes
-		assertEquals(TESTAVATAR_NAME, media.getFileName());
+		assertEquals(TEST_AVATAR_NAME, media.getFileName());
+		assertEquals(title, media.getTitle());
+		assertEquals(description, media.getDescription());
+		assertEquals(BASE_USER, media.getAuthor());
+
+		// delete metadata
+		dataSource.deleteEntityAvatar(media.getEntityId());
+		dataSource.deleteMedia(media.getId());
+	}
+	
+	@Test
+	public void uploadAvatarWebFormDataParamAuth() throws Exception {
+		// file fields
+		String title = "Test Avatar";
+		String description = "My Test Avatar";
+
+		Base64 encoder = new Base64(true);
+		String authStr = BASE_USER + ":" + BASE_TOKEN;
+
+		ClientResource client = new ClientResource(BASE_URL + "/"
+				+ BASE_CHANNEL + "/avatar" + "?auth="
+				+ new String(encoder.encode(authStr.getBytes())));
+
+		Form form = createWebForm(TEST_AVATAR_NAME, title, 
+				description, TEST_FILE_PATH + TEST_AVATAR_NAME,
+				TEST_AVATAR_CONTENT_TYPE);
+
+		Representation result = client.put(form);
+		Media media = gson.fromJson(result.getText(), Media.class);
+
+		// verify if resultant media has the passed attributes
+		assertEquals(TEST_AVATAR_NAME, media.getFileName());
 		assertEquals(title, media.getTitle());
 		assertEquals(description, media.getDescription());
 		assertEquals(BASE_USER, media.getAuthor());
