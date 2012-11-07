@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
 import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Method;
 
 public class ImageUtils {
 
@@ -56,7 +57,7 @@ public class ImageUtils {
 	public static BufferedImage createImagePreview(File image, int size)
 			throws IOException {
 		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, size);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, size);
 		img.flush();
 
 		return thumbnail;
@@ -65,7 +66,7 @@ public class ImageUtils {
 	public static BufferedImage createImagePreview(File image, int width,
 			int height) throws IOException {
 		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, width, height);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, width, height);
 		img.flush();
 
 		return thumbnail;
@@ -73,14 +74,28 @@ public class ImageUtils {
 
 	public static BufferedImage createImagePreview(BufferedImage img,
 			int width, int height) {
-		final BufferedImage thumbnail = Scalr.resize(img, width, height);
+		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, width, height);
 		img.flush();
 		
 		return thumbnail;
 	}
 
+	public static BufferedImage cropMaximumSquare(BufferedImage img) {
+		int smallerSide = img.getHeight() <= img.getWidth() ? img.getHeight() : img.getWidth();
+		int x = img.getWidth() - smallerSide;
+		int y = img.getHeight() - smallerSide;
+		
+		final BufferedImage croppedImg = Scalr.crop(img, x, y, smallerSide, smallerSide);
+		
+		return croppedImg;
+	}
+
 	public static boolean isImage(String extension) {
 		return Arrays.binarySearch(FORMATS, extension.toLowerCase()) >= 0;
+	}
+	
+	public static boolean isSquare(BufferedImage img) {
+		return img.getHeight() == img.getWidth();
 	}
 
 	private static final String[] FORMATS = { "001", "2bp", "360", "3fr",

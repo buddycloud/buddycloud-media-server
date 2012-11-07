@@ -24,6 +24,13 @@
 			<version>4.10</version>
 		</dependency>
 
+		<!-- EasyMock -->
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.1</version>
+		</dependency>
+
 		<!-- Java Servlet -->
 		<dependency>
 			<groupId>javax.servlet</groupId>

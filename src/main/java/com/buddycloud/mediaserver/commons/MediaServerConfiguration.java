@@ -67,7 +67,7 @@ public class MediaServerConfiguration {
 	public static final String DEF_JDBC_DRIVER_CLASS_PROPERTY = "org.postgresql.Driver";
 	
 	// File System
-	public static final long DEF_MEDIA_SIZE_LIMIT_PROPERTY = 1000240;
+	public static final long DEF_MEDIA_SIZE_LIMIT_PROPERTY = 1048576;
 
 	// HTTP
 	public static final int DEF_HTTP_PORT = 8080;

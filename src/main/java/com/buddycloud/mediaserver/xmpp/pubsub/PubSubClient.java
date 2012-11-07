@@ -140,13 +140,19 @@ public class PubSubClient {
 	 */
 	public boolean matchUserCapability(String userId, String entityId,
 			CapabilitiesDecorator capability) {
+		String bareId = XMPPUtils.getBareId(userId);
+		
+		//workaround for #86 (The channel's owner is sometimes not part of <affiliations/>) buddycloud-server issue
+		if (bareId.equals(entityId)) {
+			return true;
+		}
+		
 		Node node = getNode(entityId);
-
 		if (node != null) {
 			Affiliation affiliation = null;
 
 			try {
-				affiliation = getAffiliation(node, XMPPUtils.getBareId(userId));
+				affiliation = getAffiliation(node, bareId);
 			} catch (XMPPException e) {
 				LOGGER.warn("Could not read node '" + node.getId() + "' "
 						+ "affiliation for '" + userId + "'", e);

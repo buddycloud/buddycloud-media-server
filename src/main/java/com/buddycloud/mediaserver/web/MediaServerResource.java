@@ -26,17 +26,24 @@ import org.restlet.Response;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.engine.header.Header;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Options;
 import org.restlet.resource.ServerResource;
 import org.restlet.util.Series;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.buddycloud.mediaserver.xmpp.AuthVerifier;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public abstract class MediaServerResource extends ServerResource {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(MediaServerResource.class);
 
 	protected static final String AUTH_SEPARATOR = ":";
 	protected static final String CORS_ALLOW_HEADER = "Access-Control-Allow-Headers";
@@ -51,27 +58,26 @@ public abstract class MediaServerResource extends ServerResource {
 	
 	@Options
 	public Representation getOptions() {
-		Request request = getRequest();
-		
-		Series<Header> messageHeaders = getMessageHeaders(request);
-		Header requestMethod = messageHeaders.getFirst(REQUEST_METHOD_HEADER);
-		
-		if (requestMethod != null) {
-			if (requestMethod.getValue().toUpperCase().equals("PUT") || 
-					requestMethod.getValue().toUpperCase().equals("POST")) {
-				addCORSHeaders(request);
-			}
-		} else {
-			addCORSHeaders();
-		}
-		
+		addCORSHeaders(getRequest());
 		return new EmptyRepresentation();
 	}
 
-	protected boolean verifyRequest(String userId, String token, String url) {
+	protected Representation verifyRequest(String userId, String token, String url) {
+		if (userId == null || token == null) {
+			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+			return authenticationResponse();
+		}
+		
 		AuthVerifier authClient = XMPPToolBox.getInstance().getAuthClient();
 
-		return authClient.verifyRequest(userId, token, url);
+		if (!authClient.verifyRequest(userId, token, url)) {
+			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+			return new StringRepresentation("User '" + userId
+					+ "' not allowed to access resource",
+					MediaType.APPLICATION_JSON);
+		}
+		
+		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -103,6 +109,11 @@ public abstract class MediaServerResource extends ServerResource {
 			Series<Header> messageHeaders = getMessageHeaders(request);
 			Header originHeader = messageHeaders.getFirst(ORIGIN_HEADER);
 			
+			// work around for lower case origin headers
+			if (originHeader == null) {
+				messageHeaders.getFirst(ORIGIN_HEADER.toLowerCase());
+			}
+			
 			origin = originHeader != null ? originHeader.getValue() : null;
 		}
 		
@@ -123,6 +134,14 @@ public abstract class MediaServerResource extends ServerResource {
 		response.setChallengeRequests(challengeRequests);
 
 		return response.getEntity();
+	}
+	
+	protected Representation unexpectedError(Throwable t) {
+		LOGGER.error("Unexpected error: " + t.getLocalizedMessage(), t);
+
+		setStatus(Status.SERVER_ERROR_INTERNAL);
+		return new StringRepresentation("Unexpected error.",
+				MediaType.APPLICATION_JSON);
 	}
 
 	protected String decodeAuth(String auth) {

@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.data.MediaType;
@@ -31,10 +32,13 @@ import org.restlet.resource.ClientResource;
 import com.buddycloud.mediaserver.MediaServerTest;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 import com.google.gson.reflect.TypeToken;
 
 public class DownloadMediasInfoTest extends MediaServerTest {
-
+	private static final String URL = BASE_URL + "/" + BASE_CHANNEL;
 	private static final String MEDIA_ID1 = generateRandomString();
 	private static final String MEDIA_ID2 = generateRandomString();
 
@@ -48,21 +52,34 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	protected void testSetUp() throws Exception {
 		storeFile(MEDIA_ID1);
 		storeFile(MEDIA_ID2);
+		
+		// mocks
+		AuthVerifier authClient = xmppTest.getAuthVerifier();
+		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, 
+				URL)).andReturn(true);
+		
+		PubSubClient pubSubClient = xmppTest.getPubSubClient();
+		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
+				EasyMock.matches(BASE_CHANNEL), 
+				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
+		
+		EasyMock.replay(authClient);
+		EasyMock.replay(pubSubClient);
 	}
 
 	private void storeFile(String id) throws Exception {
-		File destDir = new File(
-				configuration
+		File destDir = new File(configuration
 				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 				+ File.separator + BASE_CHANNEL);
+		
 		if (!destDir.mkdir()) {
 			FileUtils.cleanDirectory(destDir);
 		}
 
-		FileUtils.copyFile(new File(TESTFILE_PATH + TESTIMAGE_NAME), new File(
+		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
 				destDir + File.separator + id));
 
-		Media media = buildMedia(id, TESTFILE_PATH + TESTIMAGE_NAME);
+		Media media = buildMedia(id, TEST_FILE_PATH + TEST_IMAGE_NAME);
 		dataSource.storeMedia(media);
 	}
 
@@ -77,8 +94,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 
 	@Test
 	public void downloadMediasInfo() throws Exception {
-		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "");
+		ClientResource client = new ClientResource(URL);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -93,8 +109,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
-		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "" + "?auth="
+		ClientResource client = new ClientResource(URL + "?auth="
 				+ new String(encoder.encode(authStr.getBytes())));
 
 		Representation result = client.get(MediaType.APPLICATION_JSON);
@@ -106,8 +121,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	@Test
 	public void downloadMediasInfoMax() throws Exception {
 		int max = 1;
-		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "?max=" + max);
+		ClientResource client = new ClientResource(URL + "?max=" + max);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 
@@ -120,8 +134,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	@Test
 	public void downloadMediasInfoAfter() throws Exception {
 		int max = 1;
-		ClientResource client = new ClientResource(BASE_URL + "/"
-				+ BASE_CHANNEL + "?max=" + max + "&after=" + MEDIA_ID1);
+		ClientResource client = new ClientResource(URL + "?max=" + max + "&after=" + MEDIA_ID1);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
 

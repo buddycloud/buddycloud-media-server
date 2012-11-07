@@ -17,11 +17,11 @@
 
 CREATE TABLE medias(
 	id TEXT,
-	fileName TEXT NOT NULL,
+	fileName TEXT,
 	entityId TEXT NOT NULL,
 	author TEXT NOT NULL,
-	title TEXT NOT NULL,
-	description TEXT NOT NULL,
+	title TEXT,
+	description TEXT,
 	mimeType TEXT NOT NULL,
 	uploadedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	lastUpdatedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
