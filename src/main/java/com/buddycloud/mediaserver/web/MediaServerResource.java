@@ -39,13 +39,15 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 public abstract class MediaServerResource extends ServerResource {
 
 	protected static final String AUTH_SEPARATOR = ":";
-	protected static final String HEADERS_KEY = "org.restlet.http.headers";
 	protected static final String CORS_ALLOW_HEADER = "Access-Control-Allow-Headers";
-	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
-	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String CORS_CREDENTIALS_HEADER = "Access-Control-Allow-Credentials";
-	protected static final String REQUEST_METHOD_HEADER = "Access-Control-Request-Method";
+	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
+	protected static final String CORS_MAX_AGE = "Access-Control-Max-Age";
+	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
+	protected static final String HEADERS_KEY = "org.restlet.http.headers";
 	protected static final String ORIGIN_HEADER = "Origin";
+	protected static final String REQUEST_METHOD_HEADER = "Access-Control-Request-Method";
+	
 	
 	@Options
 	public Representation getOptions() {
@@ -109,6 +111,7 @@ public abstract class MediaServerResource extends ServerResource {
 		getMessageHeaders(getResponse()).add(CORS_ORIGIN_HEADER, (origin == null ? "*" : origin));
 		getMessageHeaders(getResponse()).add(CORS_METHODS_HEADER, "GET, POST, PUT, DELETE");
 		getMessageHeaders(getResponse()).add(CORS_CREDENTIALS_HEADER, "true");
+		getMessageHeaders(getResponse()).add(CORS_MAX_AGE, "86400" /*one day*/);
 	}
 
 	protected Representation authenticationResponse() {
