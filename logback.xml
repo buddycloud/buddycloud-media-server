@@ -10,6 +10,15 @@
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender">
     <file>logs/mediaserver.log</file>
+
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- daily rollover -->
+      <fileNamePattern>mediaserver.%d{yyyy-MM-dd}.log</fileNamePattern>
+
+      <!-- keep 30 days' worth of history -->
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+    
     <encoder>
       <pattern>%d %-5level %logger{35} - %msg %n</pattern>
     </encoder>
