@@ -261,7 +261,6 @@ public class MediaResource extends MediaServerResource {
 			if (maxHeight == null && maxWidth == null) {
 				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
 				
-
 				File media = mediaDAO.getMedia(userId, entityId, mediaId);
 				return new FileRepresentation(media, mediaType, maxAge);
 			}
