@@ -60,9 +60,15 @@ public class MediaServerConfiguration {
 	public static final String HTTPS_KEYSTORE_PASSWORD = "https.keystore.password";
 	public static final String HTTPS_KEY_PASSWORD = "https.key.password";
 
+	// CACHE
+	public static final String CACHE_MAX_AGE = "cache.max.age";
+
 	/*
 	 * mediaserver.properties default values
 	 */
+	// CACHE
+	public static final int DEF_CACHE_MAX_AGE = 86400; //1 day;
+	
 	// JDBC
 	public static final String DEF_JDBC_DRIVER_CLASS_PROPERTY = "org.postgresql.Driver";
 	
@@ -102,6 +108,10 @@ public class MediaServerConfiguration {
 	}
 
 	private void loadDefault() {
+		if (configuration.get(CACHE_MAX_AGE) == null) {
+			configuration.put(CACHE_MAX_AGE, DEF_CACHE_MAX_AGE);
+		}
+		
 		if (configuration.get(JDBC_DRIVER_CLASS_PROPERTY) == null) {
 			configuration.put(JDBC_DRIVER_CLASS_PROPERTY,
 					DEF_JDBC_DRIVER_CLASS_PROPERTY);			

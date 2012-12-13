@@ -253,12 +253,17 @@ public class MediaResource extends MediaServerResource {
 
 		try {
 			MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
+			
+			// Cache headers
+			int maxAge = mediaDAO.getMaxAge();
+			addCacheHeaders(maxAge);
+			
 			if (maxHeight == null && maxWidth == null) {
 				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
+				
 
 				File media = mediaDAO.getMedia(userId, entityId, mediaId);
-				return new FileRepresentation(media, mediaType);
+				return new FileRepresentation(media, mediaType, maxAge);
 			}
 
 			Thumbnail thumbnail = null;
