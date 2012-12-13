@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Properties;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -41,6 +40,7 @@ import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.util.AudioUtils;
 import com.buddycloud.mediaserver.business.util.ImageUtils;
+import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
@@ -122,7 +122,7 @@ public abstract class MediaServerTest {
 		media.setFileSize(file.length());
 		media.setShaChecksum(getFileShaChecksum(file));
 		media.setFileExtension(extension);
-		media.setMimeType(new MimetypesFileTypeMap().getContentType(file));
+		media.setMimeType(MimeTypeMapping.lookupMimeType(extension));
 
 		if (ImageUtils.isImage(extension)) {
 			BufferedImage img = ImageIO.read(file);

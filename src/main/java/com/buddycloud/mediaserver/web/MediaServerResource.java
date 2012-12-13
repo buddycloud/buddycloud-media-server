@@ -23,7 +23,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.restlet.Message;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.CacheDirective;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;
@@ -57,6 +56,9 @@ public abstract class MediaServerResource extends ServerResource {
 	protected static final String CORS_MAX_AGE = "Access-Control-Max-Age";
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String REQUEST_METHOD_HEADER = "Access-Control-Request-Method";
+	
+	// Cache headers
+	protected static final String CACHE_CONTROL = "Cache-Control";
 	
 	
 	@Options
@@ -129,8 +131,7 @@ public abstract class MediaServerResource extends ServerResource {
 	}
 	
 	protected void addCacheHeaders(int maxAge) {
-		getResponse().getCacheDirectives().add(CacheDirective.maxAge(maxAge));
-		getResponse().getCacheDirectives().add(CacheDirective.publicInfo());
+		getMessageHeaders(getResponse()).add(CACHE_CONTROL, "max-age=" + maxAge + ", public");
 	}
 
 	protected Representation authenticationResponse() {

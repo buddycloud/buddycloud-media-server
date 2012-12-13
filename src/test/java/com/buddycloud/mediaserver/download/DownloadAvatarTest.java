@@ -67,10 +67,11 @@ public class DownloadAvatarTest extends MediaServerTest {
 		
 		// mocks
 		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, 
-				URL)).andReturn(true);
+		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, URL)).andReturn(true);
 		
 		PubSubClient pubSubClient = xmppTest.getPubSubClient();
+		
+		EasyMock.expect(pubSubClient.isChannelPublic(EasyMock.matches(BASE_CHANNEL))).andReturn(true);
 		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
 				EasyMock.matches(BASE_CHANNEL), 
 				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
@@ -89,7 +90,7 @@ public class DownloadAvatarTest extends MediaServerTest {
 				+ "downloadedAvatar.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
-
+		
 		Assert.assertTrue(file.exists());
 
 		// Delete downloaded file
