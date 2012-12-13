@@ -17,6 +17,7 @@ package com.buddycloud.mediaserver.web.representation;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Date;
 
 import org.restlet.data.MediaType;
 import org.restlet.representation.OutputRepresentation;
@@ -24,11 +25,23 @@ import org.restlet.representation.OutputRepresentation;
 public class DynamicFileRepresentation extends OutputRepresentation {
 
 	private byte[] fileData;
-
-	public DynamicFileRepresentation(MediaType mediaType, byte[] fileData) {
+	
+	
+	public DynamicFileRepresentation(MediaType mediaType, byte[] fileData, int timeToLive) {
 		super(mediaType);
 		this.fileData = fileData;
+		
+        if (timeToLive == 0) {
+            setExpirationDate(null);
+        } else if (timeToLive > 0) {
+            setExpirationDate(new Date(System.currentTimeMillis() + (1000L * timeToLive)));
+        }
 	}
+
+	public DynamicFileRepresentation(MediaType mediaType, byte[] fileData) {
+		this(mediaType, fileData, -1);
+	}
+	
 
 	@Override
 	public void write(OutputStream outputStream) throws IOException {

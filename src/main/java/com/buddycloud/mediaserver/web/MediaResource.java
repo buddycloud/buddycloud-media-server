@@ -276,7 +276,7 @@ public class MediaResource extends MediaServerResource {
 				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, maxWidth);
 			}
 
-			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), thumbnail.getImg());
+			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), thumbnail.getImg(), maxAge);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 		} catch (IOException e) {
