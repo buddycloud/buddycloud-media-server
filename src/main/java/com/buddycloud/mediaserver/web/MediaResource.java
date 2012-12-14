@@ -17,9 +17,11 @@ package com.buddycloud.mediaserver.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Request;
+import org.restlet.data.CacheDirective;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -55,8 +57,11 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Put("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation putWebFormAvatar(Representation entity) {
+		setServerHeader();
+		
 		Request request = getRequest();
-		addCORSHeaders(request);
+//		The HTTP API sets the headers 
+//		addCORSHeaders(request);
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 
@@ -111,8 +116,11 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Delete
 	public Representation deleteMedia() {
+		setServerHeader();
+		
 		Request request = getRequest();
-		addCORSHeaders(request);
+//		The HTTP API sets the headers 
+//		addCORSHeaders(request);
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		String userId = null;
@@ -157,8 +165,10 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Post("application/x-www-form-urlencoded")
 	public Representation updateMedia(Representation entity) {
+		setServerHeader();
 		Request request = getRequest();
-		addCORSHeaders(request);
+//		The HTTP API sets the headers 
+//		addCORSHeaders(request);
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		String userId = null;
@@ -204,7 +214,9 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Get
 	public Representation getMedia() {
-		addCORSHeaders();
+		setServerHeader();
+//		The HTTP API sets the headers 
+//		addCORSHeaders();
 
 		Request request = getRequest();
 
@@ -253,12 +265,16 @@ public class MediaResource extends MediaServerResource {
 
 		try {
 			MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
+			
+			// Cache headers
+			int maxAge = mediaDAO.getMaxAge();
+			addCacheHeaders(maxAge);
+			
 			if (maxHeight == null && maxWidth == null) {
 				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
-
+				
 				File media = mediaDAO.getMedia(userId, entityId, mediaId);
-				return new FileRepresentation(media, mediaType);
+				return new FileRepresentation(media, mediaType, maxAge);
 			}
 
 			Thumbnail thumbnail = null;
@@ -271,7 +287,7 @@ public class MediaResource extends MediaServerResource {
 				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, maxWidth);
 			}
 
-			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), thumbnail.getImg());
+			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), thumbnail.getImg(), maxAge);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 		} catch (IOException e) {
@@ -287,5 +303,15 @@ public class MediaResource extends MediaServerResource {
 		}
 		
 		return new EmptyRepresentation();
+	}
+	
+	private void addCacheHeaders(int maxAge) {
+		List<CacheDirective> cacheDirectives = getResponse().getCacheDirectives();
+		// Clear old directives
+		cacheDirectives.clear();
+		
+		// Add max-age and public
+		cacheDirectives.add(CacheDirective.maxAge(maxAge));
+		cacheDirectives.add(CacheDirective.publicInfo());
 	}
 }
