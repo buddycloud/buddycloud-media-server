@@ -42,6 +42,8 @@ public class ChannelResource extends MediaServerResource {
 
 	@Post("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation postWebFormMedia(Representation entity) {
+		setServerHeader();
+		
 		Request request = getRequest();
 		addCORSHeaders(request);
 
@@ -92,7 +94,8 @@ public class ChannelResource extends MediaServerResource {
 	 */
 	@Get
 	public Representation getMediasInfo() {
-		addCORSHeaders(null);
+		setServerHeader();
+		addCORSHeaders();
 
 		Request request = getRequest();
 

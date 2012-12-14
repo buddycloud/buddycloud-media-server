@@ -57,8 +57,8 @@ public abstract class MediaServerResource extends ServerResource {
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
 	protected static final String REQUEST_METHOD_HEADER = "Access-Control-Request-Method";
 	
-	// Cache headers
-	protected static final String CACHE_CONTROL = "Cache-Control";
+	// Server name
+	protected static final String SERVER_NAME = "buddycloud media server";
 	
 	
 	@Options
@@ -66,7 +66,11 @@ public abstract class MediaServerResource extends ServerResource {
 		addCORSHeaders(getRequest());
 		return new EmptyRepresentation();
 	}
-
+	
+	public void setServerHeader() {
+		getResponse().getServerInfo().setAgent(SERVER_NAME);
+	}
+	
 	protected Representation verifyRequest(String userId, String token, String url) {
 		if (userId == null || token == null) {
 			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
@@ -130,10 +134,6 @@ public abstract class MediaServerResource extends ServerResource {
 		getMessageHeaders(getResponse()).add(CORS_MAX_AGE, "86400" /*one day*/);
 	}
 	
-	protected void addCacheHeaders(int maxAge) {
-		getMessageHeaders(getResponse()).add(CACHE_CONTROL, "max-age=" + maxAge + ", public");
-	}
-
 	protected Representation authenticationResponse() {
 		List<ChallengeRequest> challengeRequests = new ArrayList<ChallengeRequest>();
 		challengeRequests.add(new ChallengeRequest(ChallengeScheme.HTTP_BASIC,

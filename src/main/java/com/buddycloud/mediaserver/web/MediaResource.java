@@ -17,9 +17,11 @@ package com.buddycloud.mediaserver.web;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Request;
+import org.restlet.data.CacheDirective;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
@@ -55,6 +57,8 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Put("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation putWebFormAvatar(Representation entity) {
+		setServerHeader();
+		
 		Request request = getRequest();
 		addCORSHeaders(request);
 
@@ -111,6 +115,8 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Delete
 	public Representation deleteMedia() {
+		setServerHeader();
+		
 		Request request = getRequest();
 		addCORSHeaders(request);
 
@@ -157,6 +163,7 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Post("application/x-www-form-urlencoded")
 	public Representation updateMedia(Representation entity) {
+		setServerHeader();
 		Request request = getRequest();
 		addCORSHeaders(request);
 
@@ -204,6 +211,7 @@ public class MediaResource extends MediaServerResource {
 	 */
 	@Get
 	public Representation getMedia() {
+		setServerHeader();
 		addCORSHeaders();
 
 		Request request = getRequest();
@@ -291,5 +299,15 @@ public class MediaResource extends MediaServerResource {
 		}
 		
 		return new EmptyRepresentation();
+	}
+	
+	private void addCacheHeaders(int maxAge) {
+		List<CacheDirective> cacheDirectives = getResponse().getCacheDirectives();
+		// Clear old directives
+		cacheDirectives.clear();
+		
+		// Add max-age and public
+		cacheDirectives.add(CacheDirective.maxAge(maxAge));
+		cacheDirectives.add(CacheDirective.publicInfo());
 	}
 }
