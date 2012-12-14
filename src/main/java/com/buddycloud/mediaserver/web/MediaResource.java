@@ -60,7 +60,8 @@ public class MediaResource extends MediaServerResource {
 		setServerHeader();
 		
 		Request request = getRequest();
-		addCORSHeaders(request);
+//		The HTTP API sets the headers 
+//		addCORSHeaders(request);
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 
@@ -118,7 +119,8 @@ public class MediaResource extends MediaServerResource {
 		setServerHeader();
 		
 		Request request = getRequest();
-		addCORSHeaders(request);
+//		The HTTP API sets the headers 
+//		addCORSHeaders(request);
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		String userId = null;
@@ -165,7 +167,8 @@ public class MediaResource extends MediaServerResource {
 	public Representation updateMedia(Representation entity) {
 		setServerHeader();
 		Request request = getRequest();
-		addCORSHeaders(request);
+//		The HTTP API sets the headers 
+//		addCORSHeaders(request);
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 		String userId = null;
@@ -212,7 +215,8 @@ public class MediaResource extends MediaServerResource {
 	@Get
 	public Representation getMedia() {
 		setServerHeader();
-		addCORSHeaders();
+//		The HTTP API sets the headers 
+//		addCORSHeaders();
 
 		Request request = getRequest();
 

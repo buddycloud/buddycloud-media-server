@@ -45,7 +45,8 @@ public class ChannelResource extends MediaServerResource {
 		setServerHeader();
 		
 		Request request = getRequest();
-		addCORSHeaders(request);
+//		The HTTP API sets the headers 
+//		addCORSHeaders(request);
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 
@@ -95,7 +96,8 @@ public class ChannelResource extends MediaServerResource {
 	@Get
 	public Representation getMediasInfo() {
 		setServerHeader();
-		addCORSHeaders();
+//		The HTTP API sets the headers 
+//		addCORSHeaders();
 
 		Request request = getRequest();
 
