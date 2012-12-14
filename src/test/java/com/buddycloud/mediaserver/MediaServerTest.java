@@ -62,8 +62,8 @@ public abstract class MediaServerTest {
 	protected static final String MEDIA_ID = generateRandomString();
 
 	protected static final String BASE_TOKEN = "secret";
-	protected static final String BASE_CHANNEL = "mediaservertest@buddycloud.org";
-	protected static final String BASE_USER = "mediaservertest@buddycloud.org";
+	protected static final String BASE_CHANNEL = "testreg123@buddycloud.org";
+	protected static final String BASE_USER = "testreg123@buddycloud.org";
 	protected static final String BASE_URL = "http://localhost:8080";
 
 	protected RestletTest restletTest;
