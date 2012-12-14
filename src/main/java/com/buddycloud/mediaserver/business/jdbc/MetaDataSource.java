@@ -119,7 +119,7 @@ public class MetaDataSource {
 					media.getFileExtension(), media.getShaChecksum(),
 					media.getFileSize(), media.getLength(), media.getHeight(),
 					media.getWidth());
-
+			
 			statement.execute();
 
 			LOGGER.debug("Media metadata successfully stored. Media ID: "

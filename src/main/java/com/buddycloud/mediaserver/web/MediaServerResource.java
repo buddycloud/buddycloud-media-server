@@ -44,16 +44,21 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 public abstract class MediaServerResource extends ServerResource {
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(MediaServerResource.class);
-
+	
 	protected static final String AUTH_SEPARATOR = ":";
+	protected static final String HEADERS_KEY = "org.restlet.http.headers";
+	protected static final String ORIGIN_HEADER = "Origin";
+
+	// CORS headers
 	protected static final String CORS_ALLOW_HEADER = "Access-Control-Allow-Headers";
 	protected static final String CORS_CREDENTIALS_HEADER = "Access-Control-Allow-Credentials";
 	protected static final String CORS_ORIGIN_HEADER = "Access-Control-Allow-Origin";
 	protected static final String CORS_MAX_AGE = "Access-Control-Max-Age";
 	protected static final String CORS_METHODS_HEADER = "Access-Control-Allow-Methods";
-	protected static final String HEADERS_KEY = "org.restlet.http.headers";
-	protected static final String ORIGIN_HEADER = "Origin";
 	protected static final String REQUEST_METHOD_HEADER = "Access-Control-Request-Method";
+	
+	// Server name
+	protected static final String SERVER_NAME = "buddycloud media server";
 	
 	
 	@Options
@@ -61,7 +66,11 @@ public abstract class MediaServerResource extends ServerResource {
 		addCORSHeaders(getRequest());
 		return new EmptyRepresentation();
 	}
-
+	
+	public void setServerHeader() {
+		getResponse().getServerInfo().setAgent(SERVER_NAME);
+	}
+	
 	protected Representation verifyRequest(String userId, String token, String url) {
 		if (userId == null || token == null) {
 			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
@@ -124,7 +133,7 @@ public abstract class MediaServerResource extends ServerResource {
 		getMessageHeaders(getResponse()).add(CORS_CREDENTIALS_HEADER, "true");
 		getMessageHeaders(getResponse()).add(CORS_MAX_AGE, "86400" /*one day*/);
 	}
-
+	
 	protected Representation authenticationResponse() {
 		List<ChallengeRequest> challengeRequests = new ArrayList<ChallengeRequest>();
 		challengeRequests.add(new ChallengeRequest(ChallengeScheme.HTTP_BASIC,

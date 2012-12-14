@@ -78,6 +78,7 @@ public class MediaDAO {
 	protected Properties configuration;
 	protected Gson gson;
 
+	
 	protected MediaDAO() {
 		this.dataSource = new MetaDataSource();
 		this.pubsub = XMPPToolBox.getInstance().getPubSubClient();
@@ -85,6 +86,15 @@ public class MediaDAO {
 				DateFormat.FULL).create();
 		this.configuration = MediaServerConfiguration.getInstance()
 				.getConfiguration();
+	}
+	
+	
+	/**
+	 * Return media max-age to be used on cache headers
+	 * @return Cache max-age
+	 */
+	public int getMaxAge() {
+		return Integer.valueOf(configuration.getProperty(MediaServerConfiguration.CACHE_MAX_AGE));
 	}
 
 	/**
