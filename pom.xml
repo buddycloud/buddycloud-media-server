@@ -16,6 +16,12 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 		</profile>
+		<profile>
+            <id>mediaserver-dir</id>
+            <properties>
+                <assembly-config>mediaserver-dir-assembly.xml</assembly-config>
+            </properties>
+        </profile>
 	</profiles>
 	<dependencies>
 		<dependency>

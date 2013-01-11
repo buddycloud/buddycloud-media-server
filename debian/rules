@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+export JAVA_HOME=/usr/lib/jvm/default-java
+
+# Put depended upon jars in here
+# export CLASSPATH=
+
+%:
+	dh $@ --with javahelper
+
+override_dh_auto_build:
+	# Build the package
+	mvn package -P mediaserver-dir
+override_dh_auto_clean:
+	mvn-debian clean

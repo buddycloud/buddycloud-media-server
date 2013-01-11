@@ -1,0 +1,15 @@
+Source: buddycloudmediaserver
+Section: misc
+Priority: optional
+Maintainer: Rodrigo Duarte <rodrigo@buddycloud.com>
+Build-Depends: debhelper (>= 8), default-jdk, javahelper (>= 0.40ubuntu1) , maven2, maven-debian-helper
+Standards-Version: 3.9.2
+Homepage: <homepage>
+
+Package: buddycloudmediaserver
+Architecture: all
+Depends: ${java:Depends}, ${misc:Depends}
+Recommends: ${java:Recommends}
+Description: A media server for buddycloud channels
+ It provides a simple REST-like HTTP interface where clients can do several operations 
+ like uploading, downloading updating and deleting media.
