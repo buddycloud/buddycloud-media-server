@@ -5,7 +5,7 @@
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
 DESC="buddycloud media-server"
 NAME="buddycloud-media-server"
-RUNFROM=usr/share/buddycloud-media-server
+RUNFROM=/usr/share/buddycloud-media-server
 DAEMON=/usr/bin/java
 DAEMON_ARGS="-cp .:*:lib/* com.buddycloud.mediaserver.Main"
 PIDFILE=/var/run/$NAME.pid
