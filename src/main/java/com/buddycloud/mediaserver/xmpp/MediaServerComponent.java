@@ -55,6 +55,7 @@ public class MediaServerComponent extends AbstractComponent {
 	}
 
 	public void sendPacket(Packet arg0) {
+		arg0.setFrom(getJID());
 		LOGGER.debug("S: " + arg0.toXML());
 		super.send(arg0);
 	}

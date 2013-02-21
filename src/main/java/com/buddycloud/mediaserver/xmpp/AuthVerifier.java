@@ -54,7 +54,7 @@ public class AuthVerifier {
 
 			return reply.getType().equals(Type.result);
 		} catch (Exception e) {
-			LOGGER.warn("Error while verifying user '" + userId + "' request");
+			LOGGER.warn("Error while verifying user '" + userId + "' request", e);
 		}
 
 		return false;
