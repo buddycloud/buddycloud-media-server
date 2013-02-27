@@ -254,7 +254,7 @@ public class MediaResource extends MediaServerResource {
 				maxHeight = Integer.valueOf(queryValue);
 			}
 
-			queryValue = getQueryValue(Constants.MAX_HEIGHT_QUERY);
+			queryValue = getQueryValue(Constants.MAX_WIDTH_QUERY);
 			if (queryValue != null) {
 				maxWidth = Integer.valueOf(queryValue);
 			}
