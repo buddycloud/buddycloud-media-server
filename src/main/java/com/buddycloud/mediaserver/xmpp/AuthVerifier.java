@@ -17,11 +17,10 @@ package com.buddycloud.mediaserver.xmpp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xmpp.packet.IQ;
-import org.xmpp.packet.IQ.Type;
+import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 
-import com.buddycloud.mediaserver.xmpp.util.HTTPAuthIQ;
+import com.buddycloud.mediaserver.xmpp.util.HTTPAuthMessageBuilder;
 import com.buddycloud.mediaserver.xmpp.util.SyncPacketSendUtil;
 
 /**
@@ -49,10 +48,11 @@ public class AuthVerifier {
 	 */
 	public boolean verifyRequest(String userId, String tid, String url) {
 		try {
-			IQ reply = SyncPacketSendUtil.getReply(component,
-					createVerifyIQ(userId, tid, url));
+			Packet reply = SyncPacketSendUtil.getReply(component,
+					createVerifyMessage(userId, tid, url));
 
-			return reply.getType().equals(Type.result);
+			String typeAttr = reply.getElement().attributeValue("type");
+			return typeAttr == null || !typeAttr.equals("error");
 		} catch (Exception e) {
 			LOGGER.warn("Error while verifying user '" + userId + "' request", e);
 		}
@@ -60,10 +60,10 @@ public class AuthVerifier {
 		return false;
 	}
 
-	private Packet createVerifyIQ(String userId, String tid, String url) {
-		HTTPAuthIQ packet = new HTTPAuthIQ(tid, url);
-		packet.setTo(userId);
-
-		return packet;
+	private Packet createVerifyMessage(String userId, String tid, String url) {
+		HTTPAuthMessageBuilder builder = new HTTPAuthMessageBuilder(tid, url);
+		Message message = builder.createPacket();
+		message.setTo(userId);
+		return message;
 	}
 }
