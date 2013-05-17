@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 
 import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
@@ -62,18 +63,23 @@ public class MediaServerComponent extends AbstractComponent {
 
 	@Override
 	protected void handleIQResult(IQ iq) {
-		processPacket(iq);
+		collectPacket(iq);
 	}
 
 	@Override
 	protected void handleIQError(IQ iq) {
-		processPacket(iq);
+		collectPacket(iq);
 	}
 
-	private void processPacket(IQ iq) {
+	private void collectPacket(Packet packet) {
 		for (MediaServerPacketCollector packetCollector : collectors) {
-			packetCollector.processPacket(iq);
+			packetCollector.processPacket(packet);
 		}
+	}
+	
+	@Override
+	protected void handleMessage(Message message) {
+		collectPacket(message);
 	}
 
 	public void removePacketCollector(MediaServerPacketCollector packetCollector) {

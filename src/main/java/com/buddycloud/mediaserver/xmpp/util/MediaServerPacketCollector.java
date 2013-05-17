@@ -17,7 +17,6 @@ package com.buddycloud.mediaserver.xmpp.util;
 
 import java.util.LinkedList;
 
-import org.xmpp.packet.IQ;
 import org.xmpp.packet.Packet;
 
 import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
@@ -28,14 +27,14 @@ public class MediaServerPacketCollector {
 
 	private MediaServerComponent component;
 	private MediaServerPacketFilter packetFilter;
-	private LinkedList<IQ> resultQueue;
+	private LinkedList<Packet> resultQueue;
 	private boolean cancelled = false;
 
 	public MediaServerPacketCollector(MediaServerComponent component,
 			MediaServerPacketFilter packetFilter) {
 		this.component = component;
 		this.packetFilter = packetFilter;
-		this.resultQueue = new LinkedList<IQ>();
+		this.resultQueue = new LinkedList<Packet>();
 	}
 
 	public void cancel() {
@@ -70,7 +69,7 @@ public class MediaServerPacketCollector {
 		return resultQueue.removeLast();
 	}
 
-	public synchronized IQ nextResult(long timeout) {
+	public synchronized Packet nextResult(long timeout) {
 		// Wait up to the specified amount of time for a result.
 		if (resultQueue.isEmpty()) {
 			long waitTime = timeout;
@@ -106,7 +105,7 @@ public class MediaServerPacketCollector {
 		}
 	}
 
-	public synchronized void processPacket(IQ packet) {
+	public synchronized void processPacket(Packet packet) {
 		if (packet == null) {
 			return;
 		}
