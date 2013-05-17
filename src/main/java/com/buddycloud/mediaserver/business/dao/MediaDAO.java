@@ -607,7 +607,7 @@ public class MediaDAO {
 			if (!preview.exists()) {
 				dataSource.deletePreview(previewId);
 			} else {
-				return new Thumbnail(dataSource.getPreviewMimeType(mediaId), 
+				return new Thumbnail(dataSource.getPreviewMimeType(previewId), 
 						IOUtils.toByteArray(FileUtils.openInputStream(preview)));
 			}
 		} else {
