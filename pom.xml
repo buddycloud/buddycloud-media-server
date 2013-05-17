@@ -251,7 +251,7 @@
 		</plugins>
 	</build>
 	<properties>
-		<restlet-version>2.1-RC6</restlet-version>
+		<restlet-version>2.2-M3</restlet-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<skipTests>true</skipTests>
 	</properties>
