@@ -15,11 +15,11 @@
  */
 package com.buddycloud.mediaserver.xmpp.util;
 
+import java.util.UUID;
+
 import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.tree.BaseElement;
-import org.dom4j.tree.DefaultAttribute;
-import org.xmpp.packet.IQ;
+import org.xmpp.packet.Message;
+import org.xmpp.packet.Message.Type;
 
 /**
  * A PacketExtension that implements XEP-0070: HTTP Authentication
@@ -28,34 +28,35 @@ import org.xmpp.packet.IQ;
  * @see <a href="http://xmpp.org/extensions/xep-0070.html">XEP-0070:&nbsp;HTTP
  *      Authentication</a>
  */
-public class HTTPAuthIQ extends IQ {
+public class HTTPAuthMessageBuilder {
 
 	public static final String ELEMENT_NAME = "confirm";
 	public static final String NAMESPACE = "http://jabber.org/protocol/http-auth";
 
 	private String id;
 	private String url;
+	private String thread;
 
-	public HTTPAuthIQ(String id, String url) {
+	public HTTPAuthMessageBuilder(String id, String url) {
 		this.id = id;
 		this.url = url;
-		addChildElement();
+		this.thread = UUID.randomUUID().toString().replace("-", "");
 	}
 
-	private void addChildElement() {
-		Element childElement = new BaseElement(getElementName(), new Namespace(
-				null, getNamespace()));
-		childElement.add(new DefaultAttribute("id", id));
-		childElement.add(new DefaultAttribute("url", url));
-
-		setChildElement(childElement);
-	}
-
-	public String getElementName() {
-		return ELEMENT_NAME;
-	}
-
-	public String getNamespace() {
-		return NAMESPACE;
+	public Message createPacket() {
+		Message m = new Message();
+		m.setType(Type.normal);
+		m.setThread(thread);
+		m.setBody("Confirmation message for transaction " + id);
+		
+		Element rootEl = m.getElement();
+		rootEl.addAttribute("xmlns:stream", "http://etherx.jabber.org/streams");
+		
+		Element authEl = rootEl.addElement(ELEMENT_NAME, NAMESPACE);
+		authEl.addAttribute("id", id);
+		authEl.addAttribute("url", url);
+		authEl.addAttribute("method", "GET");
+		
+		return m;
 	}
 }
