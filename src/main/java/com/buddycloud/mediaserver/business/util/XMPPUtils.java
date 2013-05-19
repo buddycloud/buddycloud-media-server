@@ -19,6 +19,6 @@ public class XMPPUtils {
 	private XMPPUtils() {}
 	
 	public static String getBareId(String userId) {
-		return userId.split("/")[0];
+		return userId != null ? userId.split("/")[0] : null;
 	}
 }

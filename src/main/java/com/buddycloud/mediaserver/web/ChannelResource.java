@@ -61,9 +61,9 @@ public class ChannelResource extends MediaServerResource {
 			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
-		if (verifyRequest != null) {
-			return verifyRequest;
+		Representation checkRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
+		if (checkRequest != null) {
+			return checkRequest;
 		}
 
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
@@ -119,7 +119,7 @@ public class ChannelResource extends MediaServerResource {
 				return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 			}
 
-			Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
+			Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
 			if (verifyRequest != null) {
 				return verifyRequest;
 			}

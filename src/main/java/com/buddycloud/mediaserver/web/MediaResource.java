@@ -76,7 +76,7 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
+		Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
@@ -134,7 +134,7 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
+		Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
@@ -182,7 +182,7 @@ public class MediaResource extends MediaServerResource {
 			return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 		}
 
-		Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
+		Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
 		if (verifyRequest != null) {
 			return verifyRequest;
 		}
@@ -239,7 +239,7 @@ public class MediaResource extends MediaServerResource {
 				return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 			}
 
-			Representation verifyRequest = verifyRequest(userId, token, request.getResourceRef().getIdentifier());
+			Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
 			if (verifyRequest != null) {
 				return verifyRequest;
 			}

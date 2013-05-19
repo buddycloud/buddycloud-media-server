@@ -71,7 +71,8 @@ public abstract class MediaServerResource extends ServerResource {
 		getResponse().getServerInfo().setAgent(SERVER_NAME);
 	}
 	
-	protected Representation verifyRequest(String userId, String token, String url) {
+	protected Representation checkRequest(String userId, String token, String url) {
+		LOGGER.debug("Checking request. User ID: " + userId + ". Token: " + token + ". URL: " + url);
 		if (userId == null || token == null) {
 			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
 			return authenticationResponse();
@@ -139,8 +140,11 @@ public abstract class MediaServerResource extends ServerResource {
 		challengeRequests.add(new ChallengeRequest(ChallengeScheme.HTTP_BASIC,
 				MediaServerApplication.REALM));
 
+		StringRepresentation representation = new StringRepresentation("Authentication error.",
+				MediaType.APPLICATION_JSON);
 		Response response = getResponse();
 		response.setChallengeRequests(challengeRequests);
+		response.setEntity(representation);
 
 		return response.getEntity();
 	}
