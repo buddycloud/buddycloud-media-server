@@ -671,7 +671,6 @@ public class MediaDAO {
 
 		for (int i = 0; i < items.size(); i++) {
 			FileItem item = items.get(i);
-			LOGGER.debug("HTTP field: " + item.getFieldName().toLowerCase());
 			if (fieldName.equals(item.getFieldName().toLowerCase())) {
 				field = item.getString();
 				items.remove(i);
@@ -688,7 +687,6 @@ public class MediaDAO {
 
 		for (int i = 0; i < items.size(); i++) {
 			FileItem item = items.get(i);
-			LOGGER.debug("HTTP field: " + item.getFieldName().toLowerCase());
 			if (Constants.DATA_FIELD.equals(item.getFieldName().toLowerCase())) {
 				field = item;
 				break;
