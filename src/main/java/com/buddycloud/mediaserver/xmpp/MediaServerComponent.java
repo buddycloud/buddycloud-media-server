@@ -72,6 +72,7 @@ public class MediaServerComponent extends AbstractComponent {
 	}
 
 	private void collectPacket(Packet packet) {
+		LOGGER.debug("R: " + packet.toXML());
 		for (MediaServerPacketCollector packetCollector : collectors) {
 			packetCollector.processPacket(packet);
 		}
