@@ -440,6 +440,9 @@ public class MediaDAO {
 	public String insertWebFormMedia(String userId, String entityId, Form form,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
 
+		LOGGER.debug("User '" + userId
+				+ "' trying to upload web-form media on: " + entityId);
+		
 		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
 
@@ -489,13 +492,16 @@ public class MediaDAO {
 	public String insertFormDataMedia(String userId, String entityId, Request request,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
 
+		LOGGER.debug("User '" + userId
+				+ "' trying to upload form-data media in: " + entityId);
+		
 		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
 				new OwnerDecorator(new ModeratorDecorator(
 						new PublisherDecorator())));
 
 		if (!isUserAllowed) {
 			LOGGER.debug("User '" + userId
-					+ "' not allowed to uploade file on: " + entityId);
+					+ "' not allowed to upload file in: " + entityId);
 			throw new UserNotAllowedException(userId);
 		}
 
@@ -503,8 +509,14 @@ public class MediaDAO {
 		factory.setSizeThreshold(Integer.valueOf(configuration
 				.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
 
-		RestletFileUpload upload = new RestletFileUpload(factory);
-		List<FileItem> items = upload.parseRequest(request);
+		List<FileItem> items = null;
+		
+		try {
+			RestletFileUpload upload = new RestletFileUpload(factory);
+			items = upload.parseRequest(request);
+		} catch (Throwable e) {
+			throw new FileUploadException("Invalid request data.");
+		}
 
 		// get form fields
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
@@ -524,7 +536,8 @@ public class MediaDAO {
 			if (fileField.getContentType() != null) {
 				contentType = fileField.getContentType();
 			} else {
-				throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + " for the uploaded file.");
+				throw new FileUploadException("Must provide a " + Constants.TYPE_FIELD + 
+						" for the uploaded file.");
 			}
 		}
 
@@ -658,6 +671,7 @@ public class MediaDAO {
 
 		for (int i = 0; i < items.size(); i++) {
 			FileItem item = items.get(i);
+			LOGGER.debug("HTTP field: " + item.getFieldName().toLowerCase());
 			if (fieldName.equals(item.getFieldName().toLowerCase())) {
 				field = item.getString();
 				items.remove(i);
@@ -674,6 +688,7 @@ public class MediaDAO {
 
 		for (int i = 0; i < items.size(); i++) {
 			FileItem item = items.get(i);
+			LOGGER.debug("HTTP field: " + item.getFieldName().toLowerCase());
 			if (Constants.DATA_FIELD.equals(item.getFieldName().toLowerCase())) {
 				field = item;
 				break;
