@@ -82,6 +82,8 @@ public abstract class MediaServerResource extends ServerResource {
 
 		if (!authClient.verifyRequest(userId, token, url)) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+			LOGGER.debug("Request not authorized. " +
+					"User ID: " + userId + ". Token: " + token + ". URL: " + url);
 			return new StringRepresentation("User '" + userId
 					+ "' not allowed to access resource",
 					MediaType.APPLICATION_JSON);
