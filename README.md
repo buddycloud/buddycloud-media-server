@@ -44,8 +44,9 @@ communicate with. See the *Configuration* section.
 Configuration
 -------------
 
-You can configure the media server by editing `configuration.properties` in the server's
-root directory. This file has multiple properties definitions:
+You can configure the media server by copying `configuration.properties.example` to 
+`configuration.properties` in the server's root directory, and then editing as 
+required. This file has multiple properties definitions:
 
 	# HTTP 
 	http.port=8080
