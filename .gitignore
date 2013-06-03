@@ -1,0 +1,5 @@
+.project
+.settings
+.classpath
+configuration.properties
+.DS_Store
