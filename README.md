@@ -44,8 +44,8 @@ communicate with. See the *Configuration* section.
 Configuration
 -------------
 
-You can configure the media server by copying `configuration.properties.example` to 
-`configuration.properties` in the server's root directory, and then editing as 
+You can configure the media server by copying `mediaserver.properties.example` to 
+`mediaserver.properties` in the server's root directory, and then editing as 
 required. This file has multiple properties definitions:
 
 	# HTTP 
