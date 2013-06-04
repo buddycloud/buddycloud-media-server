@@ -60,17 +60,17 @@ required. This file has multiple properties definitions:
 	# XMPP
 	xmpp.component.host=localhost
 	xmpp.component.port=5275
-	xmpp.component.subdomain=mediaserver
+	xmpp.component.subdomain=mediaserver.example.com
 	xmpp.component.secretkey=secret
 	
 	xmpp.connection.username=mediaserver-test
 	xmpp.connection.password=mediaserver-test
-	xmpp.connection.host=crater.buddycloud.org
+	xmpp.connection.host=localhost
 	xmpp.connection.port=5222
-	xmpp.connection.servicename=buddycloud.org
+	xmpp.connection.servicename=example.com
 	
 	# buddycloud
-	bc.channels.server=channels.buddycloud.org
+	bc.channels.server=channels.example.com
 	
 	# JDBC
 	jdbc.db.url=jdbc:postgresql://localhost:5432/mediaserver?user=postgres&password=postgres
