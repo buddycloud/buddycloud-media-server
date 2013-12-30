@@ -52,6 +52,13 @@
 			<version>9.1-901.jdbc4</version>
 		</dependency>
 
+        <!-- HSQL -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+
 		<!-- Gson: Java to Json conversion -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>

@@ -16,8 +16,11 @@
 package com.buddycloud.mediaserver;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.util.Properties;
 
@@ -49,6 +52,8 @@ import com.google.gson.GsonBuilder;
 
 public abstract class MediaServerTest {
 
+    protected static final String TEST_JDBC_DRIVER_CLASS = "org.hsqldb.jdbcDriver";
+    protected static final String TEST_JDBC_DB_URL = "jdbc:hsqldb:mem:test;user=sa;sql.syntax_pgs=true";
 	protected static final String TEST_MEDIA_STORAGE_ROOT = "/tmp";
 	protected static final String TEST_IMAGE_NAME = "testimage.jpg";
 	protected static final String TEST_IMAGE_CONTENT_TYPE = "image/jpeg";
@@ -60,6 +65,8 @@ public abstract class MediaServerTest {
 
 	protected static final String TEST_OUTPUT_DIR = "test";
 	protected static final String MEDIA_ID = generateRandomString();
+
+    protected static final String SCHEMA_SCRIPTS_PATH = "resources/schema/";
 
 	protected static final String BASE_TOKEN = "secret";
 	protected static final String BASE_CHANNEL = "testreg123@buddycloud.org";
@@ -80,6 +87,10 @@ public abstract class MediaServerTest {
 		configuration.setProperty(
 				MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY,
 				TEST_MEDIA_STORAGE_ROOT);
+        configuration.setProperty(MediaServerConfiguration.JDBC_DRIVER_CLASS_PROPERTY,
+                TEST_JDBC_DRIVER_CLASS);
+        configuration.setProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY,
+                TEST_JDBC_DB_URL);
 
 		dataSource = new MetaDataSource();
 		gson = new GsonBuilder()
@@ -93,13 +104,50 @@ public abstract class MediaServerTest {
 
 	@After
 	public void tearDown() throws Exception {
+        load("drop_schema");
+
 		restletTest.shutdown();
 		xmppTest.shutdown();
 		testTearDown();
 	}
 
+    public void load(final String scriptName) throws SQLException, IOException {
+        FileInputStream fileInputStream = new FileInputStream(SCHEMA_SCRIPTS_PATH + scriptName + ".sql");
+        runScript(new InputStreamReader(fileInputStream));
+    }
+
+    private void runScript(final Reader inputStream) throws SQLException, IOException {
+        // Now read line bye line
+        BufferedReader reader = new BufferedReader(inputStream);
+        String currLine;
+        StringBuilder query = new StringBuilder();
+        Statement statement = dataSource.getConnection().createStatement();
+
+        while ((currLine = reader.readLine()) != null) {
+            // Skip comments and empty lines
+            if (currLine.length() > 0 && currLine.charAt(0) == '-' || currLine.length() == 0) {
+                continue;
+            }
+
+            query.append(" " + currLine);
+
+            // If one command complete
+            if (query.charAt(query.length() - 1) == ';') {
+                query = query.replace(query.length() - 1, query.length(), " ");
+
+                // Execute
+                statement.execute(query.toString());
+                query = new StringBuilder();
+            }
+        }
+
+        dataSource.close(statement);
+    }
+
 	protected void start() throws Exception {
-		restletTest = new RestletTest();
+        load("create_schema");
+
+        restletTest = new RestletTest();
 		restletTest.start(configuration);
 
 		xmppTest = new XMPPTest();

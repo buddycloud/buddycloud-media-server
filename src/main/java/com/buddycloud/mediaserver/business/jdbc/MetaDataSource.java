@@ -51,8 +51,7 @@ public class MetaDataSource {
 	private Properties configuration;
 
 	public MetaDataSource() {
-		this.configuration = MediaServerConfiguration.getInstance()
-				.getConfiguration();
+		this.configuration = MediaServerConfiguration.getInstance().getConfiguration();
 
 		try {
 			createDataSource();
@@ -65,15 +64,14 @@ public class MetaDataSource {
 
 	private PreparedStatement prepareStatement(String sql, Object... args)
 			throws SQLException {
-		PreparedStatement prepareStatement = dataSource.getConnection()
-				.prepareStatement(sql);
+		PreparedStatement prepareStatement = dataSource.getConnection().prepareStatement(sql);
 		for (int i = 1; i <= args.length; i++) {
 			prepareStatement.setObject(i, args[i - 1]);
 		}
 		return prepareStatement;
 	}
 
-	private void close(Statement statement) {
+	public void close(Statement statement) {
 		if (statement == null) {
 			return;
 		}
@@ -98,8 +96,7 @@ public class MetaDataSource {
 
 	private void createDataSource() throws PropertyVetoException {
 		this.dataSource = new ComboPooledDataSource();
-		dataSource
-				.setDriverClass(configuration
+		dataSource.setDriverClass(configuration
 						.getProperty(MediaServerConfiguration.JDBC_DRIVER_CLASS_PROPERTY));
 		dataSource.setJdbcUrl(configuration
 				.getProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY));

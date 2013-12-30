@@ -56,9 +56,8 @@ CREATE TABLE previews(
 	PRIMARY KEY(id)
 );
 
-CREATE SEQUENCE avatars_id_seq;
 CREATE TABLE avatars(
-	id TEXT PRIMARY KEY DEFAULT nextval('avatars_id_seq'),
+	id SERIAL PRIMARY KEY,
 	mediaId TEXT REFERENCES medias(id),
 	entityId TEXT NOT NULL
 );
