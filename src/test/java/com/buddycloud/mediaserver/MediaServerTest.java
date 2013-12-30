@@ -30,7 +30,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.engine.util.Base64;
@@ -63,7 +65,6 @@ public abstract class MediaServerTest {
 	protected static final String TEST_AVATAR_CONTENT_TYPE = "image/jpeg";
 	protected static final String TEST_FILE_PATH = "resources/tests/";
 
-	protected static final String TEST_OUTPUT_DIR = "test";
 	protected static final String MEDIA_ID = generateRandomString();
 
     protected static final String SCHEMA_SCRIPTS_PATH = "resources/schema/";
@@ -73,50 +74,64 @@ public abstract class MediaServerTest {
 	protected static final String BASE_USER = "testreg123@buddycloud.org";
 	protected static final String BASE_URL = "http://localhost:8080";
 
-	protected RestletTest restletTest;
-	protected XMPPTest xmppTest;
-	protected Properties configuration;
-	protected MetaDataSource dataSource;
-	protected Gson gson;
+	protected static RestletTest restletTest;
+	protected static XMPPTest xmppTest;
+	protected static Properties configuration;
+	protected static MetaDataSource dataSource;
+	protected static Gson gson;
 
-	
-	@Before
-	public void setUp() throws Exception {
-		configuration = MediaServerConfiguration.getInstance()
-				.getConfiguration();
-		configuration.setProperty(
-				MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY,
-				TEST_MEDIA_STORAGE_ROOT);
+
+    @BeforeClass
+    public static void prepareEnv() throws Exception {
+        configuration = MediaServerConfiguration.getInstance()
+                .getConfiguration();
+        configuration.setProperty(
+                MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY,
+                TEST_MEDIA_STORAGE_ROOT);
         configuration.setProperty(MediaServerConfiguration.JDBC_DRIVER_CLASS_PROPERTY,
                 TEST_JDBC_DRIVER_CLASS);
         configuration.setProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY,
                 TEST_JDBC_DB_URL);
 
-		dataSource = new MetaDataSource();
-		gson = new GsonBuilder()
-				.setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
+        dataSource = new MetaDataSource();
+        gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
-		start();
-		testSetUp();
+        start();
+        createSchema();
+    }
 
-		Thread.sleep(1000);
-	}
+    @AfterClass
+    public static void destroyEnv() throws Exception {
+        restletTest.shutdown();
+        xmppTest.shutdown();
+        dropSchema();
+    }
 
-	@After
-	public void tearDown() throws Exception {
+    @Before
+    public void setUp() throws Exception {
+        testSetUp();
+        Thread.sleep(1000);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        testTearDown();
+    }
+
+    private static void createSchema() throws IOException, SQLException {
+        load("create_schema");
+    }
+
+    private static void dropSchema() throws IOException, SQLException {
         load("drop_schema");
+    }
 
-		restletTest.shutdown();
-		xmppTest.shutdown();
-		testTearDown();
-	}
-
-    public void load(final String scriptName) throws SQLException, IOException {
+    public static void load(final String scriptName) throws SQLException, IOException {
         FileInputStream fileInputStream = new FileInputStream(SCHEMA_SCRIPTS_PATH + scriptName + ".sql");
         runScript(new InputStreamReader(fileInputStream));
     }
 
-    private void runScript(final Reader inputStream) throws SQLException, IOException {
+    public static void runScript(final Reader inputStream) throws SQLException, IOException {
         // Now read line bye line
         BufferedReader reader = new BufferedReader(inputStream);
         String currLine;
@@ -144,9 +159,7 @@ public abstract class MediaServerTest {
         dataSource.close(statement);
     }
 
-	protected void start() throws Exception {
-        load("create_schema");
-
+	protected static void start() throws Exception {
         restletTest = new RestletTest();
 		restletTest.start(configuration);
 

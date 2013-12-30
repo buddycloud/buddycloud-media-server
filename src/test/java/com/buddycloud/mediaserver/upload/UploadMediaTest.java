@@ -41,19 +41,27 @@ public class UploadMediaTest extends MediaServerTest {
 	private static final String URL = BASE_URL + "/"
 			+ BASE_CHANNEL;
 
+
+    private AuthVerifier authClient;
+    private PubSubClient pubSubClient;
+
+
 	public void testTearDown() throws Exception {
 		FileUtils.cleanDirectory(new File(configuration
 								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 								+ File.separator + BASE_CHANNEL));
+
+        EasyMock.reset(authClient);
+        EasyMock.reset(pubSubClient);
 	}
 
 	@Override
 	protected void testSetUp() throws Exception {
-		AuthVerifier authClient = xmppTest.getAuthVerifier();
+		authClient = xmppTest.getAuthVerifier();
 		EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN), 
 				EasyMock.startsWith(URL))).andReturn(true);
 		
-		PubSubClient pubSubClient = xmppTest.getPubSubClient();
+		pubSubClient = xmppTest.getPubSubClient();
 		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
 				EasyMock.matches(BASE_CHANNEL), 
 				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
