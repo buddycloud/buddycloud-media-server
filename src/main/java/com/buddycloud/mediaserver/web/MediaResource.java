@@ -15,10 +15,16 @@
  */
 package com.buddycloud.mediaserver.web;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
+import com.buddycloud.mediaserver.business.dao.DAOFactory;
+import com.buddycloud.mediaserver.business.dao.MediaDAO;
+import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.Thumbnail;
+import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
+import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
+import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Request;
 import org.restlet.data.CacheDirective;
@@ -34,16 +40,9 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.Put;
 
-import com.buddycloud.mediaserver.business.dao.DAOFactory;
-import com.buddycloud.mediaserver.business.dao.MediaDAO;
-import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.Thumbnail;
-import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
-import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
-import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
-import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
-import com.buddycloud.mediaserver.web.representation.DynamicFileRepresentation;
-import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Resource that represents /<channel>/<mediaId> endpoint.
@@ -279,7 +278,7 @@ public class MediaResource extends MediaServerResource {
 				return new FileRepresentation(media, mediaType, maxAge);
 			}
 
-			Thumbnail thumbnail = null;
+			Thumbnail thumbnail;
 
 			if (maxHeight != null && maxWidth == null) {
 				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight);
