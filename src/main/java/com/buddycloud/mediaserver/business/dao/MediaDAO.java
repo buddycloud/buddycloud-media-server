@@ -15,38 +15,10 @@
  */
 package com.buddycloud.mediaserver.business.dao;
 
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.util.List;
-import java.util.Properties;
-
-import javax.imageio.ImageIO;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.RandomStringUtils;
-import org.restlet.Request;
-import org.restlet.data.Form;
-import org.restlet.engine.util.Base64;
-import org.restlet.ext.fileupload.RestletFileUpload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
-import com.buddycloud.mediaserver.business.util.AudioUtils;
-import com.buddycloud.mediaserver.business.util.ImageUtils;
-import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
-import com.buddycloud.mediaserver.business.util.VideoUtils;
-import com.buddycloud.mediaserver.business.util.XMPPUtils;
+import com.buddycloud.mediaserver.business.util.*;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.Thumbnail;
@@ -62,6 +34,28 @@ import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.OwnerDecorator;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.PublisherDecorator;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.RandomStringUtils;
+import org.restlet.Request;
+import org.restlet.data.Form;
+import org.restlet.engine.util.Base64;
+import org.restlet.ext.fileupload.RestletFileUpload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Provides a Data Access Object to metadata
