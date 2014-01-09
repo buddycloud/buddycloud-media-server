@@ -15,17 +15,17 @@
  */
 package com.buddycloud.mediaserver.business.util;
 
+import net.coobird.thumbnailator.Thumbnailator;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
+import org.apache.commons.io.FileUtils;
+
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FileUtils;
-import org.imgscalr.Scalr;
-import org.imgscalr.Scalr.Method;
 
 public class ImageUtils {
 
@@ -44,29 +44,20 @@ public class ImageUtils {
 
 	public static byte[] imageToBytes(BufferedImage image, String imageFormat)
 			throws IOException {
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write(image, imageFormat, baos);
-		baos.flush();
+		ByteArrayOutputStream stream = new ByteArrayOutputStream();
+		ImageIO.write(image, imageFormat, stream);
+        stream.flush();
 
-		byte[] imageInByte = baos.toByteArray();
-		baos.close();
+		byte[] imageInByte = stream.toByteArray();
+        stream.close();
 
 		return imageInByte;
-	}
-
-	public static BufferedImage createImagePreview(File image, int size)
-			throws IOException {
-		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, size);
-		img.flush();
-
-		return thumbnail;
 	}
 
 	public static BufferedImage createImagePreview(File image, int width,
 			int height) throws IOException {
 		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, width, height);
+		final BufferedImage thumbnail = Thumbnailator.createThumbnail(img, width, height);
 		img.flush();
 
 		return thumbnail;
@@ -74,20 +65,17 @@ public class ImageUtils {
 
 	public static BufferedImage createImagePreview(BufferedImage img,
 			int width, int height) {
-		final BufferedImage thumbnail = Scalr.resize(img, Method.ULTRA_QUALITY, width, height);
+		final BufferedImage thumbnail = Thumbnailator.createThumbnail(img, width, height);
 		img.flush();
 		
 		return thumbnail;
 	}
 
-	public static BufferedImage cropMaximumSquare(BufferedImage img) {
+	public static BufferedImage cropMaximumSquare(BufferedImage img) throws IOException {
 		int smallerSide = img.getHeight() <= img.getWidth() ? img.getHeight() : img.getWidth();
-		int x = img.getWidth() - smallerSide;
-		int y = img.getHeight() - smallerSide;
-		
-		final BufferedImage croppedImg = Scalr.crop(img, x, y, smallerSide, smallerSide);
-		
-		return croppedImg;
+        final BufferedImage cropedImg  =
+                Thumbnails.of(img).sourceRegion(Positions.CENTER, smallerSide/2, smallerSide/2).size(smallerSide, smallerSide).asBufferedImage();
+        return cropedImg;
 	}
 
 	public static boolean isImage(String extension) {
