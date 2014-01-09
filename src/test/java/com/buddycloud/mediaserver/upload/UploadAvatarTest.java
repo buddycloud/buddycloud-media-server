@@ -15,7 +15,7 @@
  */
 package com.buddycloud.mediaserver.upload;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 

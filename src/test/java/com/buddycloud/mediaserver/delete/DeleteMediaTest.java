@@ -17,7 +17,7 @@ package com.buddycloud.mediaserver.delete;
 
 import java.io.File;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;

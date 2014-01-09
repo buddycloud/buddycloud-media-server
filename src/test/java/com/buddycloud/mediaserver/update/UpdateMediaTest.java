@@ -15,7 +15,7 @@
  */
 package com.buddycloud.mediaserver.update;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
@@ -39,44 +39,61 @@ public class UpdateMediaTest extends MediaServerTest {
 	
 	private static final String URL = BASE_URL + "/"
 			+ BASE_CHANNEL + "/" + MEDIA_ID;
+
+    private AuthVerifier authClient;
+    private PubSubClient pubSubClient;
 	
 
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration
-								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-								+ File.separator + BASE_CHANNEL));
+		clearFilesAndDB();
 
-		dataSource.deleteMedia(MEDIA_ID);
+        // Reset mocks
+        EasyMock.reset(authClient);
+        EasyMock.reset(pubSubClient);
 	}
 
-	@Override
-	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration
-						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-						+ File.separator + BASE_CHANNEL);
-		if (!destDir.mkdir()) {
-			FileUtils.cleanDirectory(destDir);
-		}
+    @Override
+    protected void testSetUp() throws Exception {
+        setupFilesAndDB();
+        setupMocks();
+    }
 
-		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
-				destDir + File.separator + MEDIA_ID));
+    private void setupFilesAndDB() throws Exception {
+        File destDir = new File(configuration
+                .getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+                + File.separator + BASE_CHANNEL);
+        if (!destDir.mkdir()) {
+            FileUtils.cleanDirectory(destDir);
+        }
 
-		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
-		dataSource.storeMedia(media);
-		
-		// mocks
-		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN), 
-				EasyMock.startsWith(URL))).andReturn(true);
-		
-		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
-				EasyMock.matches(BASE_CHANNEL), 
-				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
-		
-		EasyMock.replay(authClient);
-		EasyMock.replay(pubSubClient);
-	}
+        FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
+                destDir + File.separator + MEDIA_ID));
+
+        Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
+        dataSource.storeMedia(media);
+    }
+
+    private void clearFilesAndDB() throws Exception {
+        FileUtils.cleanDirectory(new File(configuration
+                .getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+                + File.separator + BASE_CHANNEL));
+
+        dataSource.deleteMedia(MEDIA_ID);
+    }
+
+    private void setupMocks() {
+        authClient = xmppTest.getAuthVerifier();
+        EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN),
+                EasyMock.startsWith(URL))).andReturn(true);
+
+        pubSubClient = xmppTest.getPubSubClient();
+        EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER),
+                EasyMock.matches(BASE_CHANNEL),
+                (CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
+
+        EasyMock.replay(authClient);
+        EasyMock.replay(pubSubClient);
+    }
 
 	@Test
 	public void anonymousSuccessfulUpdate() throws Exception {

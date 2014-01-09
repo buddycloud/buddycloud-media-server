@@ -18,8 +18,6 @@ package com.buddycloud.mediaserver.download;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import junit.framework.Assert;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -34,51 +32,69 @@ import com.buddycloud.mediaserver.xmpp.AuthVerifier;
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 
+import static org.junit.Assert.assertTrue;
+
 public class DownloadAvatarTest extends MediaServerTest {
 	private static final String URL = BASE_URL + "/" + BASE_CHANNEL + "/avatar";
 	private static final String TEST_OUTPUT_DIR = "test";
 
+    private AuthVerifier authClient;
+    private PubSubClient pubSubClient;
+
 	
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration
-								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-								+ File.separator + BASE_CHANNEL));
+        clearFilesAndDB();
 
-		dataSource.deleteEntityAvatar(BASE_CHANNEL);
-		dataSource.deleteMedia(MEDIA_ID);
+        // Reset mocks
+        EasyMock.reset(authClient);
+        EasyMock.reset(pubSubClient);
 	}
 
-	@Override
-	protected void testSetUp() throws Exception {
-		File destDir = new File(
-				configuration
-						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-						+ File.separator + BASE_CHANNEL);
-		if (!destDir.mkdir()) {
-			FileUtils.cleanDirectory(destDir);
-		}
+    @Override
+    protected void testSetUp() throws Exception {
+        setupFilesAndDB();
+        setupMocks();
+    }
 
-		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_AVATAR_NAME), new File(
-				destDir + File.separator + MEDIA_ID));
+    private void setupFilesAndDB() throws Exception {
+        File destDir = new File(
+                configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+                        + File.separator + BASE_CHANNEL);
+        if (!destDir.mkdir()) {
+            FileUtils.cleanDirectory(destDir);
+        }
 
-		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_AVATAR_NAME);
-		dataSource.storeMedia(media);
-		dataSource.storeAvatar(media);
-		
-		// mocks
-		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, URL)).andReturn(true);
-		
-		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		
-		EasyMock.expect(pubSubClient.isChannelPublic(EasyMock.matches(BASE_CHANNEL))).andReturn(true);
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
-				EasyMock.matches(BASE_CHANNEL), 
-				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
-		
-		EasyMock.replay(authClient);
-		EasyMock.replay(pubSubClient);
-	}
+        FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_AVATAR_NAME), new File(
+                destDir + File.separator + MEDIA_ID));
+
+        Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_AVATAR_NAME);
+        dataSource.storeMedia(media);
+        dataSource.storeAvatar(media);
+    }
+
+    private void clearFilesAndDB() throws Exception {
+        FileUtils.cleanDirectory(new File(configuration
+                .getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+                + File.separator + BASE_CHANNEL));
+
+        dataSource.deleteEntityAvatar(BASE_CHANNEL);
+        dataSource.deleteMedia(MEDIA_ID);
+    }
+
+    private void setupMocks() {
+        authClient = xmppTest.getAuthVerifier();
+        EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, URL)).andReturn(true);
+
+        pubSubClient = xmppTest.getPubSubClient();
+
+        EasyMock.expect(pubSubClient.isChannelPublic(EasyMock.matches(BASE_CHANNEL))).andReturn(true);
+        EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER),
+                EasyMock.matches(BASE_CHANNEL),
+                (CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
+
+        EasyMock.replay(authClient);
+        EasyMock.replay(pubSubClient);
+    }
 
 	@Test
 	public void anonymousSuccessfulDownload() throws Exception {
@@ -90,12 +106,12 @@ public class DownloadAvatarTest extends MediaServerTest {
 				+ "downloadedAvatar.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
-		
-		Assert.assertTrue(file.exists());
+        outputStream.close();
 
-		// Delete downloaded file
-		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
-		outputStream.close();
+        assertTrue(file.exists());
+
+        // Delete downloaded file
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 	}
 
 	@Test
@@ -110,12 +126,12 @@ public class DownloadAvatarTest extends MediaServerTest {
 				+ "downloadedAvatar.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
+        outputStream.close();
 
-		Assert.assertTrue(file.exists());
+        assertTrue(file.exists());
 
-		// Delete downloaded file
-		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
-		outputStream.close();
+        // Delete downloaded file
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 	}
 
 	@Test
@@ -132,12 +148,12 @@ public class DownloadAvatarTest extends MediaServerTest {
 				+ "avatarPreview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
+        outputStream.close();
 
-		Assert.assertTrue(file.exists());
+        assertTrue(file.exists());
 
-		// Delete downloaded file
-		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
-		outputStream.close();
+        // Delete downloaded file
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 
 		// Delete previews table row
 		final String previewId = dataSource.getPreviewId(MEDIA_ID, height,
@@ -153,7 +169,7 @@ public class DownloadAvatarTest extends MediaServerTest {
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
-		String completeUrl = URL + "?maxheight=" + height + "&maxwidth=" + width + "?auth="
+		String completeUrl = URL + "?maxheight=" + height + "&maxwidth=" + width + "&auth="
 				+ new String(encoder.encode(authStr.getBytes()));
 
 		ClientResource client = new ClientResource(completeUrl);
@@ -164,12 +180,12 @@ public class DownloadAvatarTest extends MediaServerTest {
 				+ "avatarPreview.jpg");
 		FileOutputStream outputStream = FileUtils.openOutputStream(file);
 		client.get().write(outputStream);
+        outputStream.close();
 
-		Assert.assertTrue(file.exists());
+        assertTrue(file.exists());
 
-		// Delete downloaded file
-		FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
-		outputStream.close();
+        // Delete downloaded file
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 
 		// Delete previews table row
 		final String previewId = dataSource.getPreviewId(MEDIA_ID, height,

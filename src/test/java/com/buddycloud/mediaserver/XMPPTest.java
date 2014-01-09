@@ -40,8 +40,6 @@ public class XMPPTest implements TextExtension {
 
 	public void start(Properties configuration) throws Exception {
 		if (!started) {
-			EasyMock.reset(authClient);
-			EasyMock.reset(pubSubClient);
 			started = true;
 		}
 	}
@@ -49,8 +47,6 @@ public class XMPPTest implements TextExtension {
 	@Override
 	public void shutdown() throws Exception {
 		if (started) {
-			EasyMock.verify(authClient);
-			EasyMock.verify(pubSubClient);
 			started = false;
 		}
 	}

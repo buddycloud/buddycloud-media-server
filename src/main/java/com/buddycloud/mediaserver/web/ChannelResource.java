@@ -41,7 +41,7 @@ import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 public class ChannelResource extends MediaServerResource {
 
 	@Post("application/x-www-form-urlencoded|multipart/form-data")
-	public Representation postWebFormMedia(Representation entity) {
+	public Representation postMedia(Representation entity) {
 		setServerHeader();
 		
 		Request request = getRequest();

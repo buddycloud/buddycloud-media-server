@@ -746,7 +746,7 @@ public class MediaDAO {
 
 	protected String getFileExtension(String fileName, String mimeType) {
 		if (fileName != null) {
-			String[] dotSplit = fileName.split(".");
+			String[] dotSplit = fileName.split("\\.");
 			if (dotSplit.length > 1) {
 				return dotSplit[dotSplit.length - 1];
 			}

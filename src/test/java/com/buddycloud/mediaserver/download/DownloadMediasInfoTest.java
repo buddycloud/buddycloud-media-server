@@ -15,7 +15,7 @@
  */
 package com.buddycloud.mediaserver.download;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.util.List;
@@ -42,6 +42,9 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	private static final String MEDIA_ID1 = generateRandomString();
 	private static final String MEDIA_ID2 = generateRandomString();
 
+    private AuthVerifier authClient;
+    private PubSubClient pubSubClient;
+
 
 	public void testTearDown() throws Exception {
 		deleteFile(MEDIA_ID1);
@@ -53,34 +56,37 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		storeFile(MEDIA_ID1);
 		storeFile(MEDIA_ID2);
 		
-		// mocks
-		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, 
-				URL)).andReturn(true);
-		
-		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
-				EasyMock.matches(BASE_CHANNEL), 
-				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
-		
-		EasyMock.replay(authClient);
-		EasyMock.replay(pubSubClient);
+        setupMocks();
 	}
 
+    private void setupMocks() {
+        authClient = xmppTest.getAuthVerifier();
+        EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN,
+                URL)).andReturn(true);
+
+        pubSubClient = xmppTest.getPubSubClient();
+        EasyMock.expect(pubSubClient.isChannelPublic(EasyMock.matches(BASE_CHANNEL))).andReturn(true);
+        EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER),
+                EasyMock.matches(BASE_CHANNEL),
+                (CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
+
+        EasyMock.replay(authClient);
+        EasyMock.replay(pubSubClient);
+    }
+
 	private void storeFile(String id) throws Exception {
-		File destDir = new File(configuration
-				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-				+ File.separator + BASE_CHANNEL);
-		
-		if (!destDir.mkdir()) {
-			FileUtils.cleanDirectory(destDir);
-		}
+        File destDir = new File(configuration
+                .getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+                + File.separator + BASE_CHANNEL);
+        if (!destDir.mkdir()) {
+            FileUtils.cleanDirectory(destDir);
+        }
 
-		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
-				destDir + File.separator + id));
+        FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
+                destDir + File.separator + id));
 
-		Media media = buildMedia(id, TEST_FILE_PATH + TEST_IMAGE_NAME);
-		dataSource.storeMedia(media);
+        Media media = buildMedia(id, TEST_FILE_PATH + TEST_IMAGE_NAME);
+        dataSource.storeMedia(media);
 	}
 
 	private void deleteFile(String id) throws Exception {
@@ -88,7 +94,7 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 				+ File.separator + BASE_CHANNEL));
 
-		dataSource.deleteMedia(MEDIA_ID);
+		dataSource.deleteMedia(id);
 	}
 
 
