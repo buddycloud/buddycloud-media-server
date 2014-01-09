@@ -630,8 +630,8 @@ public class MediaDAO {
 			IOException, InvalidPreviewFormatException {
 		String extension = dataSource.getMediaExtension(mediaId);
 
-		BufferedImage previewImg = null;
-		Thumbnail thumbnail = null;
+		BufferedImage previewImg;
+		Thumbnail thumbnail;
 
 		if (ImageUtils.isImage(extension)) {
 			previewImg = ImageUtils.createImagePreview(media, maxWidth,

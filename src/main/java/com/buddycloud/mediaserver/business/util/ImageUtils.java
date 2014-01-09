@@ -56,11 +56,7 @@ public class ImageUtils {
 
 	public static BufferedImage createImagePreview(File image, int width,
 			int height) throws IOException {
-		final BufferedImage img = ImageIO.read(image);
-		final BufferedImage thumbnail = Thumbnailator.createThumbnail(img, width, height);
-		img.flush();
-
-		return thumbnail;
+		return Thumbnailator.createThumbnail(image, width, height);
 	}
 
 	public static BufferedImage createImagePreview(BufferedImage img,
