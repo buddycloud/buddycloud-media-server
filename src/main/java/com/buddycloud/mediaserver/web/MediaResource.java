@@ -56,7 +56,7 @@ public class MediaResource extends MediaServerResource {
 	 * Uploads avatar (PUT /<channel>/avatar) 
 	 */
 	@Put("application/x-www-form-urlencoded|multipart/form-data")
-	public Representation putWebFormAvatar(Representation entity) {
+	public Representation putAvatar(Representation entity) {
 		setServerHeader();
 		
 		Request request = getRequest();
@@ -221,28 +221,30 @@ public class MediaResource extends MediaServerResource {
 		Request request = getRequest();
 
 		String userId = null;
-		String token = null;
+		String token;
 
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
 
-		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
+		if (!mediaId.equals(Constants.AVATAR_ARG)) {
+            boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
 
-		if (!isChannelPublic && !mediaId.equals(Constants.AVATAR_ARG)) {
-			String auth = getQueryValue(Constants.AUTH_QUERY);
+            if (!isChannelPublic) {
+                String auth = getQueryValue(Constants.AUTH_QUERY);
 
-			try {
-				userId = getUserId(request, auth);
-				token = getTransactionId(request, auth);
-			} catch (Throwable t) {
-				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-				return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
-			}
+                try {
+                    userId = getUserId(request, auth);
+                    token = getTransactionId(request, auth);
+                } catch (Throwable t) {
+                    setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
+                    return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
+                }
 
-			Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
-			if (verifyRequest != null) {
-				return verifyRequest;
-			}
+                Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
+                if (verifyRequest != null) {
+                    return verifyRequest;
+                }
+            }
 		}
 
 		Integer maxHeight = null;

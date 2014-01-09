@@ -15,11 +15,12 @@
  */
 package com.buddycloud.mediaserver.download;
 
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.util.List;
-
+import com.buddycloud.mediaserver.MediaServerTest;
+import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -29,13 +30,10 @@ import org.restlet.data.MediaType;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.buddycloud.mediaserver.MediaServerTest;
-import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.xmpp.AuthVerifier;
-import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
-import com.google.gson.reflect.TypeToken;
+import java.io.File;
+import java.util.List;
+
+import static org.junit.Assert.assertTrue;
 
 public class DownloadMediasInfoTest extends MediaServerTest {
 	private static final String URL = BASE_URL + "/" + BASE_CHANNEL;
@@ -49,6 +47,14 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 	public void testTearDown() throws Exception {
 		deleteFile(MEDIA_ID1);
 		deleteFile(MEDIA_ID2);
+
+        // Verify mocks
+        EasyMock.verify(authClient);
+        EasyMock.verify(pubSubClient);
+
+        // Reset mocks
+        EasyMock.reset(authClient);
+        EasyMock.reset(pubSubClient);
 	}
 
 	@Override
@@ -61,14 +67,9 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 
     private void setupMocks() {
         authClient = xmppTest.getAuthVerifier();
-        EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN,
-                URL)).andReturn(true);
 
         pubSubClient = xmppTest.getPubSubClient();
         EasyMock.expect(pubSubClient.isChannelPublic(EasyMock.matches(BASE_CHANNEL))).andReturn(true);
-        EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER),
-                EasyMock.matches(BASE_CHANNEL),
-                (CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
 
         EasyMock.replay(authClient);
         EasyMock.replay(pubSubClient);

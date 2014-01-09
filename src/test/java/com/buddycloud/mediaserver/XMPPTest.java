@@ -15,13 +15,12 @@
  */
 package com.buddycloud.mediaserver;
 
-import java.util.Properties;
-
-import org.easymock.EasyMock;
-
 import com.buddycloud.mediaserver.xmpp.AuthVerifier;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+import org.easymock.EasyMock;
+
+import java.util.Properties;
 
 public class XMPPTest implements TextExtension {
 	

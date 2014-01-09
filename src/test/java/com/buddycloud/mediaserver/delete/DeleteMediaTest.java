@@ -15,10 +15,11 @@
  */
 package com.buddycloud.mediaserver.delete;
 
-import java.io.File;
-
-import org.junit.Assert;
-
+import com.buddycloud.mediaserver.MediaServerTest;
+import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -26,50 +27,61 @@ import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
 
-import com.buddycloud.mediaserver.MediaServerTest;
-import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.xmpp.AuthVerifier;
-import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
+import java.io.File;
+
+import static org.junit.Assert.assertFalse;
 
 public class DeleteMediaTest extends MediaServerTest {
 
 	private static final String URL = BASE_URL + "/" + BASE_CHANNEL + "/" + MEDIA_ID;
 	private File fileToDelete;
 
-	
-	public void testTearDown() throws Exception {}
+    private AuthVerifier authClient;
+    private PubSubClient pubSubClient;
 
-	@Override
-	protected void testSetUp() throws Exception {
-		File destDir = new File(configuration
-						.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-						+ File.separator + BASE_CHANNEL);
-		if (!destDir.mkdir()) {
-			FileUtils.cleanDirectory(destDir);
-		}
 
-		fileToDelete = new File(destDir + File.separator + MEDIA_ID);
-		FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME),
-				fileToDelete);
+    public void testTearDown() throws Exception {
+        // Verify mocks
+        EasyMock.verify(authClient);
+        EasyMock.verify(pubSubClient);
 
-		Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
-		dataSource.storeMedia(media);
-		
-		// mocks
-		AuthVerifier authClient = xmppTest.getAuthVerifier();
-		EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN), 
-				EasyMock.startsWith(URL))).andReturn(true);
-		
-		PubSubClient pubSubClient = xmppTest.getPubSubClient();
-		EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER), 
-				EasyMock.matches(BASE_CHANNEL), 
-				(CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
-		
-		EasyMock.replay(authClient);
-		EasyMock.replay(pubSubClient);
-	}
+        // Reset mocks
+        EasyMock.reset(authClient);
+        EasyMock.reset(pubSubClient);
+    }
+
+    @Override
+    protected void testSetUp() throws Exception {
+        setupFilesAndDB();
+        setupMocks();
+    }
+
+    private void setupFilesAndDB() throws Exception {
+        File destDir = new File(configuration
+                .getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+                + File.separator + BASE_CHANNEL);
+        if (!destDir.mkdir()) {
+            FileUtils.cleanDirectory(destDir);
+        }
+
+        fileToDelete = new File(destDir + File.separator + MEDIA_ID);
+        FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME),
+                fileToDelete);
+
+        Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
+        dataSource.storeMedia(media);
+    }
+
+    private void setupMocks() {
+        authClient = xmppTest.getAuthVerifier();
+        EasyMock.expect(authClient.verifyRequest(EasyMock.matches(BASE_USER), EasyMock.matches(BASE_TOKEN),
+                EasyMock.startsWith(URL))).andReturn(true);
+
+        pubSubClient = xmppTest.getPubSubClient();
+
+        EasyMock.replay(authClient);
+        EasyMock.replay(pubSubClient);
+    }
 
 	@Test
 	public void deleteMedia() throws Exception {
@@ -79,7 +91,7 @@ public class DeleteMediaTest extends MediaServerTest {
 
 		client.delete();
 
-		Assert.assertFalse(fileToDelete.exists());
+		assertFalse(fileToDelete.exists());
 	}
 
 	@Test
@@ -92,6 +104,6 @@ public class DeleteMediaTest extends MediaServerTest {
 
 		client.delete();
 
-		Assert.assertFalse(fileToDelete.exists());
+		assertFalse(fileToDelete.exists());
 	}
 }

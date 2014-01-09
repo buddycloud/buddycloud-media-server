@@ -15,9 +15,11 @@
  */
 package com.buddycloud.mediaserver.download;
 
-import java.io.File;
-import java.io.FileOutputStream;
-
+import com.buddycloud.mediaserver.MediaServerTest;
+import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -25,12 +27,8 @@ import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
 import org.restlet.resource.ClientResource;
 
-import com.buddycloud.mediaserver.MediaServerTest;
-import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.xmpp.AuthVerifier;
-import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
+import java.io.File;
+import java.io.FileOutputStream;
 
 import static org.junit.Assert.assertTrue;
 
@@ -44,6 +42,10 @@ public class DownloadVideoTest extends MediaServerTest {
 
     public void testTearDown() throws Exception {
         clearFilesAndDB();
+
+        // Verify mocks
+        EasyMock.verify(authClient);
+        EasyMock.verify(pubSubClient);
 
         // Reset mocks
         EasyMock.reset(authClient);
@@ -82,14 +84,9 @@ public class DownloadVideoTest extends MediaServerTest {
 
     private void setupMocks() {
         authClient = xmppTest.getAuthVerifier();
-        EasyMock.expect(authClient.verifyRequest(BASE_USER, BASE_TOKEN, URL)).andReturn(true);
-
         pubSubClient = xmppTest.getPubSubClient();
 
         EasyMock.expect(pubSubClient.isChannelPublic(EasyMock.matches(BASE_CHANNEL))).andReturn(true);
-        EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER),
-                EasyMock.matches(BASE_CHANNEL),
-                (CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
 
         EasyMock.replay(authClient);
         EasyMock.replay(pubSubClient);

@@ -15,6 +15,12 @@
  */
 package com.buddycloud.mediaserver.web;
 
+import com.buddycloud.mediaserver.business.dao.DAOFactory;
+import com.buddycloud.mediaserver.business.dao.MediaDAO;
+import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -25,13 +31,6 @@ import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
-
-import com.buddycloud.mediaserver.business.dao.DAOFactory;
-import com.buddycloud.mediaserver.business.dao.MediaDAO;
-import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
-import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
-import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 /**
  * Resource that represents /<channel> endpoint.

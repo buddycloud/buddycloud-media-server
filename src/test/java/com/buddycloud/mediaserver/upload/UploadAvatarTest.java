@@ -15,10 +15,12 @@
  */
 package com.buddycloud.mediaserver.upload;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-
+import com.buddycloud.mediaserver.MediaServerTest;
+import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -29,12 +31,9 @@ import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
 
-import com.buddycloud.mediaserver.MediaServerTest;
-import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.xmpp.AuthVerifier;
-import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
+import java.io.File;
+
+import static org.junit.Assert.assertEquals;
 
 public class UploadAvatarTest extends MediaServerTest {
 	
@@ -50,6 +49,11 @@ public class UploadAvatarTest extends MediaServerTest {
 								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 								+ File.separator + BASE_CHANNEL));
 
+        // Verify mocks
+        EasyMock.verify(authClient);
+        EasyMock.verify(pubSubClient);
+
+        // Reset mocks
         EasyMock.reset(authClient);
         EasyMock.reset(pubSubClient);
 	}
