@@ -15,8 +15,11 @@
  */
 package com.buddycloud.mediaserver;
 
-import java.util.Properties;
-
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
+import com.buddycloud.mediaserver.web.MediaServerApplication;
+import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
@@ -33,11 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
 
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
-import com.buddycloud.mediaserver.web.MediaServerApplication;
-import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
-import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
+import java.util.Properties;
 
 public class Main {
 	private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
@@ -48,12 +47,31 @@ public class Main {
 
 		try {
 			startRestletComponent(configuration);
-			startXMPPToolBox(configuration);
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(), e);
 			System.exit(1);
 		}
-	}
+
+        while (!startXMPPToolBox(configuration)) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.exit(1);
+            }
+        }
+
+        keepAlive();
+    }
+
+    private static void keepAlive() {
+        while (true) {
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                System.exit(1);
+            }
+        }
+    }
 
 	private static void startRestletComponent(Properties configuration)
 			throws Exception {
@@ -97,31 +115,28 @@ public class Main {
 		LOGGER.info("buddycloud Media Server HTTP server started!");
 	}
 
-	private static void startXMPPToolBox(Properties configuration)
-			throws Exception {
+	private static boolean startXMPPToolBox(Properties configuration) {
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
 
-		MediaServerComponent component = createXMPPComponent(configuration);
+        MediaServerComponent component;
+        try {
+            component = createXMPPComponent(configuration);
+        } catch (ComponentException e) {
+            return false;
+        }
 
-		String[] servers = configuration.getProperty("bc.channels.server")
-				.split(";");
+        String[] servers = configuration.getProperty("bc.channels.server").split(";");
 
 		XMPPToolBox.getInstance().start(component, connection, servers);
 		
 		LOGGER.info("buddycloud Media Server XMPP component started!");
 
-		while (true) {
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException e) {
-				throw e;
-			}
-		}
+        return true;
 	}
 
 	private static MediaServerComponent createXMPPComponent(
-			Properties configuration) throws Exception {
+			Properties configuration) throws ComponentException {
 		ExternalComponentManager componentManager = new ExternalComponentManager(
 				configuration.getProperty("xmpp.component.host"),
 				Integer.valueOf(configuration

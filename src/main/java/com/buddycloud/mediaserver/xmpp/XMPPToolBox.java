@@ -15,9 +15,8 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
-import org.jivesoftware.smack.XMPPConnection;
-
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+import org.jivesoftware.smack.XMPPConnection;
 
 public class XMPPToolBox {
 
@@ -49,6 +48,8 @@ public class XMPPToolBox {
 		if (!started) {
 			this.authClient = authClient;
 			this.pubSubClient = pubSubClient;
+
+            started = true;
 		}
 	}
 

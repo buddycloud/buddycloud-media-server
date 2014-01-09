@@ -30,15 +30,16 @@ public class XMPPTest implements TextExtension {
 
 
 	public XMPPTest() {
-		this.authClient = EasyMock.createMock(AuthVerifier.class);
-		this.pubSubClient = EasyMock.createMock(PubSubClient.class);
 		this.started = false;
-		XMPPToolBox.getInstance().start(authClient, pubSubClient);
 	}
 
 
 	public void start(Properties configuration) throws Exception {
 		if (!started) {
+            this.authClient = EasyMock.createMock(AuthVerifier.class);
+            this.pubSubClient = EasyMock.createMock(PubSubClient.class);
+            XMPPToolBox.getInstance().start(authClient, pubSubClient);
+
 			started = true;
 		}
 	}
