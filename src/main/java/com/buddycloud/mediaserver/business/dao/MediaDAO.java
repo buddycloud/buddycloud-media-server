@@ -711,10 +711,10 @@ public class MediaDAO {
 
 				if (isAvatar && !ImageUtils.isSquare(img)) {
 					img = ImageUtils.cropMaximumSquare(img);
-					
+
 					// update image file
-					file = ImageUtils.storeImageIntoFile(img, 
-							fileExtension, file.getAbsolutePath());
+					file = ImageUtils.storeImageIntoFile(img, img.getWidth(),
+							img.getHeight(), fileExtension, file.getAbsolutePath());
 				}
 
 				media.setHeight(img.getHeight());
@@ -810,8 +810,8 @@ public class MediaDAO {
 
 		public void start() {
 			try {
-				File previewFile = ImageUtils.storeImageIntoFile(img,
-						extension, directory + File.separator + previewId);
+				File previewFile = ImageUtils.storeImageIntoFile(img, width,
+						height, extension, directory + File.separator + previewId);
 
 				Preview preview = createPreview(previewId, mediaId, mimeType,
 						height, width, previewFile);

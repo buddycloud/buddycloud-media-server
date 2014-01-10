@@ -18,6 +18,7 @@ package com.buddycloud.mediaserver.business.util;
 import net.coobird.thumbnailator.Thumbnailator;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
+import net.coobird.thumbnailator.util.ThumbnailatorUtils;
 import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
@@ -32,12 +33,12 @@ public class ImageUtils {
 	private ImageUtils() {
 	}
 
-	public static File storeImageIntoFile(BufferedImage image,
+	public static File storeImageIntoFile(BufferedImage image, int width, int height,
 			String imageFormat, String pathToStore) throws IOException {
 
-		// Store into provided path
-		File output = new File(pathToStore);
-		ImageIO.write(image, imageFormat, FileUtils.openOutputStream(output));
+        File output = new File(pathToStore);
+        // Resize and store into provided path
+        Thumbnails.of(image).size(width, height).outputQuality(1.0d).outputFormat(imageFormat).toFile(output);
 
 		return output;
 	}
