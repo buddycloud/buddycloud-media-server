@@ -15,13 +15,16 @@
  */
 package com.buddycloud.mediaserver.business.util;
 
-import net.coobird.thumbnailator.Thumbnailator;
+import com.mortennobel.imagescaling.AdvancedResizeOp;
+import com.mortennobel.imagescaling.ResampleOp;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;
-import net.coobird.thumbnailator.util.ThumbnailatorUtils;
-import org.apache.commons.io.FileUtils;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.FileImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,12 +36,35 @@ public class ImageUtils {
 	private ImageUtils() {
 	}
 
+    private static ImageWriteParam getParams(ImageWriter writer) {
+        ImageWriteParam param = writer.getDefaultWriteParam();
+        try {
+            // Do not compress before output the file
+            param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+            param.setCompressionQuality(1.0f);
+        } catch (UnsupportedOperationException ignored) {
+            // If the format does not support setting compression mode
+        }
+
+        return param;
+    }
+
+    private static void writeToFile(BufferedImage image, String format, File file) throws IOException {
+        ImageWriter writer = ImageIO.getImageWritersByFormatName(format).next();
+        ImageWriteParam param = getParams(writer);
+
+        writer.setOutput(new FileImageOutputStream(file));
+        writer.write(null, new IIOImage(image, null, null), param);
+    }
+
 	public static File storeImageIntoFile(BufferedImage image, int width, int height,
 			String imageFormat, String pathToStore) throws IOException {
+        
+        ResampleOp resampleOp = getResampleOp(image, width, height);
+        BufferedImage rescaled = resampleOp.filter(image, null);
 
         File output = new File(pathToStore);
-        // Resize and store into provided path
-        Thumbnails.of(image).size(width, height).outputQuality(1.0d).outputFormat(imageFormat).toFile(output);
+        writeToFile(rescaled, imageFormat, output);
 
 		return output;
 	}
@@ -46,9 +72,13 @@ public class ImageUtils {
 	public static byte[] imageToBytes(BufferedImage image, String imageFormat)
 			throws IOException {
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		ImageIO.write(image, imageFormat, stream);
-        stream.flush();
 
+        ImageWriter writer = ImageIO.getImageWritersByFormatName(imageFormat).next();
+        ImageWriteParam param = getParams(writer);
+        writer.setOutput(stream);
+        writer.write(null, new IIOImage(image, null, null), param);
+
+        stream.flush();
 		byte[] imageInByte = stream.toByteArray();
         stream.close();
 
@@ -57,15 +87,15 @@ public class ImageUtils {
 
 	public static BufferedImage createImagePreview(File image, int width,
 			int height) throws IOException {
-		return Thumbnailator.createThumbnail(image, width, height);
+        BufferedImage bufferedImage = ImageIO.read(image);
+        ResampleOp resampleOp = getResampleOp(bufferedImage, width, height);
+        return resampleOp.filter(bufferedImage, null);
 	}
 
 	public static BufferedImage createImagePreview(BufferedImage img,
 			int width, int height) {
-		final BufferedImage thumbnail = Thumbnailator.createThumbnail(img, width, height);
-		img.flush();
-		
-		return thumbnail;
+        ResampleOp resampleOp = getResampleOp(img, width, height);
+        return resampleOp.filter(img, null);
 	}
 
 	public static BufferedImage cropMaximumSquare(BufferedImage img) throws IOException {
@@ -74,6 +104,15 @@ public class ImageUtils {
                 Thumbnails.of(img).sourceRegion(Positions.CENTER, smallerSide/2, smallerSide/2).size(smallerSide, smallerSide).asBufferedImage();
         return cropedImg;
 	}
+
+    private static ResampleOp getResampleOp(BufferedImage img, int maxWidth, int maxHeight) {
+        double ratio = Math.min((double) maxWidth / img.getWidth(), (double) maxHeight / img.getHeight());
+
+        ResampleOp resampleOp = new ResampleOp((int) ratio * img.getWidth(), (int) ratio * img.getHeight());
+        resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.Normal);
+
+        return resampleOp;
+    }
 
 	public static boolean isImage(String extension) {
 		return Arrays.binarySearch(FORMATS, extension.toLowerCase()) >= 0;

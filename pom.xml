@@ -110,6 +110,13 @@
             <version>[0.4, 0.5)</version>
         </dependency>
 
+        <!-- java-image-scaling -->
+        <dependency>
+            <groupId>com.mortennobel</groupId>
+            <artifactId>java-image-scaling</artifactId>
+            <version>0.8.5</version>
+        </dependency>
+
         <!-- Xuggle -->
         <dependency>
             <groupId>xuggle</groupId>
