@@ -43,7 +43,7 @@ public class ImageUtils {
             // Do not compress before output the file
             param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
             param.setCompressionQuality(1.0f);
-        } catch (UnsupportedOperationException ignored) {
+        } catch (Throwable ignored) {
             // If the format does not support setting compression mode
         }
 
