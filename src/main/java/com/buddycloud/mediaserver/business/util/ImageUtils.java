@@ -119,10 +119,7 @@ public class ImageUtils {
         double width = ratio * img.getWidth();
         double height = ratio * img.getHeight();
 
-        ResampleOp resampleOp = new ResampleOp((int) width, (int) height);
-        resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.Normal);
-
-        return resampleOp;
+        return new ResampleOp((int) width, (int) height);
     }
 
 	public static boolean isImage(String extension) {
