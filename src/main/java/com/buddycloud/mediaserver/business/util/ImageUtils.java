@@ -89,6 +89,10 @@ public class ImageUtils {
 	public static BufferedImage createImagePreview(File image, int width,
 			int height) throws IOException {
         BufferedImage bufferedImage = ImageIO.read(image);
+        if (bufferedImage.getWidth() > width || bufferedImage.getHeight() > height) {
+            return bufferedImage;
+        }
+
         ResampleOp resampleOp = getResampleOp(bufferedImage, width, height);
         return resampleOp.filter(bufferedImage, null);
 	}
