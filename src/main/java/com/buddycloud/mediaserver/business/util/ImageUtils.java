@@ -25,6 +25,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -75,7 +76,7 @@ public class ImageUtils {
 
         ImageWriter writer = ImageIO.getImageWritersByFormatName(imageFormat).next();
         ImageWriteParam param = getParams(writer);
-        writer.setOutput(stream);
+        writer.setOutput(new MemoryCacheImageOutputStream(stream));
         writer.write(null, new IIOImage(image, null, null), param);
 
         stream.flush();
@@ -107,8 +108,8 @@ public class ImageUtils {
 
     private static ResampleOp getResampleOp(BufferedImage img, int maxWidth, int maxHeight) {
         // java-image-scaling throws a RuntimeException if width or height are smaller than 3
-        maxWidth = Math.min(maxWidth, 3);
-        maxHeight = Math.min(maxHeight, 3);
+        maxWidth = Math.max(maxWidth, 4);
+        maxHeight = Math.max(maxHeight, 4);
 
         double ratio = Math.min((double) maxWidth / img.getWidth(), (double) maxHeight / img.getHeight());
         double width = ratio * img.getWidth();
