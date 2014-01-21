@@ -106,9 +106,15 @@ public class ImageUtils {
 	}
 
     private static ResampleOp getResampleOp(BufferedImage img, int maxWidth, int maxHeight) {
-        double ratio = Math.min((double) maxWidth / img.getWidth(), (double) maxHeight / img.getHeight());
+        // java-image-scaling throws a RuntimeException if width or height are smaller than 3
+        maxWidth = Math.min(maxWidth, 3);
+        maxHeight = Math.min(maxHeight, 3);
 
-        ResampleOp resampleOp = new ResampleOp((int) ratio * img.getWidth(), (int) ratio * img.getHeight());
+        double ratio = Math.min((double) maxWidth / img.getWidth(), (double) maxHeight / img.getHeight());
+        double width = ratio * img.getWidth();
+        double height = ratio * img.getHeight();
+
+        ResampleOp resampleOp = new ResampleOp((int) width, (int) height);
         resampleOp.setUnsharpenMask(AdvancedResizeOp.UnsharpenMask.Normal);
 
         return resampleOp;
