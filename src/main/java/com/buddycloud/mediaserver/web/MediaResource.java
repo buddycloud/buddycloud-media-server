@@ -31,7 +31,6 @@ import org.restlet.data.CacheDirective;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.restlet.engine.header.Header;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
@@ -267,6 +266,9 @@ public class MediaResource extends MediaServerResource {
 		}
 
 		try {
+            // Cache headers
+            addCacheHeaders(isChannelPublic);
+
 			MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 			if (maxHeight == null && maxWidth == null) {

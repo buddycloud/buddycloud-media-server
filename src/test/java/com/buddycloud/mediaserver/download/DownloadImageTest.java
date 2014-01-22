@@ -132,42 +132,10 @@ public class DownloadImageTest extends MediaServerTest {
         FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 	}
 
-	@Test
-	public void downloadImagePreview() throws Exception {
-        BufferedImage originalImage = ImageIO.read(new File(TEST_FILE_PATH + TEST_IMAGE_NAME));
-		int height = originalImage.getHeight() + 1;
-		int width = originalImage.getWidth() + 1;
-		String completeUrl = URL + "?maxheight=" + height + "&maxwidth=" + width;
-
-		ClientResource client = new ClientResource(completeUrl);
-		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
-				BASE_TOKEN);
-
-		File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
-		FileOutputStream outputStream = FileUtils.openOutputStream(file);
-		client.get().write(outputStream);
-        outputStream.close();
-
-        assertTrue(file.exists());
-
-        // Downloads the original image
-        BufferedImage downloadedImage = ImageIO.read(file);
-        assertEquals(downloadedImage.getHeight(), originalImage.getHeight());
-        assertEquals(downloadedImage.getWidth(), originalImage.getWidth());
-
-        // Delete downloaded file
-        FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
-
-		// Delete previews table row
-		final String previewId = dataSource.getPreviewId(MEDIA_ID, height,
-				width);
-		dataSource.deletePreview(previewId);
-	}
-
     @Test
-    public void downloadPreviewBiggerThanImage() throws Exception {
-        int height = 313;
-        int width = 313;
+    public void downloadImagePreview() throws Exception {
+        int height = 50;
+        int width = 50;
         String completeUrl = URL + "?maxheight=" + height + "&maxwidth=" + width;
 
         ClientResource client = new ClientResource(completeUrl);
@@ -180,8 +148,38 @@ public class DownloadImageTest extends MediaServerTest {
         outputStream.close();
 
         assertTrue(file.exists());
-        BufferedImage image = ImageIO.read(file);
 
+        // Delete downloaded file
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
+
+        // Delete previews table row
+        final String previewId = dataSource.getPreviewId(MEDIA_ID, height,
+                width);
+        dataSource.deletePreview(previewId);
+    }
+
+    @Test
+    public void downloadPreviewBiggerThanImage() throws Exception {
+        BufferedImage originalImage = ImageIO.read(new File(TEST_FILE_PATH + TEST_IMAGE_NAME));
+        int height = originalImage.getHeight() + 1;
+        int width = originalImage.getWidth() + 1;
+        String completeUrl = URL + "?maxheight=" + height + "&maxwidth=" + width;
+
+        ClientResource client = new ClientResource(completeUrl);
+        client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+                BASE_TOKEN);
+
+        File file = new File(TEST_OUTPUT_DIR + File.separator + "preview.jpg");
+        FileOutputStream outputStream = FileUtils.openOutputStream(file);
+        client.get().write(outputStream);
+        outputStream.close();
+
+        assertTrue(file.exists());
+
+        // Downloads the original image
+        BufferedImage downloadedImage = ImageIO.read(file);
+        assertEquals(downloadedImage.getHeight(), originalImage.getHeight());
+        assertEquals(downloadedImage.getWidth(), originalImage.getWidth());
 
         // Delete downloaded file
         FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
