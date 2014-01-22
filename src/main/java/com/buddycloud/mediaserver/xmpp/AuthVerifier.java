@@ -15,13 +15,12 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
+import com.buddycloud.mediaserver.xmpp.util.HTTPAuthMessageBuilder;
+import com.buddycloud.mediaserver.xmpp.util.SyncPacketSendUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
-
-import com.buddycloud.mediaserver.xmpp.util.HTTPAuthMessageBuilder;
-import com.buddycloud.mediaserver.xmpp.util.SyncPacketSendUtil;
 
 /**
  * Authentication class that uses an XMPP component to 
@@ -35,35 +34,36 @@ public class AuthVerifier {
 	private static Logger LOGGER = LoggerFactory.getLogger(AuthVerifier.class);
 	private MediaServerComponent component;
 
+
 	public AuthVerifier(MediaServerComponent component) {
 		this.component = component;
 	}
 
 	/**
 	 * Verifies if the client has really sent this request.
-	 * @param userId client's user id.
+	 * @param userJID client's user id.
 	 * @param tid transaction id provided by the client.
 	 * @param url URL that the client is trying to access.
 	 * @return if the client has really sent the request.
 	 */
-	public boolean verifyRequest(String userId, String tid, String url) {
+	public boolean verifyRequest(String userJID, String tid, String url) {
 		try {
 			Packet reply = SyncPacketSendUtil.getReply(component,
-					createVerifyMessage(userId, tid, url));
+					createVerifyMessage(userJID, tid, url));
 
-			String typeAttr = reply.getElement().attributeValue("type");
+            String typeAttr = reply.getElement().attributeValue("type");
 			return typeAttr == null || !typeAttr.equals("error");
 		} catch (Exception e) {
-			LOGGER.warn("Error while verifying user '" + userId + "' request", e);
+			LOGGER.warn("Error while verifying user '" + userJID + "' request", e);
 		}
 
 		return false;
 	}
 
-	private Packet createVerifyMessage(String userId, String tid, String url) {
+	private Packet createVerifyMessage(String userJID, String tid, String url) {
 		HTTPAuthMessageBuilder builder = new HTTPAuthMessageBuilder(tid, url);
-		Message message = builder.createPacket();
-		message.setTo(userId);
+		Message message = builder.createMessagePacket();
+		message.setTo(userJID);
 		return message;
 	}
 }

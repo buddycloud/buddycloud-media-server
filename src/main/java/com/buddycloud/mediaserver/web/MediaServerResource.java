@@ -66,20 +66,20 @@ public abstract class MediaServerResource extends ServerResource {
 		getResponse().getServerInfo().setAgent(SERVER_NAME);
 	}
 	
-	protected Representation checkRequest(String userId, String token, String url) {
-		LOGGER.debug("Checking request. User ID: " + userId + ". Token: " + token + ". URL: " + url);
-		if (userId == null || token == null) {
+	protected Representation checkRequest(String userJID, String token, String url) {
+		LOGGER.debug("Checking request. User ID: " + userJID + ". Token: " + token + ". URL: " + url);
+		if (userJID == null || token == null) {
 			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
 			return authenticationResponse();
 		}
 		
 		AuthVerifier authClient = XMPPToolBox.getInstance().getAuthClient();
 
-		if (!authClient.verifyRequest(userId, token, url)) {
+		if (!authClient.verifyRequest(userJID, token, url)) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
 			LOGGER.debug("Request not authorized. " +
-					"User ID: " + userId + ". Token: " + token + ". URL: " + url);
-			return new StringRepresentation("User '" + userId
+					"User ID: " + userJID + ". Token: " + token + ". URL: " + url);
+			return new StringRepresentation("User '" + userJID
 					+ "' not allowed to access resource",
 					MediaType.APPLICATION_JSON);
 		}
@@ -161,20 +161,20 @@ public abstract class MediaServerResource extends ServerResource {
 	}
 
 	protected String getUserId(Request request, String auth) {
-		String userId = null;
+		String userJID = null;
 
 		if (auth == null) {
 			ChallengeResponse challenge = request.getChallengeResponse();
 
 			if (challenge != null) {
-				userId = challenge.getIdentifier();
+				userJID = challenge.getIdentifier();
 			}
 		} else {
 			String[] split = decodeAuth(auth).split(AUTH_SEPARATOR);
-			userId = split[0];
+			userJID = split[0];
 		}
 
-		return userId;
+		return userJID;
 	}
 
 	protected String getTransactionId(Request request, String auth) {

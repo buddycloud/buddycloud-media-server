@@ -18,7 +18,10 @@ package com.buddycloud.mediaserver.business.dao;
 import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
-import com.buddycloud.mediaserver.business.util.*;
+import com.buddycloud.mediaserver.business.util.AudioUtils;
+import com.buddycloud.mediaserver.business.util.ImageUtils;
+import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
+import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaFile;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
@@ -47,6 +50,7 @@ import org.restlet.engine.util.Base64;
 import org.restlet.ext.fileupload.RestletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -84,14 +88,14 @@ public class MediaDAO {
 
 	/**
 	 * Deletes a media file ant its metadata.
-	 * @param userId the user that is trying to delete media.
+	 * @param userJID the user that is trying to delete media.
 	 * @param entityId media channel's id.
 	 * @param mediaId media to be deleted.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
-	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
 	 */
-	public void deleteMedia(String userId, String entityId, String mediaId)
+	public void deleteMedia(String userJID, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
 			UserNotAllowedException {
 
@@ -101,17 +105,17 @@ public class MediaDAO {
 		}
 
 		boolean isUploader = dataSource.getMediaUploader(mediaId)
-				.equals(userId);
+				.equals(userJID);
 
 		if (!isUploader) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
 					entityId, new OwnerDecorator(new ModeratorDecorator()));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId
+				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform delete operation on: "
 						+ mediaId);
-				throw new UserNotAllowedException(userId);
+				throw new UserNotAllowedException(userJID);
 			}
 		}
 
@@ -154,24 +158,24 @@ public class MediaDAO {
 
 	/**
 	 * Gets an information list from all medias in a channel.
-	 * @param userId the user that is trying to request the media lsit.
+	 * @param userJID the user that is trying to request the media lsit.
 	 * @param entityId media channel's id.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
-	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
 	 */
-	public String getMediasInfo(String userId, String entityId, Integer max, String after)
+	public String getMediasInfo(String userJID, String entityId, Integer max, String after)
 			throws UserNotAllowedException, MetadataSourceException {
 
-		if (userId != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+		if (userJID != null) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
 					entityId, new OwnerDecorator(new ModeratorDecorator(
 							new PublisherDecorator(new MemberDecorator()))));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId
+				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform get info operation on: "
 						+ entityId);
-				throw new UserNotAllowedException(userId);
+				throw new UserNotAllowedException(userJID);
 			}
 		}
 
@@ -184,16 +188,16 @@ public class MediaDAO {
 
 	/**
 	 * Gets a media file.
-	 * @param userId the user that is trying to get the media.
+	 * @param userJID the user that is trying to get the media.
 	 * @param entityId media channel's id.
 	 * @param mediaId media to be fetched.
 	 * @return media file.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting media file.
-	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
 	 */
-	public MediaFile<File> getMedia(String userId, String entityId, String mediaId)
+	public MediaFile<File> getMedia(String userJID, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
 			IOException, UserNotAllowedException {
 
@@ -201,16 +205,16 @@ public class MediaDAO {
 			return getAvatar(entityId);
 		}
 
-		if (userId != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+		if (userJID != null) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
 					entityId, new OwnerDecorator(new ModeratorDecorator(
 							new PublisherDecorator(new MemberDecorator()))));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId
+				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform get operation on: "
 						+ entityId);
-				throw new UserNotAllowedException(userId);
+				throw new UserNotAllowedException(userJID);
 			}
 		}
 
@@ -256,7 +260,7 @@ public class MediaDAO {
 
 	/**
 	 * Gets a media preview.
-	 * @param userId user that is requesting the preview.
+	 * @param userJID user that is requesting the preview.
 	 * @param entityId media's channel.
 	 * @param mediaId media to be fetched.
 	 * @param size preview size limit.
@@ -265,19 +269,19 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting preview file.
 	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
-	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
 	 */
-	public MediaFile<byte[]> getMediaPreview(String userId, String entityId,
+	public MediaFile<byte[]> getMediaPreview(String userJID, String entityId,
 			String mediaId, Integer size) throws MetadataSourceException,
 			MediaNotFoundException, IOException, InvalidPreviewFormatException,
 			UserNotAllowedException {
 
-		return getMediaPreview(userId, entityId, mediaId, size, size);
+		return getMediaPreview(userJID, entityId, mediaId, size, size);
 	}
 
 	/**
 	 * Gets a media preview.
-	 * @param userId user that is requesting the preview.
+	 * @param userJID user that is requesting the preview.
 	 * @param entityId media's channel.
 	 * @param mediaId media to be fetched.
 	 * @param maxHeight preview height limit.
@@ -287,26 +291,26 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting preview file.
 	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
-	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
 	 */	
-	public MediaFile<byte[]> getMediaPreview(String userId, String entityId,
+	public MediaFile<byte[]> getMediaPreview(String userJID, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
 					throws MetadataSourceException, MediaNotFoundException,
 					IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
-			return getAvatarPreview(userId, entityId, maxHeight, maxWidth);
+			return getAvatarPreview(userJID, entityId, maxHeight, maxWidth);
 		}
 
-		if (userId != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+		if (userJID != null) {
+			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
 					entityId, new OwnerDecorator(new ModeratorDecorator(
 							new PublisherDecorator(new MemberDecorator()))));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId
+				LOGGER.debug("User '" + userJID
 						+ "' not allowed to get media on: " + entityId);
-				throw new UserNotAllowedException(userId);
+				throw new UserNotAllowedException(userJID);
 			}
 		}
 
@@ -316,7 +320,7 @@ public class MediaDAO {
 				getDirectory(entityId));
 	}
 
-	private MediaFile<byte[]> getAvatarPreview(String userId, String entityId,
+	private MediaFile<byte[]> getAvatarPreview(String userJID, String entityId,
 			Integer maxHeight, Integer maxWidth)
 					throws MetadataSourceException, MediaNotFoundException,
 					IOException, InvalidPreviewFormatException {
@@ -351,16 +355,16 @@ public class MediaDAO {
 
 	/**
 	 * Updates media's metadata.
-	 * @param userId the user that is requesting the update.
+	 * @param userJID the user that is requesting the update.
 	 * @param entityId media's channel.
 	 * @param mediaId media to be updated.
 	 * @param form contains which are the metadata to be updated.
 	 * @return media's new metadata.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
-	 * @throws UserNotAllowedException the @{link userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException the @{link userJID} is not allowed to perform this operation.
 	 */
-	public String updateMedia(String userId, String entityId, String mediaId,
+	public String updateMedia(String userJID, String entityId, String mediaId,
 			Form form) throws MetadataSourceException, MediaNotFoundException, 
 			UserNotAllowedException {
 
@@ -369,19 +373,19 @@ public class MediaDAO {
 		}
 
 		boolean isUploader = dataSource.getMediaUploader(mediaId)
-				.equals(userId);
-		boolean isMember = pubsub.matchUserCapability(userId, entityId,
+				.equals(userJID);
+		boolean isMember = pubsub.matchUserCapability(userJID, entityId,
 				new MemberDecorator());
 
 		if (!(isUploader && isMember)) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userId,
+			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
 					entityId, new OwnerDecorator(new ModeratorDecorator()));
 
 			if (!isUserAllowed) {
-				LOGGER.debug("User '" + userId
+				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform delete operation on: "
 						+ mediaId);
-				throw new UserNotAllowedException(userId);
+				throw new UserNotAllowedException(userJID);
 			}
 		}
 
@@ -418,27 +422,27 @@ public class MediaDAO {
 
 	/**
 	 * Uploads media from web form.
-	 * @param userId user that is uploading the media.
+	 * @param userJID user that is uploading the media.
 	 * @param entityId channel where the media will belong.
 	 * @param form web form containing the media.
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws UserNotAllowedException the user {@param userId} is now allowed to upload media in this channel.
+	 * @throws UserNotAllowedException the user {@param userJID} is now allowed to upload media in this channel.
 	 */
-	public String insertWebFormMedia(String userId, String entityId, Form form,
+	public String insertWebFormMedia(String userJID, String entityId, Form form,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
 
-		LOGGER.debug("User '" + userId
+		LOGGER.debug("User '" + userJID
 				+ "' trying to upload web-form media on: " + entityId);
 		
-		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
+		boolean isUserAllowed = pubsub.matchUserCapability(userJID, entityId,
 				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
 
 		if (!isUserAllowed) {
-			LOGGER.debug("User '" + userId
+			LOGGER.debug("User '" + userJID
 					+ "' not allowed to uploade file on: " + entityId);
-			throw new UserNotAllowedException(userId);
+			throw new UserNotAllowedException(userJID);
 		}
 
         int fileSizeLimit = Integer.valueOf(configuration
@@ -479,7 +483,7 @@ public class MediaDAO {
 		}
 
 		// storing
-		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
+		Media media = storeMedia(fileName, title, description, new JID(userJID).toBareJID(),
 				entityId, contentType, dataArray, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());
@@ -489,28 +493,28 @@ public class MediaDAO {
 
 	/**
 	 * Uploads media.
-	 * @param userId user that is uploading the media.
+	 * @param userJID user that is uploading the media.
 	 * @param entityId channel where the media will belong.
 	 * @param request media file and required upload fields.
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws UserNotAllowedException the user {@param userId} is now allowed to upload media in this channel.
+	 * @throws UserNotAllowedException the user {@param userJID} is now allowed to upload media in this channel.
 	 */
-	public String insertFormDataMedia(String userId, String entityId, Request request,
+	public String insertFormDataMedia(String userJID, String entityId, Request request,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
 
-		LOGGER.debug("User '" + userId
+		LOGGER.debug("User '" + userJID
 				+ "' trying to upload form-data media in: " + entityId);
 		
-		boolean isUserAllowed = pubsub.matchUserCapability(userId, entityId,
+		boolean isUserAllowed = pubsub.matchUserCapability(userJID, entityId,
 				new OwnerDecorator(new ModeratorDecorator(
 						new PublisherDecorator())));
 
 		if (!isUserAllowed) {
-			LOGGER.debug("User '" + userId
+			LOGGER.debug("User '" + userJID
 					+ "' not allowed to upload file in: " + entityId);
-			throw new UserNotAllowedException(userId);
+			throw new UserNotAllowedException(userJID);
 		}
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -568,7 +572,7 @@ public class MediaDAO {
 		}
 
 		// storing
-		Media media = storeMedia(fileName, title, description, XMPPUtils.getBareId(userId),
+		Media media = storeMedia(fileName, title, description, new JID(userJID).toBareJID(),
 				entityId, contentType, dataArray, isAvatar);
 
 		LOGGER.debug("Media sucessfully added. Media ID: " + media.getId());

@@ -15,11 +15,11 @@
  */
 package com.buddycloud.mediaserver.xmpp.util;
 
-import java.util.UUID;
-
 import org.dom4j.Element;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Message.Type;
+
+import java.util.UUID;
 
 /**
  * A PacketExtension that implements XEP-0070: HTTP Authentication
@@ -37,13 +37,15 @@ public class HTTPAuthMessageBuilder {
 	private String url;
 	private String thread;
 
+
 	public HTTPAuthMessageBuilder(String id, String url) {
 		this.id = id;
 		this.url = url;
 		this.thread = UUID.randomUUID().toString().replace("-", "");
 	}
 
-	public Message createPacket() {
+
+	public Message createMessagePacket() {
 		Message m = new Message();
 		m.setType(Type.normal);
 		m.setThread(thread);

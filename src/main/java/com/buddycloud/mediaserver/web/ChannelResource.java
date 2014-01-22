@@ -49,18 +49,18 @@ public class ChannelResource extends MediaServerResource {
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 
-		String userId;
+		String userJID;
 		String token;
 
 		try {
-			userId = getUserId(request, auth);
+			userJID = getUserId(request, auth);
 			token = getTransactionId(request, auth);
 		} catch (Throwable t) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
 		}
 
-		Representation checkRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
+		Representation checkRequest = checkRequest(userJID, token, request.getResourceRef().getIdentifier());
 		if (checkRequest != null) {
 			return checkRequest;
 		}
@@ -72,9 +72,9 @@ public class ChannelResource extends MediaServerResource {
 		String result = "";
 		try {
 			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
-				result = mediaDAO.insertFormDataMedia(userId, entityId, getRequest(), false);
+				result = mediaDAO.insertFormDataMedia(userJID, entityId, getRequest(), false);
 			} else {
-				result = mediaDAO.insertWebFormMedia(userId, entityId, new Form(entity), false);
+				result = mediaDAO.insertWebFormMedia(userJID, entityId, new Form(entity), false);
 			}
 			
 			setStatus(Status.SUCCESS_CREATED);
@@ -100,7 +100,7 @@ public class ChannelResource extends MediaServerResource {
 
 		Request request = getRequest();
 
-		String userId = null;
+		String userJID = null;
 		String token;
 
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
@@ -111,14 +111,14 @@ public class ChannelResource extends MediaServerResource {
 			String auth = getQueryValue(Constants.AUTH_QUERY);
 
 			try {
-				userId = getUserId(request, auth);
+				userJID = getUserId(request, auth);
 				token = getTransactionId(request, auth);
 			} catch (Throwable t) {
 				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 				return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
 			}
 
-			Representation verifyRequest = checkRequest(userId, token, request.getResourceRef().getIdentifier());
+			Representation verifyRequest = checkRequest(userJID, token, request.getResourceRef().getIdentifier());
 			if (verifyRequest != null) {
 				return verifyRequest;
 			}
@@ -142,7 +142,7 @@ public class ChannelResource extends MediaServerResource {
 		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
 
 		try {
-			return new StringRepresentation(mediaDAO.getMediasInfo(userId,
+			return new StringRepresentation(mediaDAO.getMediasInfo(userJID,
 					entityId, max, after), MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);

@@ -202,7 +202,7 @@ public abstract class MediaServerTest {
 	}
 
 	private String getFileShaChecksum(File file) throws IOException {
-		return DigestUtils.shaHex(FileUtils.openInputStream(file));
+		return DigestUtils.sha1Hex(FileUtils.openInputStream(file));
 	}
 
 	protected static String generateRandomString() {

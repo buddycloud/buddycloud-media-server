@@ -15,29 +15,21 @@
  */
 package com.buddycloud.mediaserver.xmpp.pubsub;
 
-import java.util.LinkedList;
-import java.util.List;
-
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.packet.RSMSet;
-import org.jivesoftware.smackx.pubsub.AccessModel;
-import org.jivesoftware.smackx.pubsub.Affiliation;
-import org.jivesoftware.smackx.pubsub.AffiliationsExtension;
-import org.jivesoftware.smackx.pubsub.ConfigureForm;
-import org.jivesoftware.smackx.pubsub.Node;
-import org.jivesoftware.smackx.pubsub.NodeExtension;
-import org.jivesoftware.smackx.pubsub.PubSubElementType;
-import org.jivesoftware.smackx.pubsub.PubSubManager;
+import org.jivesoftware.smackx.pubsub.*;
 import org.jivesoftware.smackx.pubsub.packet.PubSub;
 import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xmpp.packet.JID;
 
-import com.buddycloud.mediaserver.business.util.XMPPUtils;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * XMPP client that handles PubSub (XEP-0060) operations.
@@ -51,9 +43,11 @@ public class PubSubClient {
 
 	private List<PubSubManager> pubSubManagers = new LinkedList<PubSubManager>();
 
+
 	public PubSubClient(Connection connection, String[] servers) {
 		init(connection, servers);
 	}
+
 
 	private void init(Connection connection, String[] servers) {
 		for (String server : servers) {
@@ -90,7 +84,7 @@ public class PubSubClient {
 		return node;
 	}
 
-	private Affiliation getAffiliation(Node node, String userId)
+	private Affiliation getAffiliation(Node node, String userJID)
 			throws XMPPException {
 
 		PubSub request = node.createPubsubPacket(Type.GET, new NodeExtension(
@@ -110,7 +104,7 @@ public class PubSubClient {
 			List<Affiliation> affiliations = subElem.getAffiliations();
 
 			for (Affiliation affiliation : affiliations) {
-				if (affiliation.getNodeId().equals(userId)) {
+				if (affiliation.getNodeId().equals(userJID)) {
 					return affiliation;
 				}
 			}
@@ -133,14 +127,14 @@ public class PubSubClient {
 	/**
 	 * Verifies if an user has the desired capability (member, moderator,
 	 * owner or publisher).
-	 * @param userId the user Jabber Id.
+	 * @param userJID the user Jabber Id.
 	 * @param entityId channel id.
 	 * @param capability decorator that represents the desired capabilities.
 	 * @return if the user has the desired capabilities.
 	 */
-	public boolean matchUserCapability(String userId, String entityId,
+	public boolean matchUserCapability(String userJID, String entityId,
 			CapabilitiesDecorator capability) {
-		String bareId = XMPPUtils.getBareId(userId);
+		String bareId = new JID(userJID).toBareJID();
 		
 		//workaround for #86 (The channel's owner is sometimes not part of <affiliations/>) buddycloud-server issue
 		if (bareId.equals(entityId)) {
@@ -149,13 +143,13 @@ public class PubSubClient {
 		
 		Node node = getNode(entityId);
 		if (node != null) {
-			Affiliation affiliation = null;
+			Affiliation affiliation;
 
 			try {
 				affiliation = getAffiliation(node, bareId);
 			} catch (XMPPException e) {
 				LOGGER.warn("Could not read node '" + node.getId() + "' "
-						+ "affiliation for '" + userId + "'", e);
+						+ "affiliation for '" + userJID + "'", e);
 
 				return false;
 			}
@@ -172,7 +166,7 @@ public class PubSubClient {
 	/**
 	 * Verifies if a channel is public.
 	 * @param entityId channel to be verified.
-	 * @return if {@link entityId} is public.
+	 * @return if {@param entityId} is public.
 	 */
 	public boolean isChannelPublic(String entityId) {
 		Node node = getNode(entityId);
