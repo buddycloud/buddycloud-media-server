@@ -14,7 +14,7 @@ delete operation.
  
 To authenticate HTTP requests, the media server uses [XEP-0070][xep],
 this means that the client **must** have an XMPP client that "understands"
-such protocol in order to do media operations. There is only one exception: 
+such protocol in order to do media requests. There is only one exception: 
 download media from public channels - any client has access.
 
 [bc]: http://buddycloud.com/
@@ -38,8 +38,8 @@ After unpacking, you can then start it by invoking
 
     bash mediaserver
 
-The server needs to be configured for the buddycloud/XMPP server it should
-communicate with. See the *Configuration* section.
+The server needs to be configured to point to a Buddycloud and XMPP server. 
+See the *Configuration* section.
 
 Configuration
 -------------
@@ -75,6 +75,10 @@ required. This file has multiple properties definitions:
 	# JDBC
 	jdbc.db.url=jdbc:postgresql://localhost:5432/mediaserver?user=postgres&password=postgres
 	jdbc.driver.class=org.postgresql.Driver
+
+	# Max threshold beyond which files are written directly to disk, in bytes
+	# Only used while uploading multipart form data files
+	media.todisk.threshold=1048576
 	
 	# File System
 	media.storage.root=/tmp
@@ -108,7 +112,7 @@ In addition of the component, the media server also have a simple client that ha
 - **xmpp.connection.port** (Required): XMPP server port for clients connections.
 - **xmpp.connection.servicename** (Required): client's connection *servicename*.
 
-buddycloud related:
+Buddycloud related:
 
 - **bc.channels.server** (Required): list of channels' pubsub servers where the media server will look for
 possible permissions. Note that this configuration **limits** the domains served by the server.
@@ -120,4 +124,5 @@ media's metadata and uses [JDBC](http://www.oracle.com/technetwork/java/overview
 - **jdbc.driver.class** (Optional): if someday the media server allow a different database, this
 property will be used (default is *org.postgresql.Driver*).
 - **media.storage.root** (Required): root path where the media server will store the media files.
-- **media.sizelimit** (Optional): the tolerated file size in bytes (default is *1048576* - 1 MB) which beyond are directly stored on disk.
+- **media.sizelimit** (Optional): the tolerated file content size which the media server will store (default is *104857600* - 100 MB).
+- **media.todisk.threshold** (Optional): the tolerated file size in bytes (default is *1048576* - 1 MB) which beyond are directly stored on disk.
