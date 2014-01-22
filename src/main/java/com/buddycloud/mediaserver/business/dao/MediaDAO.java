@@ -453,11 +453,15 @@ public class MediaDAO {
 		String fileName = form.getFirstValue(Constants.NAME_FIELD);
 		String title = form.getFirstValue(Constants.TITLE_FIELD);
 		String description = form.getFirstValue(Constants.DESC_FIELD);
-        int fileSize = Integer.valueOf(form.getFirstValue(Constants.SIZE_FIELD));
+        String fileSizeStr = form.getFirstValue(Constants.SIZE_FIELD);
 
-        // First size checking
-        if (fileSize > fileSizeLimit) {
-            throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+        if (fileSizeStr != null) {
+            int fileSize = Integer.valueOf(fileSizeStr);
+
+            // First size checking
+            if (fileSize > fileSizeLimit) {
+                throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+            }
         }
 
 		String data = form.getFirstValue(Constants.DATA_FIELD);
@@ -469,7 +473,7 @@ public class MediaDAO {
 		byte[] dataArray = Base64.decode(data);
 
         // Second size checking
-        fileSize = dataArray.length;
+        int fileSize = dataArray.length;
         if (fileSize > fileSizeLimit) {
             throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
         }
@@ -535,11 +539,15 @@ public class MediaDAO {
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);
 		String description = getFormFieldContent(items, Constants.DESC_FIELD);
 		String contentType = getFormFieldContent(items, Constants.TYPE_FIELD);
-        int fileSize = Integer.valueOf(getFormFieldContent(items, Constants.SIZE_FIELD));
+        String fileSizeStr = getFormFieldContent(items, Constants.SIZE_FIELD);
 
-        // First size checking
-        if (fileSize > fileSizeLimit) {
-            throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+        if (fileSizeStr != null) {
+            int fileSize = Integer.valueOf(fileSizeStr);
+
+            // First size checking
+            if (fileSize > fileSizeLimit) {
+                throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+            }
         }
 
 		FileItem fileField = getFileFormField(items);
