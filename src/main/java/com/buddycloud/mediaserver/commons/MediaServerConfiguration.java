@@ -15,7 +15,6 @@
  */
 package com.buddycloud.mediaserver.commons;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +31,7 @@ public class MediaServerConfiguration {
 	// File System
 	public static final String MEDIA_STORAGE_ROOT_PROPERTY = "media.storage.root";
 	public static final String MEDIA_SIZE_LIMIT_PROPERTY = "media.sizelimit";
+    public static final String MEDIA_TO_DISK_THRESHOLD_PROPERTY = "media.todisk.threshold";
 
 	// JDBC
 	public static final String JDBC_DRIVER_CLASS_PROPERTY = "jdbc.driver.class";
@@ -74,7 +74,8 @@ public class MediaServerConfiguration {
 	public static final String DEF_JDBC_DRIVER_CLASS_PROPERTY = "org.postgresql.Driver";
 	
 	// File System
-	public static final long DEF_MEDIA_SIZE_LIMIT_PROPERTY = 1048576;
+    public static final long DEF_MEDIA_SIZE_LIMIT = 1048576;
+	public static final long DEF_MEDIA_TO_DISK_THRESHOLD = 1048576;
 
 	// HTTP
 	public static final int DEF_HTTP_PORT = 8080;
@@ -118,10 +119,15 @@ public class MediaServerConfiguration {
 					DEF_JDBC_DRIVER_CLASS_PROPERTY);			
 		}
 		
-		if (configuration.get(MEDIA_SIZE_LIMIT_PROPERTY) == null) {
-			configuration.put(MEDIA_SIZE_LIMIT_PROPERTY,
-					DEF_MEDIA_SIZE_LIMIT_PROPERTY);
+		if (configuration.get(MEDIA_TO_DISK_THRESHOLD_PROPERTY) == null) {
+			configuration.put(MEDIA_TO_DISK_THRESHOLD_PROPERTY,
+					DEF_MEDIA_TO_DISK_THRESHOLD);
 		}
+
+        if (configuration.get(MEDIA_SIZE_LIMIT_PROPERTY) == null) {
+            configuration.put(MEDIA_SIZE_LIMIT_PROPERTY,
+                    DEF_MEDIA_SIZE_LIMIT);
+        }
 
 		if (configuration.get(HTTP_PORT) == null) {
 			configuration.put(HTTP_PORT, DEF_HTTP_PORT);

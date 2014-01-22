@@ -446,10 +446,19 @@ public class MediaDAO {
 			throw new UserNotAllowedException(userId);
 		}
 
+        int fileSizeLimit = Integer.valueOf(configuration
+                .getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY));
+
 		// get form fields
 		String fileName = form.getFirstValue(Constants.NAME_FIELD);
 		String title = form.getFirstValue(Constants.TITLE_FIELD);
 		String description = form.getFirstValue(Constants.DESC_FIELD);
+        int fileSize = Integer.valueOf(form.getFirstValue(Constants.SIZE_FIELD));
+
+        // First size checking
+        if (fileSize > fileSizeLimit) {
+            throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+        }
 
 		String data = form.getFirstValue(Constants.DATA_FIELD);
 
@@ -457,7 +466,13 @@ public class MediaDAO {
 			throw new FileUploadException("Must provide the file data.");
 		}
 
-		byte[] dataArray = Base64.decode(data);		
+		byte[] dataArray = Base64.decode(data);
+
+        // Second size checking
+        fileSize = dataArray.length;
+        if (fileSize > fileSizeLimit) {
+            throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+        }
 
 		String contentType = form.getFirstValue(Constants.TYPE_FIELD);
 		if (contentType == null) {
@@ -501,7 +516,7 @@ public class MediaDAO {
 
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(Integer.valueOf(configuration
-				.getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY)));
+				.getProperty(MediaServerConfiguration.MEDIA_TO_DISK_THRESHOLD_PROPERTY)));
 
 		List<FileItem> items = null;
 		
@@ -512,11 +527,20 @@ public class MediaDAO {
 			throw new FileUploadException("Invalid request data.");
 		}
 
+        int fileSizeLimit = Integer.valueOf(configuration
+                .getProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY));
+
 		// get form fields
 		String fileName = getFormFieldContent(items, Constants.NAME_FIELD);
 		String title = getFormFieldContent(items, Constants.TITLE_FIELD);
 		String description = getFormFieldContent(items, Constants.DESC_FIELD);
 		String contentType = getFormFieldContent(items, Constants.TYPE_FIELD);
+        int fileSize = Integer.valueOf(getFormFieldContent(items, Constants.SIZE_FIELD));
+
+        // First size checking
+        if (fileSize > fileSizeLimit) {
+            throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+        }
 
 		FileItem fileField = getFileFormField(items);
 
@@ -524,7 +548,12 @@ public class MediaDAO {
 			throw new FileUploadException("Must provide the file data.");
 		}
 
-		byte[] dataArray = fileField.get();
+        // Second size checking
+        if (fileField.getSize() > fileSizeLimit) {
+            throw new FileUploadException("File content size bigger than: " + fileSizeLimit);
+        }
+
+        byte[] dataArray = fileField.get();
 
 		if (contentType == null) {
 			if (fileField.getContentType() != null) {
