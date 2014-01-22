@@ -98,7 +98,7 @@ public class MediaDAO {
 	 * @param mediaId media to be deleted.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
-	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */
 	public void deleteMedia(String userId, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
@@ -141,7 +141,7 @@ public class MediaDAO {
 		// delete existent previews from media
 		deletePreviews(mediaId, fullDirectoryPath);
 
-		// delete file and metadata
+		// delete file and metadata. Best effort
 		media.delete();
 		dataSource.deleteMedia(mediaId);
 	}
@@ -153,6 +153,7 @@ public class MediaDAO {
 		if (!previews.isEmpty()) {
 			for (String previewId : previews) {
 				File preview = new File(dirPath + File.separator + previewId);
+                // Best effort
 				preview.delete();
 			}
 
@@ -165,7 +166,7 @@ public class MediaDAO {
 	 * @param userId the user that is trying to request the media lsit.
 	 * @param entityId media channel's id.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
-	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */
 	public String getMediasInfo(String userId, String entityId, Integer max, String after)
 			throws UserNotAllowedException, MetadataSourceException {
@@ -199,7 +200,7 @@ public class MediaDAO {
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting media file.
-	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */
 	public File getMedia(String userId, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
@@ -239,7 +240,7 @@ public class MediaDAO {
 	 * @param entityId avatar's channel.
 	 * @return avatar file.
 	 * @throws MetadataSourceException if something goes wrong while retrieving avatar's metadata.
-	 * @throws MediaNotFoundException there is no media representing {@link entityId} avatar.
+	 * @throws MediaNotFoundException there is no media representing {@param entityId} avatar.
 	 */
 	public File getAvatar(String entityId) throws MetadataSourceException,
 	MediaNotFoundException, IOException {
@@ -269,7 +270,7 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting preview file.
 	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
-	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */
 	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer size) throws MetadataSourceException,
@@ -291,7 +292,7 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting preview file.
 	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
-	 * @throws UserNotAllowedException this {@link userId} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */	
 	public Thumbnail getMediaPreview(String userId, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
@@ -358,9 +359,8 @@ public class MediaDAO {
 	 * @param userId the user that is requesting the update.
 	 * @param entityId media's channel.
 	 * @param mediaId media to be updated.
-	 * @param request contains which are the metadata to be updated.
+	 * @param form contains which are the metadata to be updated.
 	 * @return media's new metadata.
-	 * @throws FileUploadException if something goes wrong during request parsing.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws UserNotAllowedException the @{link userId} is not allowed to perform this operation.
@@ -429,7 +429,7 @@ public class MediaDAO {
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws UserNotAllowedException the user {@link userId} is now allowed to upload media in this channel.
+	 * @throws UserNotAllowedException the user {@param userId} is now allowed to upload media in this channel.
 	 */
 	public String insertWebFormMedia(String userId, String entityId, Form form,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
@@ -500,7 +500,7 @@ public class MediaDAO {
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws UserNotAllowedException the user {@link userId} is now allowed to upload media in this channel.
+	 * @throws UserNotAllowedException the user {@param userId} is now allowed to upload media in this channel.
 	 */
 	public String insertFormDataMedia(String userId, String entityId, Request request,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
@@ -522,7 +522,7 @@ public class MediaDAO {
 		factory.setSizeThreshold(Integer.valueOf(configuration
 				.getProperty(MediaServerConfiguration.MEDIA_TO_DISK_THRESHOLD_PROPERTY)));
 
-		List<FileItem> items = null;
+		List<FileItem> items;
 		
 		try {
 			RestletFileUpload upload = new RestletFileUpload(factory);
@@ -663,8 +663,7 @@ public class MediaDAO {
 	}
 
 	private Thumbnail buildNewPreview(File media, String mediaId, String previewId, String mediaDirectory,
-			Integer maxHeight, Integer maxWidth) throws MetadataSourceException, 
-			IOException, InvalidPreviewFormatException {
+			Integer maxHeight, Integer maxWidth) throws MetadataSourceException, IOException, InvalidPreviewFormatException {
 		String extension = dataSource.getMediaExtension(mediaId);
 
 		BufferedImage previewImg;
@@ -716,8 +715,7 @@ public class MediaDAO {
 	protected FileItem getFileFormField(List<FileItem> items) {
 		FileItem field = null;
 
-		for (int i = 0; i < items.size(); i++) {
-			FileItem item = items.get(i);
+		for (FileItem item : items) {
 			if (Constants.DATA_FIELD.equals(item.getFieldName().toLowerCase())) {
 				field = item;
 				break;
@@ -802,7 +800,7 @@ public class MediaDAO {
 
 	protected String getFileShaChecksum(File file) {
 		try {
-			return DigestUtils.shaHex(FileUtils.openInputStream(file));
+            return DigestUtils.sha1Hex(FileUtils.openInputStream(file));
 		} catch (IOException e) {
 			LOGGER.error("Error during media SHA1 checksum generation.", e);
 		}
@@ -832,6 +830,7 @@ public class MediaDAO {
 		private String mimeType;
 		private BufferedImage img;
 
+
 		StorePreviewThread(String previewId, String directory, String mediaId,
 				String mimeType, Integer height, Integer width, String extension,
 				BufferedImage img) {
@@ -844,6 +843,7 @@ public class MediaDAO {
 			this.mimeType = mimeType;
 			this.img = img;
 		}
+
 
 		public void start() {
 			try {
