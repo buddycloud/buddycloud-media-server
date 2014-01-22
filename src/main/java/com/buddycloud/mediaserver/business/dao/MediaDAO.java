@@ -163,9 +163,19 @@ public class MediaDAO {
      * @param mediaId the media's id
      * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
      * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
+     * @throws MediaNotFoundException if there is not such media metadata
      */
     public String getMediaInfo(String userJID, String entityId, String mediaId)
-            throws UserNotAllowedException, MetadataSourceException {
+            throws UserNotAllowedException, MetadataSourceException, MediaNotFoundException {
+        if (isAvatar(mediaId)) {
+            LOGGER.debug("Getting media info for " + entityId + " avatar");
+            mediaId = dataSource.getEntityAvatarId(entityId);
+            if (mediaId == null) {
+                throw new MediaNotFoundException("avatar", entityId);
+            }
+
+            return gson.toJson(dataSource.getMedia(mediaId));
+        }
 
         if (userJID != null) {
             boolean isUserAllowed = pubsub.matchUserCapability(userJID,
@@ -182,7 +192,12 @@ public class MediaDAO {
 
         LOGGER.debug("Getting media info: " + mediaId);
 
-        return gson.toJson(dataSource.getMedia(mediaId));
+        Media media = dataSource.getMedia(mediaId);
+        if (media == null) {
+            throw new MediaNotFoundException(mediaId, entityId);
+        }
+
+        return gson.toJson(media);
     }
 
 	/**
@@ -271,6 +286,9 @@ public class MediaDAO {
 	public MediaFile<File> getAvatar(String entityId) throws MetadataSourceException,
             MediaNotFoundException, IOException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
+        if (mediaId == null) {
+            throw new MediaNotFoundException("avatar", entityId);
+        }
 
 		LOGGER.debug("Getting avatar. Entity ID: " + entityId);
 

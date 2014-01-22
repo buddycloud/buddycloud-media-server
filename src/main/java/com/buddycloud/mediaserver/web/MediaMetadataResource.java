@@ -18,6 +18,7 @@ package com.buddycloud.mediaserver.web;
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
@@ -83,6 +84,8 @@ public class MediaMetadataResource extends MediaServerResource {
             setStatus(Status.SERVER_ERROR_INTERNAL);
         } catch (UserNotAllowedException e) {
             setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+        } catch (MediaNotFoundException e) {
+            setStatus(Status.CLIENT_ERROR_NOT_FOUND);
         } catch (Throwable t) {
             return unexpectedError(t);
         }
