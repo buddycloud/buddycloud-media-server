@@ -30,6 +30,7 @@ import org.restlet.data.Form;
 import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 
 import java.io.File;
 
@@ -46,9 +47,12 @@ public class UploadMediaTest extends MediaServerTest {
 
 
 	public void testTearDown() throws Exception {
-		FileUtils.cleanDirectory(new File(configuration
-								.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
-								+ File.separator + BASE_CHANNEL));
+        File directory = new File(configuration.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
+                + File.separator + BASE_CHANNEL);
+
+        if (directory.exists()) {
+            FileUtils.cleanDirectory(directory);
+        }
 
         // Verify mocks
         EasyMock.verify(authClient);
@@ -245,4 +249,59 @@ public class UploadMediaTest extends MediaServerTest {
 		// delete metadata
 		dataSource.deleteMedia(media.getId());
 	}
+
+    @Test
+    public void uploadWebFormTooBigFile() throws Exception {
+        // set size limit
+        configuration.setProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY, "1");
+
+        // file fields
+        String title = "Test Image";
+        String description = "My Test Image";
+
+        Base64 encoder = new Base64(true);
+        String authStr = BASE_USER + ":" + BASE_TOKEN;
+
+        ClientResource client = new ClientResource(BASE_URL + "/"
+                + BASE_CHANNEL + "?auth="
+                + new String(encoder.encode(authStr.getBytes())));
+
+        Form form = createWebForm(TEST_IMAGE_NAME, title,
+                description, TEST_FILE_PATH + TEST_IMAGE_NAME,
+                TEST_IMAGE_CONTENT_TYPE);
+
+        try {
+            client.post(form);
+        } catch (ResourceException e) {
+            assertEquals("Bad Request", e.getMessage());
+        }
+    }
+
+    @Test
+    public void uploadMultipartFormDataTooBigFile() throws Exception {
+        // set size limit
+        configuration.setProperty(MediaServerConfiguration.MEDIA_SIZE_LIMIT_PROPERTY,
+                "1");
+
+        // file fields
+        String title = "Test Image";
+        String description = "My Test Image";
+
+        Base64 encoder = new Base64(true);
+        String authStr = BASE_USER + ":" + BASE_TOKEN;
+
+        ClientResource client = new ClientResource(BASE_URL + "/"
+                + BASE_CHANNEL + "?auth="
+                + new String(encoder.encode(authStr.getBytes())));
+
+        FormDataSet form = createFormData(TEST_IMAGE_NAME, title,
+                description, TEST_FILE_PATH + TEST_IMAGE_NAME,
+                TEST_IMAGE_CONTENT_TYPE);
+
+        try {
+            client.post(form);
+        } catch (ResourceException e) {
+            assertEquals("Bad Request", e.getMessage());
+        }
+    }
 }

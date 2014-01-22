@@ -228,13 +228,14 @@ public abstract class MediaServerTest {
 		if (contentType != null) {
 			form.set(Constants.TYPE_FIELD, contentType);
 		}
-		
+
 		if (filePath != null) {
 			try {
 				File file = new File(filePath);
 				byte[] byteArray = FileUtils.readFileToByteArray(file);
 
 				form.set(Constants.DATA_FIELD, Base64.encode(byteArray, false));
+                form.set(Constants.SIZE_FIELD, String.valueOf(byteArray.length));
 			} catch (IOException e) {}
 		}
 		

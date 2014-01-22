@@ -49,8 +49,8 @@ public class ChannelResource extends MediaServerResource {
 
 		String auth = getQueryValue(Constants.AUTH_QUERY);
 
-		String userId = null;
-		String token = null;
+		String userId;
+		String token;
 
 		try {
 			userId = getUserId(request, auth);
@@ -101,7 +101,7 @@ public class ChannelResource extends MediaServerResource {
 		Request request = getRequest();
 
 		String userId = null;
-		String token = null;
+		String token;
 
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
