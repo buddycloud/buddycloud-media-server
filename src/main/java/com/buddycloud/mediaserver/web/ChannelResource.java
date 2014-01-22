@@ -125,7 +125,7 @@ public class ChannelResource extends MediaServerResource {
 		}
 
 		Integer max = null;
-		String after = null;
+		String after;
 
 		try {
 			String queryValue = getQueryValue(Constants.MAX_QUERY);

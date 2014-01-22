@@ -18,7 +18,7 @@ package com.buddycloud.mediaserver.web;
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.Thumbnail;
+import com.buddycloud.mediaserver.commons.MediaFile;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -31,6 +31,7 @@ import org.restlet.data.CacheDirective;
 import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.engine.header.Header;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
@@ -225,8 +226,9 @@ public class MediaResource extends MediaServerResource {
 		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 		String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
 
+        boolean isChannelPublic = true;
 		if (!mediaId.equals(Constants.AVATAR_ARG)) {
-            boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
+            isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
 
             if (!isChannelPublic) {
                 String auth = getQueryValue(Constants.AUTH_QUERY);
@@ -266,19 +268,17 @@ public class MediaResource extends MediaServerResource {
 
 		try {
 			MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-			
-			// Cache headers
-			int maxAge = mediaDAO.getMaxAge();
-			addCacheHeaders(maxAge);
-			
+
 			if (maxHeight == null && maxWidth == null) {
 				MediaType mediaType = new MediaType(mediaDAO.getMediaType(entityId, mediaId));
-				
-				File media = mediaDAO.getMedia(userId, entityId, mediaId);
-				return new FileRepresentation(media, mediaType, maxAge);
+
+                MediaFile<File> mediaFile = mediaDAO.getMedia(userId, entityId, mediaId);
+                FileRepresentation fileRepresentation = new FileRepresentation(mediaFile.getMediaFile(), mediaType);
+                fileRepresentation.setModificationDate(mediaFile.getLastModified());
+                return fileRepresentation;
 			}
 
-			Thumbnail thumbnail;
+			MediaFile<byte[]> thumbnail;
 
 			if (maxHeight != null && maxWidth == null) {
 				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight);
@@ -288,7 +288,10 @@ public class MediaResource extends MediaServerResource {
 				thumbnail = mediaDAO.getMediaPreview(userId, entityId, mediaId, maxHeight, maxWidth);
 			}
 
-			return new DynamicFileRepresentation(new MediaType(thumbnail.getMimeType()), thumbnail.getImg(), maxAge);
+            DynamicFileRepresentation dynamicFileRepresentation = new DynamicFileRepresentation(
+                    new MediaType(thumbnail.getMimeType()), thumbnail.getMediaFile());
+            dynamicFileRepresentation.setModificationDate(thumbnail.getLastModified());
+            return dynamicFileRepresentation;
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 		} catch (IOException e) {
@@ -306,13 +309,13 @@ public class MediaResource extends MediaServerResource {
 		return new EmptyRepresentation();
 	}
 	
-	private void addCacheHeaders(int maxAge) {
+	private void addCacheHeaders(boolean publicInfo) {
 		List<CacheDirective> cacheDirectives = getResponse().getCacheDirectives();
 		// Clear old directives
 		cacheDirectives.clear();
-		
-		// Add max-age and public
-		cacheDirectives.add(CacheDirective.maxAge(maxAge));
-		cacheDirectives.add(CacheDirective.publicInfo());
+
+		// Add max-age and public/private
+//		cacheDirectives.add(CacheDirective.maxAge(maxAge));
+		cacheDirectives.add(publicInfo ? CacheDirective.publicInfo() : CacheDirective.privateInfo());
 	}
 }

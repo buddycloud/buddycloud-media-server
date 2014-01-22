@@ -20,8 +20,8 @@ import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.business.util.*;
 import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.MediaFile;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.commons.Thumbnail;
 import com.buddycloud.mediaserver.commons.exception.InvalidPreviewFormatException;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
@@ -80,15 +80,6 @@ public class MediaDAO {
 				DateFormat.FULL).create();
 		this.configuration = MediaServerConfiguration.getInstance()
 				.getConfiguration();
-	}
-	
-	
-	/**
-	 * Return media max-age to be used on cache headers
-	 * @return Cache max-age
-	 */
-	public int getMaxAge() {
-		return Integer.valueOf(configuration.getProperty(MediaServerConfiguration.CACHE_MAX_AGE));
 	}
 
 	/**
@@ -202,7 +193,7 @@ public class MediaDAO {
 	 * @throws IOException if something goes wrong while getting media file.
 	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */
-	public File getMedia(String userId, String entityId, String mediaId)
+	public MediaFile<File> getMedia(String userId, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
 			IOException, UserNotAllowedException {
 
@@ -226,13 +217,15 @@ public class MediaDAO {
 		LOGGER.debug("Getting media. Media ID: " + mediaId);
 
 		String fullDirectoryPath = getDirectory(entityId);
-		File media = new File(fullDirectoryPath + File.separator + mediaId);
+		File file = new File(fullDirectoryPath + File.separator + mediaId);
 
-		if (!media.exists()) {
+		if (!file.exists()) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
 
-		return media;
+        Media media = dataSource.getMedia(mediaId);
+
+        return new MediaFile<File>(media.getMimeType(), file, media.getLastUpdatedDate());
 	}
 
 	/**
@@ -242,21 +235,23 @@ public class MediaDAO {
 	 * @throws MetadataSourceException if something goes wrong while retrieving avatar's metadata.
 	 * @throws MediaNotFoundException there is no media representing {@param entityId} avatar.
 	 */
-	public File getAvatar(String entityId) throws MetadataSourceException,
-	MediaNotFoundException, IOException {
+	public MediaFile<File> getAvatar(String entityId) throws MetadataSourceException,
+            MediaNotFoundException, IOException {
 		String mediaId = dataSource.getEntityAvatarId(entityId);
 
 		LOGGER.debug("Getting avatar. Entity ID: " + entityId);
 
 		String fullDirectoryPath = getDirectory(entityId);
 
-		File media = new File(fullDirectoryPath + File.separator + mediaId);
+		File file = new File(fullDirectoryPath + File.separator + mediaId);
 
-		if (!media.exists()) {
+		if (!file.exists()) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
 
-		return media;
+        Media media = dataSource.getMedia(mediaId);
+
+		return new MediaFile<File>(media.getMimeType(), file, media.getLastUpdatedDate());
 	}
 
 	/**
@@ -265,14 +260,14 @@ public class MediaDAO {
 	 * @param entityId media's channel.
 	 * @param mediaId media to be fetched.
 	 * @param size preview size limit.
-	 * @return media's {@link Thumbnail}
+	 * @return media's {@link MediaFile}
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting preview file.
 	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
 	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */
-	public Thumbnail getMediaPreview(String userId, String entityId,
+	public MediaFile<byte[]> getMediaPreview(String userId, String entityId,
 			String mediaId, Integer size) throws MetadataSourceException,
 			MediaNotFoundException, IOException, InvalidPreviewFormatException,
 			UserNotAllowedException {
@@ -287,14 +282,14 @@ public class MediaDAO {
 	 * @param mediaId media to be fetched.
 	 * @param maxHeight preview height limit.
 	 * @param maxWidth preview width limit.
-	 * @return media's {@link Thumbnail}
+	 * @return media's {@link MediaFile}
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting preview file.
 	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
 	 * @throws UserNotAllowedException this {@param userId} is not allowed to perform this operation.
 	 */	
-	public Thumbnail getMediaPreview(String userId, String entityId,
+	public MediaFile<byte[]> getMediaPreview(String userId, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
 					throws MetadataSourceException, MediaNotFoundException,
 					IOException, InvalidPreviewFormatException, UserNotAllowedException {
@@ -321,7 +316,7 @@ public class MediaDAO {
 				getDirectory(entityId));
 	}
 
-	private Thumbnail getAvatarPreview(String userId, String entityId,
+	private MediaFile<byte[]> getAvatarPreview(String userId, String entityId,
 			Integer maxHeight, Integer maxWidth)
 					throws MetadataSourceException, MediaNotFoundException,
 					IOException, InvalidPreviewFormatException {
@@ -633,60 +628,62 @@ public class MediaDAO {
 		return media;
 	}
 
-	protected Thumbnail getPreview(String entityId, String mediaId, Integer maxHeight, 
+	protected MediaFile<byte[]> getPreview(String entityId, String mediaId, Integer maxHeight,
 			Integer maxWidth, String mediaDirectory) throws MetadataSourceException, IOException,
-			InvalidPreviewFormatException, MediaNotFoundException {
-		File media = new File(mediaDirectory + File.separator + mediaId);
+            InvalidPreviewFormatException, MediaNotFoundException {
+		File file = new File(mediaDirectory + File.separator + mediaId);
 
-		if (!media.exists()) {
+		if (!file.exists()) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
 
-		String previewId = dataSource
+        Media media = dataSource.getMedia(mediaId);
+        String previewId = dataSource
 				.getPreviewId(mediaId, maxHeight, maxWidth);
 
-		if (previewId != null) {
-			File preview = new File(mediaDirectory + File.separator + previewId);
+        if (previewId != null) {
+            File preview = new File(mediaDirectory + File.separator + previewId);
 
-			if (!preview.exists()) {
-				dataSource.deletePreview(previewId);
-			} else {
-				return new Thumbnail(dataSource.getPreviewMimeType(previewId), 
-						IOUtils.toByteArray(FileUtils.openInputStream(preview)));
+            if (!preview.exists()) {
+                dataSource.deletePreview(previewId);
+            } else {
+                return new MediaFile<byte[]>(dataSource.getPreviewMimeType(previewId),
+						IOUtils.toByteArray(FileUtils.openInputStream(preview)),
+                        media.getLastUpdatedDate());
 			}
 		} else {
 			// generate random id
 			previewId = RandomStringUtils.randomAlphanumeric(20);
 		}
 
-		return buildNewPreview(media, mediaId, previewId, mediaDirectory, maxHeight, maxWidth);
+		return buildNewPreview(file, media, previewId, mediaDirectory, maxHeight, maxWidth);
 	}
 
-	private Thumbnail buildNewPreview(File media, String mediaId, String previewId, String mediaDirectory,
+	private MediaFile<byte[]> buildNewPreview(File file, Media media, String previewId, String mediaDirectory,
 			Integer maxHeight, Integer maxWidth) throws MetadataSourceException, IOException, InvalidPreviewFormatException {
-		String extension = dataSource.getMediaExtension(mediaId);
+		String extension = media.getFileExtension();
 
 		BufferedImage previewImg;
-		Thumbnail thumbnail;
+        MediaFile<byte[]> thumbnail;
 
 		if (ImageUtils.isImage(extension)) {
-			previewImg = ImageUtils.createImagePreview(media, maxWidth,
-					maxHeight);
+			previewImg = ImageUtils.createImagePreview(file, maxWidth, maxHeight);
 
-			thumbnail = new Thumbnail(dataSource.getMediaMimeType(mediaId), 
-					ImageUtils.imageToBytes(previewImg, extension));
+			thumbnail = new MediaFile<byte[]>(media.getMimeType(),
+					ImageUtils.imageToBytes(previewImg, extension),
+                    media.getLastUpdatedDate());
 		} else if (VideoUtils.isVideo(extension)) {
-			previewImg = new VideoUtils(media).createVideoPreview(maxWidth,
-					maxHeight);
+			previewImg = new VideoUtils(file).createVideoPreview(maxWidth, maxHeight);
 
-			thumbnail = new Thumbnail(VideoUtils.PREVIEW_MIME_TYPE, 
-					ImageUtils.imageToBytes(previewImg, VideoUtils.PREVIEW_TYPE));
+			thumbnail = new MediaFile<byte[]>(VideoUtils.PREVIEW_MIME_TYPE,
+					ImageUtils.imageToBytes(previewImg, VideoUtils.PREVIEW_TYPE),
+                    media.getLastUpdatedDate());
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
 
 		// store preview in another flow
-		new StorePreviewThread(previewId, mediaDirectory, mediaId, thumbnail.getMimeType(), maxHeight,
+		new StorePreviewThread(previewId, mediaDirectory, media.getId(), thumbnail.getMimeType(), maxHeight,
 				maxWidth, extension, previewImg).start();
 
 		return thumbnail;

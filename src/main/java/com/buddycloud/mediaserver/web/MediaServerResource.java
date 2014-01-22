@@ -109,11 +109,11 @@ public abstract class MediaServerResource extends ServerResource {
         
         return headers;
     }
-	
+
 	protected void addCORSHeaders() {
 		addCORSHeaders(null);
 	}
-	
+
 	protected void addCORSHeaders(Request request) {
 		String origin = null;
 		
