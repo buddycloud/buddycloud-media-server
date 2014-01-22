@@ -156,6 +156,35 @@ public class MediaDAO {
 		}
 	}
 
+    /**
+     * Gets the media metadata.
+     * @param userJID the user that is trying to request the media lsit.
+     * @param entityId media channel's id.
+     * @param mediaId the media's id
+     * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
+     * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
+     */
+    public String getMediaInfo(String userJID, String entityId, String mediaId)
+            throws UserNotAllowedException, MetadataSourceException {
+
+        if (userJID != null) {
+            boolean isUserAllowed = pubsub.matchUserCapability(userJID,
+                    entityId, new OwnerDecorator(new ModeratorDecorator(
+                    new PublisherDecorator(new MemberDecorator()))));
+
+            if (!isUserAllowed) {
+                LOGGER.debug("User '" + userJID
+                        + "' not allowed to peform get info operation on: "
+                        + entityId);
+                throw new UserNotAllowedException(userJID);
+            }
+        }
+
+        LOGGER.debug("Getting media info: " + mediaId);
+
+        return gson.toJson(dataSource.getMedia(mediaId));
+    }
+
 	/**
 	 * Gets an information list from all medias in a channel.
 	 * @param userJID the user that is trying to request the media lsit.

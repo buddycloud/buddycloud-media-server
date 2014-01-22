@@ -37,6 +37,8 @@ public class Constants {
 	public static final String MEDIAS_URL = "/{" + ENTITY_ARG + "}";
 	public static final String MEDIA_ID_URL = "/{" + ENTITY_ARG + "}/{"
 			+ MEDIA_ARG + "}";
+    public static final String MEDIA_ID_METADATA_URL = "/{" + ENTITY_ARG + "}/{"
+            + MEDIA_ARG + "}/metadata";
 
 	// Storage constants
 	public static final String DATA_FIELD = "data";

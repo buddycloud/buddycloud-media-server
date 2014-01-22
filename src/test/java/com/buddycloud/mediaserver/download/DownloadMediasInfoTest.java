@@ -33,6 +33,7 @@ import org.restlet.resource.ClientResource;
 import java.io.File;
 import java.util.List;
 
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DownloadMediasInfoTest extends MediaServerTest {
@@ -98,6 +99,43 @@ public class DownloadMediasInfoTest extends MediaServerTest {
 		dataSource.deleteMedia(id);
 	}
 
+    @Test
+    public void downloadSingleMediaInfo() throws Exception {
+        String url = BASE_URL + "/" + BASE_CHANNEL + "/" + MEDIA_ID1 + "/metadata";
+        ClientResource client = new ClientResource(url);
+        client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+                BASE_TOKEN);
+
+        Representation result = client.get(MediaType.APPLICATION_JSON);
+        Media media = gson.fromJson(result.getText(), Media.class);
+
+        assertEquals(media.getId(), MEDIA_ID1);
+        assertEquals(media.getFileName(), TEST_IMAGE_NAME);
+        assertEquals(media.getEntityId(), BASE_CHANNEL);
+        assertEquals(media.getAuthor(), BASE_USER);
+        assertEquals(media.getDescription(), "A description");
+        assertEquals(media.getTitle(), "A title");
+    }
+
+    @Test
+    public void downloadSingleMediaInfoParamAuth() throws Exception {
+        Base64 encoder = new Base64(true);
+        String authStr = BASE_USER + ":" + BASE_TOKEN;
+
+        String url = BASE_URL + "/" + BASE_CHANNEL + "/" + MEDIA_ID1 + "/metadata";
+        ClientResource client = new ClientResource(url + "?auth="
+                + new String(encoder.encode(authStr.getBytes())));
+
+        Representation result = client.get(MediaType.APPLICATION_JSON);
+        Media media = gson.fromJson(result.getText(), Media.class);
+
+        assertEquals(media.getId(), MEDIA_ID1);
+        assertEquals(media.getFileName(), TEST_IMAGE_NAME);
+        assertEquals(media.getEntityId(), BASE_CHANNEL);
+        assertEquals(media.getAuthor(), BASE_USER);
+        assertEquals(media.getDescription(), "A description");
+        assertEquals(media.getTitle(), "A title");
+    }
 
 	@Test
 	public void downloadMediasInfo() throws Exception {

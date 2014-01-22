@@ -310,7 +310,7 @@ public class MediaResource extends MediaServerResource {
 		
 		return new EmptyRepresentation();
 	}
-	
+
 	private void addCacheHeaders(boolean publicInfo) {
 		List<CacheDirective> cacheDirectives = getResponse().getCacheDirectives();
 		// Clear old directives

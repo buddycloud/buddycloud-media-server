@@ -40,10 +40,13 @@ public class MediaServerApplication extends Application {
 	public synchronized Restlet createInboundRoot() {
 		Router router = new Router(getContext());
 
+        // GET /<name@domain.com>/<mediaID>/metadata
+        router.attach(Constants.MEDIA_ID_METADATA_URL, MediaMetadataResource.class);
+
 		// GET/PUT/DELETE /<name@domain.com>/<mediaID>
 		router.attach(Constants.MEDIA_ID_URL, MediaResource.class);
 
-		// POST /<name@domain.com>
+		// GET/POST /<name@domain.com>
 		router.attach(Constants.MEDIAS_URL, ChannelResource.class);
 
 		ChallengeAuthenticator basicAuth = getBasicAuthenticator();
