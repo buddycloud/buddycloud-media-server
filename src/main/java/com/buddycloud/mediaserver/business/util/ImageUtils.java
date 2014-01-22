@@ -15,7 +15,6 @@
  */
 package com.buddycloud.mediaserver.business.util;
 
-import com.mortennobel.imagescaling.AdvancedResizeOp;
 import com.mortennobel.imagescaling.ResampleOp;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Positions;

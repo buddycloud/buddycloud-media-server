@@ -36,6 +36,8 @@ public class DynamicFileRepresentation extends OutputRepresentation {
         } else if (timeToLive > 0) {
             setExpirationDate(new Date(System.currentTimeMillis() + (1000L * timeToLive)));
         }
+
+        setSize(fileData.length);
 	}
 
 	public DynamicFileRepresentation(MediaType mediaType, byte[] fileData) {
