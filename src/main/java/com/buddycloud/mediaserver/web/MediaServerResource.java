@@ -15,6 +15,10 @@
  */
 package com.buddycloud.mediaserver.web;
 
+import com.buddycloud.mediaserver.commons.AuthBean;
+import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.exception.MissingAuthenticationException;
+import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.AuthVerifier;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.apache.commons.codec.binary.Base64;
@@ -40,7 +44,6 @@ public abstract class MediaServerResource extends ServerResource {
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(MediaServerResource.class);
 	
-	protected static final String AUTH_SEPARATOR = ":";
 	protected static final String HEADERS_KEY = "org.restlet.http.headers";
 	protected static final String ORIGIN_HEADER = "Origin";
 
@@ -64,27 +67,6 @@ public abstract class MediaServerResource extends ServerResource {
 	
 	public void setServerHeader() {
 		getResponse().getServerInfo().setAgent(SERVER_NAME);
-	}
-	
-	protected Representation checkRequest(String userJID, String token, String url) {
-		LOGGER.debug("Checking request. User ID: " + userJID + ". Token: " + token + ". URL: " + url);
-		if (userJID == null || token == null) {
-			setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
-			return authenticationResponse();
-		}
-		
-		AuthVerifier authClient = XMPPToolBox.getInstance().getAuthClient();
-
-		if (!authClient.verifyRequest(userJID, token, url)) {
-			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-			LOGGER.debug("Request not authorized. " +
-					"User ID: " + userJID + ". Token: " + token + ". URL: " + url);
-			return new StringRepresentation("User '" + userJID
-					+ "' not allowed to access resource",
-					MediaType.APPLICATION_JSON);
-		}
-		
-		return null;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -145,6 +127,10 @@ public abstract class MediaServerResource extends ServerResource {
 
 		return response.getEntity();
 	}
+
+    protected Representation invalidQuery() {
+        return new StringRepresentation("Invalid query value!", MediaType.APPLICATION_JSON);
+    }
 	
 	protected Representation unexpectedError(Throwable t) {
 		LOGGER.error("Unexpected error: " + t.getLocalizedMessage(), t);
@@ -154,42 +140,46 @@ public abstract class MediaServerResource extends ServerResource {
 				MediaType.APPLICATION_JSON);
 	}
 
-	protected String decodeAuth(String auth) {
-		Base64 decoder = new Base64(true);
+    protected AuthBean buildAuthBean(Request request) {
+        AuthBean authBean;
+        String authToken = getQueryValue(Constants.AUTH_QUERY);
 
-		return new String(decoder.decode(auth.getBytes()));
-	}
+        if (authToken != null) {
+            authBean = AuthBean.createAuthBean(authToken);
+        } else {
+            authBean = AuthBean.createAuthBean(request);
+        }
 
-	protected String getUserId(Request request, String auth) {
-		String userJID = null;
+        return authBean;
+    }
 
-		if (auth == null) {
-			ChallengeResponse challenge = request.getChallengeResponse();
+    protected String getUsedJID(Request request, boolean authenticate) throws UserNotAllowedException, MissingAuthenticationException {
+        AuthBean authBean = buildAuthBean(request);
+        if (authBean == null) {
+            throw new MissingAuthenticationException();
+        }
 
-			if (challenge != null) {
-				userJID = challenge.getIdentifier();
-			}
-		} else {
-			String[] split = decodeAuth(auth).split(AUTH_SEPARATOR);
-			userJID = split[0];
-		}
+        String userJID = authBean.getUserJID();
+        if (authenticate) {
+            AuthVerifier authClient = XMPPToolBox.getInstance().getAuthClient();
+            if (!authClient.verifyRequest(userJID, authBean.getTransactionID(), request.getResourceRef().getIdentifier())) {
+                throw new UserNotAllowedException(userJID);
+            }
+        }
 
-		return userJID;
-	}
+        return userJID;
+    }
 
-	protected String getTransactionId(Request request, String auth) {
-		String tid = null;
+    protected Integer getIntegerQueryValue(String query) {
+        Integer result = null;
+        String queryValue = getQueryValue(query);
 
-		if (auth == null) {
-			ChallengeResponse challenge = request.getChallengeResponse();
-			if (challenge != null) {
-				tid = new String(challenge.getSecret());
-			}
-		} else {
-			String[] split = decodeAuth(auth).split(AUTH_SEPARATOR);
-			tid = split[1];
-		}
+        if (queryValue != null) {
+            try {
+                result = Integer.valueOf(queryValue);
+            } catch (NumberFormatException ignored) {}
+        }
 
-		return tid;
-	}
+        return result;
+    }
 }

@@ -20,6 +20,7 @@ import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.MissingAuthenticationException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.restlet.Request;
@@ -43,41 +44,21 @@ public class MediaMetadataResource extends MediaServerResource {
     @Get
     public Representation getMediaMetadata() {
         setServerHeader();
-//		The HTTP API sets the headers
-//		addCORSHeaders();
-
         Request request = getRequest();
 
-        String userJID = null;
-        String token;
+        try {
+            String userJID = null;
+            String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
+            String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
 
-        String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
-        String mediaId = (String) request.getAttributes().get(Constants.MEDIA_ARG);
-
-        if (!mediaId.equals(Constants.AVATAR_ARG)) {
-            boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
-
-            if (!isChannelPublic) {
-                String auth = getQueryValue(Constants.AUTH_QUERY);
-
-                try {
-                    userJID = getUserId(request, auth);
-                    token = getTransactionId(request, auth);
-                } catch (Throwable t) {
-                    setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-                    return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
-                }
-
-                Representation verifyRequest = checkRequest(userJID, token, request.getResourceRef().getIdentifier());
-                if (verifyRequest != null) {
-                    return verifyRequest;
+            if (!mediaId.equals(Constants.AVATAR_ARG)) {
+                boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
+                if (!isChannelPublic) {
+                    userJID = getUsedJID(request, true);
                 }
             }
-        }
 
-        MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
-        try {
+            MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
             return new StringRepresentation(mediaDAO.getMediaInfo(userJID,
                     entityId, mediaId), MediaType.APPLICATION_JSON);
         } catch (MetadataSourceException e) {
@@ -86,6 +67,9 @@ public class MediaMetadataResource extends MediaServerResource {
             setStatus(Status.CLIENT_ERROR_FORBIDDEN);
         } catch (MediaNotFoundException e) {
             setStatus(Status.CLIENT_ERROR_NOT_FOUND);
+        } catch (MissingAuthenticationException e) {
+            setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+            return authenticationResponse();
         } catch (Throwable t) {
             return unexpectedError(t);
         }

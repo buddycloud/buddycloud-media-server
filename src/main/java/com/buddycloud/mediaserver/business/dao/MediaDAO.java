@@ -310,27 +310,6 @@ public class MediaDAO {
 	 * @param userJID user that is requesting the preview.
 	 * @param entityId media's channel.
 	 * @param mediaId media to be fetched.
-	 * @param size preview size limit.
-	 * @return media's {@link MediaFile}
-	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
-	 * @throws MediaNotFoundException there is no media with such id.
-	 * @throws IOException if something goes wrong while getting preview file.
-	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
-	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
-	 */
-	public MediaFile<byte[]> getMediaPreview(String userJID, String entityId,
-			String mediaId, Integer size) throws MetadataSourceException,
-			MediaNotFoundException, IOException, InvalidPreviewFormatException,
-			UserNotAllowedException {
-
-		return getMediaPreview(userJID, entityId, mediaId, size, size);
-	}
-
-	/**
-	 * Gets a media preview.
-	 * @param userJID user that is requesting the preview.
-	 * @param entityId media's channel.
-	 * @param mediaId media to be fetched.
 	 * @param maxHeight preview height limit.
 	 * @param maxWidth preview width limit.
 	 * @return media's {@link MediaFile}
@@ -346,7 +325,7 @@ public class MediaDAO {
 					IOException, InvalidPreviewFormatException, UserNotAllowedException {
 
 		if (isAvatar(mediaId)) {
-			return getAvatarPreview(userJID, entityId, maxHeight, maxWidth);
+			return getAvatarPreview(entityId, maxHeight, maxWidth);
 		}
 
 		if (userJID != null) {
@@ -367,7 +346,7 @@ public class MediaDAO {
 				getDirectory(entityId));
 	}
 
-	private MediaFile<byte[]> getAvatarPreview(String userJID, String entityId,
+	private MediaFile<byte[]> getAvatarPreview(String entityId,
 			Integer maxHeight, Integer maxWidth)
 					throws MetadataSourceException, MediaNotFoundException,
 					IOException, InvalidPreviewFormatException {

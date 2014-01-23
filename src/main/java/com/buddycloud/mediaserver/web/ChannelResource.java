@@ -19,6 +19,7 @@ import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
+import com.buddycloud.mediaserver.commons.exception.MissingAuthenticationException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.apache.commons.fileupload.FileUploadException;
@@ -42,52 +43,34 @@ public class ChannelResource extends MediaServerResource {
 	@Post("application/x-www-form-urlencoded|multipart/form-data")
 	public Representation postMedia(Representation entity) {
 		setServerHeader();
-		
 		Request request = getRequest();
-//		The HTTP API sets the headers 
-//		addCORSHeaders(request);
 
-		String auth = getQueryValue(Constants.AUTH_QUERY);
+        try {
+            String userJID = getUsedJID(request, true);
+            MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
+            String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
-		String userJID;
-		String token;
-
-		try {
-			userJID = getUserId(request, auth);
-			token = getTransactionId(request, auth);
-		} catch (Throwable t) {
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation(t.getLocalizedMessage(), MediaType.APPLICATION_JSON);
-		}
-
-		Representation checkRequest = checkRequest(userJID, token, request.getResourceRef().getIdentifier());
-		if (checkRequest != null) {
-			return checkRequest;
-		}
-
-		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
-		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
-
-		String result = "";
-		try {
-			if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
+            String result;
+            if (MediaType.MULTIPART_FORM_DATA.equals(entity.getMediaType(), true)) {
 				result = mediaDAO.insertFormDataMedia(userJID, entityId, getRequest(), false);
 			} else {
 				result = mediaDAO.insertWebFormMedia(userJID, entityId, new Form(entity), false);
 			}
-			
 			setStatus(Status.SUCCESS_CREATED);
+            return new StringRepresentation(result, MediaType.APPLICATION_JSON);
 		} catch (FileUploadException e) {
 			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-		} catch (Throwable t) {
-			return unexpectedError(t);	
-		}
-		
-		return new StringRepresentation(result, MediaType.APPLICATION_JSON);
-	}
+		} catch (MissingAuthenticationException e) {
+            setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+            return authenticationResponse();
+        } catch (Throwable t) {
+            return unexpectedError(t);
+        }
+
+        return new EmptyRepresentation();
+    }
 
 	/**
 	 * Gets media's information list (GET /<channel>) 
@@ -95,63 +78,35 @@ public class ChannelResource extends MediaServerResource {
 	@Get
 	public Representation getMediasInfo() {
 		setServerHeader();
-//		The HTTP API sets the headers 
-//		addCORSHeaders();
-
 		Request request = getRequest();
 
-		String userJID = null;
-		String token;
+        try {
+            String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
 
-		String entityId = (String) request.getAttributes().get(Constants.ENTITY_ARG);
+            String userJID = null;
+            boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
+            if (!isChannelPublic) {
+                userJID = getUsedJID(request, true);
+            }
 
-		boolean isChannelPublic = XMPPToolBox.getInstance().getPubSubClient().isChannelPublic(entityId);
+            // Queries
+            Integer max = getIntegerQueryValue(Constants.MAX_QUERY);
+            String after = getQueryValue(Constants.AFTER_QUERY);
 
-		if (!isChannelPublic) {
-			String auth = getQueryValue(Constants.AUTH_QUERY);
-
-			try {
-				userJID = getUserId(request, auth);
-				token = getTransactionId(request, auth);
-			} catch (Throwable t) {
-				setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-				return new StringRepresentation("Error while getting auth params", MediaType.APPLICATION_JSON);
-			}
-
-			Representation verifyRequest = checkRequest(userJID, token, request.getResourceRef().getIdentifier());
-			if (verifyRequest != null) {
-				return verifyRequest;
-			}
-		}
-
-		Integer max = null;
-		String after;
-
-		try {
-			String queryValue = getQueryValue(Constants.MAX_QUERY);
-			if (queryValue != null) {
-				max = Integer.valueOf(queryValue);
-			}
-
-			after = getQueryValue(Constants.AFTER_QUERY);
-		} catch (Throwable t) {
-			setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
-			return new StringRepresentation("Invalid query value!", MediaType.APPLICATION_JSON);
-		}
-
-		MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
-
-		try {
-			return new StringRepresentation(mediaDAO.getMediasInfo(userJID,
+            MediaDAO mediaDAO = DAOFactory.getInstance().getDAO();
+            return new StringRepresentation(mediaDAO.getMediasInfo(userJID,
 					entityId, max, after), MediaType.APPLICATION_JSON);
 		} catch (MetadataSourceException e) {
 			setStatus(Status.SERVER_ERROR_INTERNAL);
 		} catch (UserNotAllowedException e) {
 			setStatus(Status.CLIENT_ERROR_FORBIDDEN);
-		} catch (Throwable t) {
-			return unexpectedError(t);
-		}
+		} catch (MissingAuthenticationException e) {
+            setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
+            return authenticationResponse();
+        } catch (Throwable t) {
+            return unexpectedError(t);
+        }
 
-		return new EmptyRepresentation();
+        return new EmptyRepresentation();
 	}
 }

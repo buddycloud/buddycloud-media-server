@@ -15,28 +15,19 @@
  */
 package com.buddycloud.mediaserver.business.jdbc;
 
-import java.beans.PropertyVetoException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.buddycloud.mediaserver.business.model.Media;
 import com.buddycloud.mediaserver.business.model.Preview;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.commons.exception.CreateDataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyVetoException;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
 
 /**
  * Responsible for creating and handling database connections
@@ -160,7 +151,7 @@ public class MetaDataSource {
 		PreparedStatement statement = null;
 		try {
 			if (max != null) {
-				String sql = null;
+				String sql;
 				if (after != null) {
 					sql = Queries.GET_MEDIAS_INFO_AFTER.replaceAll("#", max.toString());
 					statement = prepareStatement(sql, entityId, after);
