@@ -87,6 +87,7 @@ public class PubSubClient {
             }
 
             try {
+                LOGGER.debug("Getting " + entityId + " node at channel server [" + serverAddress + "]");
                 node = manager.getNode("/user/" + entityId + "/posts");
             } catch (XMPPException e) {
                 LOGGER.error("Error while getting " + entityId + "node", e);
@@ -106,9 +107,10 @@ public class PubSubClient {
 
         DiscoverItems discoverItems;
         try {
+            LOGGER.debug("Discover nodes for domain [" + domain + "]");
             discoverItems = pubSubManager.discoverNodes(null);
         } catch (XMPPException e) {
-            LOGGER.error("Error while trying to fetch domain " + domain + "node", e);
+            LOGGER.error("Error while trying to fetch domain [" + domain + "] node", e);
             return null;
         }
 
@@ -117,6 +119,7 @@ public class PubSubClient {
             String entityID = items.next().getEntityID();
             DiscoverInfo discoverInfo;
             try {
+                LOGGER.debug("Discover identities for entity [" + entityID + "]");
                 discoverInfo = discoManager.discoverInfo(entityID);
             } catch (XMPPException e) {
                 LOGGER.error("Error while trying to fetch " + entityID + "identities", e);
@@ -137,9 +140,11 @@ public class PubSubClient {
     private String getChannelServerAddress(String domain) {
         String serverAddress = null;
         if (serversCache.containsKey(domain)) {
+            LOGGER.debug("Server cache doesn't contains the channel server for domain [" + domain + "]");
             serverAddress = discoverDomainServer(domain);
         }
 
+        LOGGER.debug("Channel server for domain [" + domain + "] discovered: " + serverAddress);
         if (serverAddress != null) {
             serversCache.put(domain, serverAddress);
         }
@@ -209,6 +214,7 @@ public class PubSubClient {
 			Affiliation affiliation;
 
 			try {
+                LOGGER.debug("Getting " + userBareJID + " affiliation for node [" + node.getId() + "]");
 				affiliation = getAffiliation(node, userBareJID);
 			} catch (XMPPException e) {
 				LOGGER.warn("Could not read node '" + node.getId()
@@ -216,6 +222,8 @@ public class PubSubClient {
 
 				return false;
 			}
+
+            LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
 
 			if (affiliation != null) {
 				return capability.isUserAllowed(affiliation.getType()
