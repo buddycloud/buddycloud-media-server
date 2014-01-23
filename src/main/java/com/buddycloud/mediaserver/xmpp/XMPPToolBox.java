@@ -35,10 +35,10 @@ public class XMPPToolBox {
 	}
 
 	public void start(MediaServerComponent component,
-			XMPPConnection connection, String[] servers) {
+			XMPPConnection connection) {
 		if (!started) {
 			authClient = new AuthVerifier(component);
-			pubSubClient = new PubSubClient(connection, servers);
+			pubSubClient = new PubSubClient(connection);
 
 			started = true;
 		}

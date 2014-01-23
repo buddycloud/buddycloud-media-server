@@ -126,9 +126,7 @@ public class Main {
             return false;
         }
 
-        String[] servers = configuration.getProperty("bc.channels.server").split(";");
-
-		XMPPToolBox.getInstance().start(component, connection, servers);
+		XMPPToolBox.getInstance().start(component, connection);
 		
 		LOGGER.info("buddycloud Media Server XMPP component started!");
 

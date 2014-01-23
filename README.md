@@ -69,9 +69,6 @@ required. This file has multiple properties definitions:
 	xmpp.connection.port=5222
 	xmpp.connection.servicename=example.com
 	
-	# buddycloud
-	bc.channels.server=channels.example.com
-	
 	# JDBC
 	jdbc.db.url=jdbc:postgresql://localhost:5432/mediaserver?user=postgres&password=postgres
 	jdbc.driver.class=org.postgresql.Driver
@@ -111,11 +108,6 @@ In addition of the component, the media server also have a simple client that ha
 - **xmpp.connection.host** (Required): XMPP server location.
 - **xmpp.connection.port** (Required): XMPP server port for clients connections.
 - **xmpp.connection.servicename** (Required): client's connection *servicename*.
-
-Buddycloud related:
-
-- **bc.channels.server** (Required): list of channels' pubsub servers where the media server will look for
-possible permissions. Note that this configuration **limits** the domains served by the server.
 
 Storage related:
 

@@ -22,15 +22,16 @@ xmpp.connection.host=crater.buddycloud.org
 xmpp.connection.port=5222
 xmpp.connection.servicename=buddycloud.org
 
-# buddycloud
-bc.channels.server=channels.buddycloud.org
-
 # JDBC
 jdbc.db.url=jdbc:postgresql://localhost:5432/buddycloud-media-server?user=postgres&password=postgres
 jdbc.driver.class=org.postgresql.Driver
 
 # File System
 media.storage.root=/tmp
+
+# Max threshold beyond which files are written directly to disk, in bytes
+# Only used while uploading multipart form data files
+media.todisk.threshold=1048576
 
 # Max filesize in bytes
 media.sizelimit=100000000

@@ -20,6 +20,9 @@ import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.packet.DiscoverInfo;
+import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.packet.RSMSet;
 import org.jivesoftware.smackx.pubsub.*;
 import org.jivesoftware.smackx.pubsub.packet.PubSub;
@@ -28,8 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * XMPP client that handles PubSub (XEP-0060) operations.
@@ -38,23 +43,23 @@ import java.util.List;
  *
  */
 public class PubSubClient {
+    private static final String IDENTITY_CATEGORY = "pubsub";
+    private static final String IDENTITY_TYPE = "channels";
 
 	private static Logger LOGGER = LoggerFactory.getLogger(PubSubClient.class);
 
-	private List<PubSubManager> pubSubManagers = new LinkedList<PubSubManager>();
+    private Map<String, PubSubManager> pubSubManagersCache = new HashMap<String, PubSubManager>();
+    private Map<String, String> serversCache = new HashMap<String, String>();
+    private Connection connection;
 
 
-	public PubSubClient(Connection connection, String[] servers) {
-		init(connection, servers);
+	public PubSubClient(Connection connection) {
+        this.connection = connection;
+		init();
 	}
 
 
-	private void init(Connection connection, String[] servers) {
-		for (String server : servers) {
-			PubSubManager pubSubManager = new PubSubManager(connection, server);
-			pubSubManagers.add(pubSubManager);
-		}
-
+	private void init() {
 		Object affiliationsProvider = ProviderManager.getInstance()
 				.getExtensionProvider(
 						PubSubElementType.AFFILIATIONS.getElementName(),
@@ -71,55 +76,113 @@ public class PubSubClient {
 	}
 
 	private Node getNode(String entityId) {
-		Node node = null;
-		for (PubSubManager manager : pubSubManagers) {
-			try {
-				node = manager.getNode("/user/" + entityId + "/posts");
-			} catch (Exception e) {
-				// do nothing
-				continue;
-			}
-		}
+        JID entityJID = new JID(entityId);
+        String serverAddress = getChannelServerAddress(entityJID.getDomain());
+        Node node = null;
+        if (serverAddress != null) {
+            PubSubManager manager = pubSubManagersCache.get(serverAddress);
+            if (manager == null) {
+                manager = new PubSubManager(connection, serverAddress);
+                pubSubManagersCache.put(serverAddress, manager);
+            }
 
-		return node;
+            try {
+                node = manager.getNode("/user" + entityId + "/posts");
+            } catch (XMPPException e) {
+                LOGGER.error("Error while getting " + entityId + "node", e);
+            }
+        }
+
+        return node;
 	}
 
-	private Affiliation getAffiliation(Node node, String userJID)
+    private boolean isChannelServerIdentity(DiscoverInfo.Identity identity) {
+        return identity.getCategory().equals(IDENTITY_CATEGORY) && identity.getType().equals(IDENTITY_TYPE);
+    }
+
+    private String discoverDomainServer(String domain) {
+        ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
+        PubSubManager pubSubManager = new PubSubManager(connection, domain);
+
+        DiscoverItems discoverItems;
+        try {
+            discoverItems = pubSubManager.discoverNodes(null);
+        } catch (XMPPException e) {
+            LOGGER.error("Error while trying to fetch domain " + domain + "node", e);
+            return null;
+        }
+
+        Iterator<DiscoverItems.Item> items = discoverItems.getItems();
+        while (items.hasNext()) {
+            String entityID = items.next().getEntityID();
+            DiscoverInfo discoverInfo;
+            try {
+                discoverInfo = discoManager.discoverInfo(entityID);
+            } catch (XMPPException e) {
+                LOGGER.error("Error while trying to fetch " + entityID + "identities", e);
+                return null;
+            }
+
+            Iterator<DiscoverInfo.Identity> identities = discoverInfo.getIdentities();
+            while (identities.hasNext()) {
+                if (isChannelServerIdentity(identities.next())) {
+                    return entityID;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String getChannelServerAddress(String domain) {
+        String serverAddress = null;
+        if (serversCache.containsKey(domain)) {
+            serverAddress = discoverDomainServer(domain);
+        }
+
+        if (serverAddress != null) {
+            serversCache.put(domain, serverAddress);
+        }
+
+        return serverAddress;
+    }
+
+	private Affiliation getAffiliation(Node node, String userBareJID)
 			throws XMPPException {
 
-		PubSub request = node.createPubsubPacket(Type.GET, new NodeExtension(
-				PubSubElementType.AFFILIATIONS, node.getId()),
-				PubSubNamespace.OWNER);
+        PubSub request = node.createPubsubPacket(Type.GET, new NodeExtension(
+                PubSubElementType.AFFILIATIONS, node.getId()),
+                PubSubNamespace.OWNER);
 
-		int itemCount = 0;
-		while (true) {
+        int itemCount = 0;
+        while (true) {
 
-			PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
+            PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
 
-			AffiliationsExtension subElem = (AffiliationsExtension) reply
-					.getExtension(
-							PubSubElementType.AFFILIATIONS.getElementName(),
-							PubSubNamespace.BASIC.getXmlns());
+            AffiliationsExtension subElem = (AffiliationsExtension) reply
+                    .getExtension(
+                            PubSubElementType.AFFILIATIONS.getElementName(),
+                            PubSubNamespace.BASIC.getXmlns());
 
-			List<Affiliation> affiliations = subElem.getAffiliations();
+            List<Affiliation> affiliations = subElem.getAffiliations();
 
-			for (Affiliation affiliation : affiliations) {
-				if (affiliation.getNodeId().equals(userJID)) {
-					return affiliation;
-				}
-			}
+            for (Affiliation affiliation : affiliations) {
+                if (affiliation.getNodeId().equals(userBareJID)) {
+                    return affiliation;
+                }
+            }
 
-			itemCount += affiliations.size();
+            itemCount += affiliations.size();
 
-			if (reply.getRsmSet() == null
-					|| itemCount == reply.getRsmSet().getCount()) {
-				break;
-			}
+            if (reply.getRsmSet() == null
+                    || itemCount == reply.getRsmSet().getCount()) {
+                break;
+            }
 
-			RSMSet rsmSet = new RSMSet();
-			rsmSet.setAfter(reply.getRsmSet().getLast());
-			request.setRsmSet(rsmSet);
-		}
+            RSMSet rsmSet = new RSMSet();
+            rsmSet.setAfter(reply.getRsmSet().getLast());
+            request.setRsmSet(rsmSet);
+        }
 
 		return null;
 	}
@@ -134,10 +197,10 @@ public class PubSubClient {
 	 */
 	public boolean matchUserCapability(String userJID, String entityId,
 			CapabilitiesDecorator capability) {
-		String bareId = new JID(userJID).toBareJID();
-		
-		//workaround for #86 (The channel's owner is sometimes not part of <affiliations/>) buddycloud-server issue
-		if (bareId.equals(entityId)) {
+        String userBareJID = new JID(userJID).toBareJID();
+
+		// Workaround for #86 (The channel's owner is sometimes not part of <affiliations/>) buddycloud-server issue
+		if (userBareJID.equals(entityId)) {
 			return true;
 		}
 		
@@ -146,10 +209,10 @@ public class PubSubClient {
 			Affiliation affiliation;
 
 			try {
-				affiliation = getAffiliation(node, bareId);
+				affiliation = getAffiliation(node, userBareJID);
 			} catch (XMPPException e) {
-				LOGGER.warn("Could not read node '" + node.getId() + "' "
-						+ "affiliation for '" + userJID + "'", e);
+				LOGGER.warn("Could not read node '" + node.getId()
+						+ " affiliation for '" + userBareJID + "'", e);
 
 				return false;
 			}
