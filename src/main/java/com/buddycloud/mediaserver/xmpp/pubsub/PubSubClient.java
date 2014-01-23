@@ -122,8 +122,8 @@ public class PubSubClient {
                 LOGGER.debug("Discover identities for entity [" + entityID + "]");
                 discoverInfo = discoManager.discoverInfo(entityID);
             } catch (XMPPException e) {
-                LOGGER.error("Error while trying to fetch " + entityID + "identities", e);
-                return null;
+                LOGGER.error("Error while trying to fetch [" + entityID + "] identities");
+                continue;
             }
 
             Iterator<DiscoverInfo.Identity> identities = discoverInfo.getIdentities();
