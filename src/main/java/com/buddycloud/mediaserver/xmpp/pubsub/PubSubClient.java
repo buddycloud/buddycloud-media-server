@@ -87,7 +87,7 @@ public class PubSubClient {
             }
 
             try {
-                node = manager.getNode("/user" + entityId + "/posts");
+                node = manager.getNode("/user/" + entityId + "/posts");
             } catch (XMPPException e) {
                 LOGGER.error("Error while getting " + entityId + "node", e);
             }

@@ -112,7 +112,7 @@ public class Main {
 
 		component.start();
 		
-		LOGGER.info("buddycloud Media Server HTTP server started!");
+		LOGGER.info("Buddycloud Media Server HTTP server started!");
 	}
 
 	private static boolean startXMPPToolBox(Properties configuration) {
@@ -128,7 +128,7 @@ public class Main {
 
 		XMPPToolBox.getInstance().start(component, connection);
 		
-		LOGGER.info("buddycloud Media Server XMPP component started!");
+		LOGGER.info("Buddycloud Media Server XMPP component started!");
 
         return true;
 	}
