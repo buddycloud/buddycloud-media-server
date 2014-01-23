@@ -109,6 +109,8 @@ In addition of the component, the media server also have a simple client that ha
 - **xmpp.connection.port** (Required): XMPP server port for clients connections.
 - **xmpp.connection.servicename** (Required): client's connection *servicename*.
 
+- **xmpp.reply.timeout** (Optional): timeout in milliseconds to wait a response to an XMPP request (default is 30000)
+
 Storage related:
 
 - **jdbc.db.url** (Required): the server uses [PostgresSQL](http://www.postgresql.org) to store

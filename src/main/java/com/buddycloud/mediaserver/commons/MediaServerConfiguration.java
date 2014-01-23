@@ -48,6 +48,8 @@ public class MediaServerConfiguration {
 	public static final String XMPP_CONNECTION_PORT = "xmpp.connection.port";
 	public static final String XMPP_CONNECTION_SERVICENAME = "xmpp.connection.servicename";
 
+    public static final String XMPP_REPLY_TIMEOUT = "xmpp.reply.timeout";
+
 	// HTTP
 	public static final String HTTP_PORT = "http.port";
 	public static final String HTTPS_PORT = "https.port";
@@ -63,6 +65,9 @@ public class MediaServerConfiguration {
 	/*
 	 * mediaserver.properties default values
 	 */
+    // XMPP
+    public static final int DEF_XMPP_REPLY_TIMEOUT = 30000; // 30 seconds
+
 	// CACHE
 	public static final int DEF_CACHE_MAX_AGE = 86400; //1 day;
 	
@@ -106,6 +111,10 @@ public class MediaServerConfiguration {
 	}
 
 	private void loadDefault() {
+        if (configuration.get(XMPP_REPLY_TIMEOUT) == null) {
+            configuration.put(XMPP_REPLY_TIMEOUT, DEF_XMPP_REPLY_TIMEOUT);
+        }
+
 		if (configuration.get(CACHE_MAX_AGE) == null) {
 			configuration.put(CACHE_MAX_AGE, DEF_CACHE_MAX_AGE);
 		}

@@ -22,6 +22,9 @@ xmpp.connection.host=crater.buddycloud.org
 xmpp.connection.port=5222
 xmpp.connection.servicename=buddycloud.org
 
+# How much time it will wait for a response to an XMPP request (in milliseconds)
+xmpp.reply.timeout=30000
+
 # JDBC
 jdbc.db.url=jdbc:postgresql://localhost:5432/buddycloud-media-server?user=postgres&password=postgres
 jdbc.driver.class=org.postgresql.Driver

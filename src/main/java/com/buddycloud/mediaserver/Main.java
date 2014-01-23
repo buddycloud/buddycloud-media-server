@@ -20,10 +20,7 @@ import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionExceptio
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.PacketListener;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
@@ -77,9 +74,9 @@ public class Main {
 			throws Exception {
 		Component component = new Component();
 
-		if (Boolean.valueOf(configuration.getProperty("https.enabled"))) {
+		if (Boolean.valueOf(configuration.getProperty(MediaServerConfiguration.HTTPS_ENABLED))) {
 			Server server = component.getServers().add(Protocol.HTTPS,
-					Integer.valueOf(configuration.getProperty("https.port")));
+					Integer.valueOf(configuration.getProperty(MediaServerConfiguration.HTTPS_PORT)));
 
 			server.getContext()
 					.getParameters()
@@ -88,23 +85,23 @@ public class Main {
 			server.getContext()
 					.getParameters()
 					.add("keystorePath",
-							configuration.getProperty("https.keystore.path"));
+							configuration.getProperty(MediaServerConfiguration.HTTPS_KEYSTORE_PATH));
 			server.getContext()
 					.getParameters()
 					.add("keystorePassword",
 							configuration
-									.getProperty("https.keystore.password"));
+									.getProperty(MediaServerConfiguration.HTTPS_KEYSTORE_PASSWORD));
 			server.getContext()
 					.getParameters()
 					.add("keyPassword",
-							configuration.getProperty("https.key.password"));
+							configuration.getProperty(MediaServerConfiguration.HTTPS_KEY_PASSWORD));
 			server.getContext()
 					.getParameters()
 					.add("keystoreType",
-							configuration.getProperty("https.keystore.type"));
+							configuration.getProperty(MediaServerConfiguration.HTTPS_KEYSTORE_TYPE));
 		} else {
 			component.getServers().add(Protocol.HTTP,
-					Integer.valueOf(configuration.getProperty("http.port")));
+					Integer.valueOf(configuration.getProperty(MediaServerConfiguration.HTTP_PORT)));
 		}
 
 		Context context = component.getContext().createChildContext();
@@ -115,7 +112,14 @@ public class Main {
 		LOGGER.info("Buddycloud Media Server HTTP server started!");
 	}
 
+    private static void setXMPPReplyTimeout(Properties configuration) {
+        int xmppReplyTimeout = Integer.valueOf(configuration.getProperty(MediaServerConfiguration.XMPP_REPLY_TIMEOUT));
+        SmackConfiguration.setPacketReplyTimeout(xmppReplyTimeout);
+    }
+
 	private static boolean startXMPPToolBox(Properties configuration) {
+        setXMPPReplyTimeout(configuration);
+
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
 
@@ -136,14 +140,14 @@ public class Main {
 	private static MediaServerComponent createXMPPComponent(
 			Properties configuration) throws ComponentException {
 		ExternalComponentManager componentManager = new ExternalComponentManager(
-				configuration.getProperty("xmpp.component.host"),
+				configuration.getProperty(MediaServerConfiguration.XMPP_COMPONENT_HOST),
 				Integer.valueOf(configuration
-						.getProperty("xmpp.component.port")));
+						.getProperty(MediaServerConfiguration.XMPP_COMPONENT_PORT)));
 
 		String subdomain = configuration
-				.getProperty("xmpp.component.subdomain");
+				.getProperty(MediaServerConfiguration.XMPP_COMPONENT_SUBDOMAIN);
 		componentManager.setSecretKey(subdomain,
-				configuration.getProperty("xmpp.component.secretkey"));
+				configuration.getProperty(MediaServerConfiguration.XMPP_COMPONENT_SECRETKEY));
 
 		MediaServerComponent mediaServer = new MediaServerComponent();
 
@@ -185,19 +189,19 @@ public class Main {
 			Properties configuration) {
 
 		String serviceName = configuration
-				.getProperty("xmpp.connection.servicename");
-		String host = configuration.getProperty("xmpp.connection.host");
-		String userName = configuration.getProperty("xmpp.connection.username");
+				.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SERVICENAME);
+		String host = configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_HOST);
+		String userName = configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_USERNAME);
 
 		ConnectionConfiguration cc = new ConnectionConfiguration(host,
 				Integer.parseInt(configuration
-						.getProperty("xmpp.connection.port")), serviceName);
+						.getProperty(MediaServerConfiguration.XMPP_CONNECTION_PORT)), serviceName);
 
 		XMPPConnection connection = new XMPPConnection(cc);
 		try {
 			connection.connect();
 			connection.login(userName,
-					configuration.getProperty("xmpp.connection.password"));
+					configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_PASSWORD));
 		} catch (XMPPException e) {
 			LOGGER.error("XMPP connection coudn't be started", e);
 			throw new CreateXMPPConnectionException(e.getMessage(), e);
