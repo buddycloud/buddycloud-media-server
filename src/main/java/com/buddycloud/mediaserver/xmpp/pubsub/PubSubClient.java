@@ -139,13 +139,13 @@ public class PubSubClient {
 
     private String getChannelServerAddress(String domain) {
         String serverAddress = null;
-        if (serversCache.containsKey(domain)) {
+        if (!serversCache.containsKey(domain)) {
             LOGGER.debug("Server cache doesn't contains the channel server for domain [" + domain + "]");
             serverAddress = discoverDomainServer(domain);
         }
 
-        LOGGER.debug("Channel server for domain [" + domain + "] discovered: " + serverAddress);
         if (serverAddress != null) {
+            LOGGER.debug("Channel server for domain [" + domain + "] discovered: " + serverAddress);
             serversCache.put(domain, serverAddress);
         }
 
