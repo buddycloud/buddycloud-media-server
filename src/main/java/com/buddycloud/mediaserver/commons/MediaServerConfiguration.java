@@ -15,16 +15,15 @@
  */
 package com.buddycloud.mediaserver.commons;
 
+import com.buddycloud.mediaserver.commons.exception.LoadConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.buddycloud.mediaserver.commons.exception.LoadConfigurationException;
 
 public class MediaServerConfiguration {
 
@@ -36,9 +35,6 @@ public class MediaServerConfiguration {
 	// JDBC
 	public static final String JDBC_DRIVER_CLASS_PROPERTY = "jdbc.driver.class";
 	public static final String JDBC_DB_URL_PROPERTY = "jdbc.db.url";
-
-	// buddycloud
-	public static final String BC_CHANNELS_SERVER = "bc.channels.server";
 
 	// XMPP
 	public static final String XMPP_COMPONENT_HOST = "xmpp.component.host";
@@ -147,10 +143,6 @@ public class MediaServerConfiguration {
 
 		if (configuration.get(JDBC_DB_URL_PROPERTY) == null) {
 			missingProperties.add(JDBC_DB_URL_PROPERTY);
-		}
-
-		if (configuration.get(BC_CHANNELS_SERVER) == null) {
-			missingProperties.add(BC_CHANNELS_SERVER);
 		}
 
 		if (configuration.get(XMPP_COMPONENT_HOST) == null) {
