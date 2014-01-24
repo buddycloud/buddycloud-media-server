@@ -45,16 +45,17 @@ public class Main {
 		try {
 			startRestletComponent(configuration);
 		} catch (Exception e) {
-			LOGGER.error(e.getMessage(), e);
+			LOGGER.error("Error while starting HTTP component", e);
 			System.exit(1);
 		}
 
-        while (!startXMPPToolBox(configuration)) {
-            try {
+        try {
+            while (!startXMPPToolBox(configuration)) {
                 Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                System.exit(1);
             }
+        } catch (Exception e) {
+            LOGGER.error("Error while starting XMPP client / component", e);
+            System.exit(1);
         }
 
         keepAlive();
@@ -173,8 +174,7 @@ public class Main {
 		connection.addPacketSendingListener(new PacketListener() {
 			@Override
 			public void processPacket(Packet arg0) {
-				LOGGER.debug("S: " + arg0.toXML() + ". Timeout: " +
-                        SmackConfiguration.getPacketReplyTimeout());
+				LOGGER.debug("S: " + arg0.toXML());
 			}
 		}, iqFilter);
 
