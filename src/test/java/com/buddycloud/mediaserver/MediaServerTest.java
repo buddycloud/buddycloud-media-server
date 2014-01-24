@@ -15,17 +15,16 @@
  */
 package com.buddycloud.mediaserver;
 
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.util.Properties;
-
-import javax.imageio.ImageIO;
-
+import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
+import com.buddycloud.mediaserver.business.model.Media;
+import com.buddycloud.mediaserver.business.util.AudioUtils;
+import com.buddycloud.mediaserver.business.util.ImageUtils;
+import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
+import com.buddycloud.mediaserver.business.util.VideoUtils;
+import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -41,18 +40,16 @@ import org.restlet.ext.html.FormDataSet;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.StringRepresentation;
 
-import com.buddycloud.mediaserver.business.jdbc.MetaDataSource;
-import com.buddycloud.mediaserver.business.model.Media;
-import com.buddycloud.mediaserver.business.util.AudioUtils;
-import com.buddycloud.mediaserver.business.util.ImageUtils;
-import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
-import com.buddycloud.mediaserver.business.util.VideoUtils;
-import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.DateFormat;
+import java.util.Properties;
 
 public abstract class MediaServerTest {
+    protected static final String HTTP_TESTS_PORT = "8081";
 
     protected static final String TEST_JDBC_DRIVER_CLASS = "org.hsqldb.jdbcDriver";
     protected static final String TEST_JDBC_DB_URL = "jdbc:hsqldb:mem:test;user=sa;sql.syntax_pgs=true";
@@ -92,6 +89,8 @@ public abstract class MediaServerTest {
                 TEST_JDBC_DRIVER_CLASS);
         configuration.setProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY,
                 TEST_JDBC_DB_URL);
+        configuration.setProperty(MediaServerConfiguration.HTTP_PORT,
+                HTTP_TESTS_PORT);
 
         dataSource = new MetaDataSource();
         gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
