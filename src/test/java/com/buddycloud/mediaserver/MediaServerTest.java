@@ -49,7 +49,8 @@ import java.text.DateFormat;
 import java.util.Properties;
 
 public abstract class MediaServerTest {
-    protected static final String HTTP_TESTS_PORT = "8081";
+    protected static final String HTTP_TEST_PORT = MediaServerConfiguration.getInstance()
+            .getConfiguration().getProperty(MediaServerConfiguration.HTTP_TESTS_PORT);
 
     protected static final String TEST_JDBC_DRIVER_CLASS = "org.hsqldb.jdbcDriver";
     protected static final String TEST_JDBC_DB_URL = "jdbc:hsqldb:mem:test;user=sa;sql.syntax_pgs=true";
@@ -69,7 +70,8 @@ public abstract class MediaServerTest {
 	protected static final String BASE_TOKEN = "secret";
 	protected static final String BASE_CHANNEL = "testreg123@buddycloud.org";
 	protected static final String BASE_USER = "testreg123@buddycloud.org";
-	protected static final String BASE_URL = "http://localhost:8080";
+
+	protected static final String BASE_URL = "http://localhost:" + HTTP_TEST_PORT;
 
 	protected static RestletTest restletTest;
 	protected static XMPPTest xmppTest;
@@ -78,20 +80,10 @@ public abstract class MediaServerTest {
 	protected static Gson gson;
 
 
+
     @BeforeClass
     public static void prepareEnv() throws Exception {
-        configuration = MediaServerConfiguration.getInstance()
-                .getConfiguration();
-        configuration.setProperty(
-                MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY,
-                TEST_MEDIA_STORAGE_ROOT);
-        configuration.setProperty(MediaServerConfiguration.JDBC_DRIVER_CLASS_PROPERTY,
-                TEST_JDBC_DRIVER_CLASS);
-        configuration.setProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY,
-                TEST_JDBC_DB_URL);
-        configuration.setProperty(MediaServerConfiguration.HTTP_PORT,
-                configuration.getProperty(MediaServerConfiguration.HTTP_TESTS_PORT));
-
+        buildConfiguration();
         dataSource = new MetaDataSource();
         gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
@@ -114,6 +106,20 @@ public abstract class MediaServerTest {
     @After
     public void tearDown() throws Exception {
         testTearDown();
+    }
+
+    private static void buildConfiguration() {
+        configuration = MediaServerConfiguration.getInstance()
+                .getConfiguration();
+        configuration.setProperty(
+                MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY,
+                TEST_MEDIA_STORAGE_ROOT);
+        configuration.setProperty(MediaServerConfiguration.JDBC_DRIVER_CLASS_PROPERTY,
+                TEST_JDBC_DRIVER_CLASS);
+        configuration.setProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY,
+                TEST_JDBC_DB_URL);
+        configuration.setProperty(MediaServerConfiguration.HTTP_PORT,
+                HTTP_TEST_PORT);
     }
 
     private static void createSchema() throws IOException, SQLException {
