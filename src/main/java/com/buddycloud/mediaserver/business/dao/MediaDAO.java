@@ -666,25 +666,28 @@ public class MediaDAO {
 		BufferedImage previewImg;
         MediaFile<byte[]> thumbnail;
 
+        String previewExtension;
 		if (ImageUtils.isImage(extension)) {
 			previewImg = ImageUtils.createImagePreview(file, maxWidth, maxHeight);
 
 			thumbnail = new MediaFile<byte[]>(media.getMimeType(),
 					ImageUtils.imageToBytes(previewImg, extension),
                     media.getLastUpdatedDate());
+            previewExtension = extension;
 		} else if (VideoUtils.isVideo(extension)) {
 			previewImg = new VideoUtils(file).createVideoPreview(maxWidth, maxHeight);
 
 			thumbnail = new MediaFile<byte[]>(VideoUtils.PREVIEW_MIME_TYPE,
 					ImageUtils.imageToBytes(previewImg, VideoUtils.PREVIEW_TYPE),
                     media.getLastUpdatedDate());
+            previewExtension = VideoUtils.PREVIEW_TYPE;
 		} else {
 			throw new InvalidPreviewFormatException(extension);
 		}
 
 		// store preview in another flow
 		new StorePreviewThread(previewId, mediaDirectory, media.getId(), thumbnail.getMimeType(), maxHeight,
-				maxWidth, extension, previewImg).start();
+				maxWidth, previewExtension, previewImg).start();
 
 		return thumbnail;
 	}
