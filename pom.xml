@@ -271,7 +271,6 @@
     <properties>
         <restlet-version>2.2-M6</restlet-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <skipTests>true</skipTests>
     </properties>
     <repositories>
         <repository>
