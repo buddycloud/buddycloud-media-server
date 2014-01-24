@@ -68,6 +68,9 @@ required. This file has multiple properties definitions:
 	xmpp.connection.host=localhost
 	xmpp.connection.port=5222
 	xmpp.connection.servicename=example.com
+
+	# How much time it will wait for a response to an XMPP request (in milliseconds)
+    xmpp.reply.timeout=30000
 	
 	# JDBC
 	jdbc.db.url=jdbc:postgresql://localhost:5432/mediaserver?user=postgres&password=postgres
