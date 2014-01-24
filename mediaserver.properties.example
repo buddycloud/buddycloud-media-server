@@ -3,6 +3,7 @@ cache.max.age=86400
 
 # HTTP 
 http.port=8080
+http.tests.port=9090
 https.port=8443
 https.enabled=false
 https.keystore.path=/$HOME/.jetty/jetty.jks

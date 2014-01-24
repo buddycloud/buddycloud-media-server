@@ -50,6 +50,7 @@ required. This file has multiple properties definitions:
 
 	# HTTP 
 	http.port=8080
+	http.tests.port=9090
 	https.port=8443
 	https.enabled=true
 	https.keystore.path=/$HOME/.jetty/jetty.jks
@@ -96,6 +97,8 @@ you **must** provide the others *https* properties.
 - **https.keystore.password**: the keystore password.
 - **https.key.password**: the HTTPS key password.
 - **http.port** (Optional): the HTTP port where the server will listen for HTTP requests (default is *8080*).
+- **http.tests.port** (Optional): the HTTP port where the server will listen for HTTP requests while running tests (default is *9090*).
+
 
 XMPP related:
 

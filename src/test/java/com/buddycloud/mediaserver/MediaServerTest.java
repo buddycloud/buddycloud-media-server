@@ -90,7 +90,7 @@ public abstract class MediaServerTest {
         configuration.setProperty(MediaServerConfiguration.JDBC_DB_URL_PROPERTY,
                 TEST_JDBC_DB_URL);
         configuration.setProperty(MediaServerConfiguration.HTTP_PORT,
-                HTTP_TESTS_PORT);
+                configuration.getProperty(MediaServerConfiguration.HTTP_TESTS_PORT));
 
         dataSource = new MetaDataSource();
         gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();

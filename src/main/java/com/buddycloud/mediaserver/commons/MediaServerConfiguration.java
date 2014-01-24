@@ -52,6 +52,7 @@ public class MediaServerConfiguration {
 
 	// HTTP
 	public static final String HTTP_PORT = "http.port";
+    public static final String HTTP_TESTS_PORT = "http.tests.port";
 	public static final String HTTPS_PORT = "https.port";
 	public static final String HTTPS_ENABLED = "https.enabled";
 	public static final String HTTPS_KEYSTORE_PATH = "https.keystore.path";
@@ -79,6 +80,7 @@ public class MediaServerConfiguration {
 	public static final long DEF_MEDIA_TO_DISK_THRESHOLD = 1048576;
 
 	// HTTP
+    public static final int DEF_HTTP_TESTS_PORT = 9091;
 	public static final int DEF_HTTP_PORT = 8080;
 	public static final boolean DEF_HTTPS_ENABLED = false;
 
@@ -136,6 +138,10 @@ public class MediaServerConfiguration {
 
 		if (configuration.get(HTTP_PORT) == null) {
 			configuration.put(HTTP_PORT, DEF_HTTP_PORT);
+		}
+
+        if (configuration.get(HTTP_TESTS_PORT) == null) {
+			configuration.put(HTTP_TESTS_PORT, DEF_HTTP_TESTS_PORT);
 		}
 
 		if (configuration.get(HTTPS_ENABLED) == null) {
