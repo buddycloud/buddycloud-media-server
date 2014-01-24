@@ -47,6 +47,7 @@ public class XMPPTest implements TextExtension {
 	@Override
 	public void shutdown() throws Exception {
 		if (started) {
+            XMPPToolBox.getInstance().stop();
 			started = false;
 		}
 	}

@@ -53,6 +53,12 @@ public class XMPPToolBox {
 		}
 	}
 
+    public void stop() {
+        if (started) {
+            started = false;
+        }
+    }
+
 	public AuthVerifier getAuthClient() {
 		return authClient;
 	}

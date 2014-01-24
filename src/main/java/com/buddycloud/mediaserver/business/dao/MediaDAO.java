@@ -31,10 +31,7 @@ import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.MemberDecorator;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.ModeratorDecorator;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.OwnerDecorator;
-import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.PublisherDecorator;
+import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -72,14 +69,12 @@ public class MediaDAO {
 	private static Logger LOGGER = LoggerFactory.getLogger(MediaDAO.class);
 
 	protected MetaDataSource dataSource;
-	protected PubSubClient pubsub;
 	protected Properties configuration;
 	protected Gson gson;
 
 	
 	protected MediaDAO() {
 		this.dataSource = new MetaDataSource();
-		this.pubsub = XMPPToolBox.getInstance().getPubSubClient();
 		this.gson = new GsonBuilder().setDateFormat(DateFormat.FULL,
 				DateFormat.FULL).create();
 		this.configuration = MediaServerConfiguration.getInstance()
@@ -108,10 +103,7 @@ public class MediaDAO {
 				.equals(userJID);
 
 		if (!isUploader) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
-					entityId, new OwnerDecorator(new ModeratorDecorator()));
-
-			if (!isUserAllowed) {
+			if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator()))) {
 				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform delete operation on: "
 						+ mediaId);
@@ -178,11 +170,8 @@ public class MediaDAO {
         }
 
         if (userJID != null) {
-            boolean isUserAllowed = pubsub.matchUserCapability(userJID,
-                    entityId, new OwnerDecorator(new ModeratorDecorator(
-                    new PublisherDecorator(new MemberDecorator()))));
-
-            if (!isUserAllowed) {
+            if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator(
+                    new PublisherDecorator(new MemberDecorator()))))) {
                 LOGGER.debug("User '" + userJID
                         + "' not allowed to peform get info operation on: "
                         + entityId);
@@ -211,11 +200,8 @@ public class MediaDAO {
 			throws UserNotAllowedException, MetadataSourceException {
 
 		if (userJID != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
-					entityId, new OwnerDecorator(new ModeratorDecorator(
-							new PublisherDecorator(new MemberDecorator()))));
-
-			if (!isUserAllowed) {
+			if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator(
+                    new PublisherDecorator(new MemberDecorator()))))) {
 				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform get info operation on: "
 						+ entityId);
@@ -250,11 +236,8 @@ public class MediaDAO {
 		}
 
 		if (userJID != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
-					entityId, new OwnerDecorator(new ModeratorDecorator(
-							new PublisherDecorator(new MemberDecorator()))));
-
-			if (!isUserAllowed) {
+            if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator(
+                    new PublisherDecorator(new MemberDecorator()))))) {
 				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform get operation on: "
 						+ entityId);
@@ -329,11 +312,8 @@ public class MediaDAO {
 		}
 
 		if (userJID != null) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
-					entityId, new OwnerDecorator(new ModeratorDecorator(
-							new PublisherDecorator(new MemberDecorator()))));
-
-			if (!isUserAllowed) {
+            if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator(
+                    new PublisherDecorator(new MemberDecorator()))))) {
 				LOGGER.debug("User '" + userJID
 						+ "' not allowed to get media on: " + entityId);
 				throw new UserNotAllowedException(userJID);
@@ -400,14 +380,9 @@ public class MediaDAO {
 
 		boolean isUploader = dataSource.getMediaUploader(mediaId)
 				.equals(userJID);
-		boolean isMember = pubsub.matchUserCapability(userJID, entityId,
-				new MemberDecorator());
 
-		if (!(isUploader && isMember)) {
-			boolean isUserAllowed = pubsub.matchUserCapability(userJID,
-					entityId, new OwnerDecorator(new ModeratorDecorator()));
-
-			if (!isUserAllowed) {
+		if (!isUploader) {
+            if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator()))) {
 				LOGGER.debug("User '" + userJID
 						+ "' not allowed to peform delete operation on: "
 						+ mediaId);
@@ -461,11 +436,9 @@ public class MediaDAO {
 
 		LOGGER.debug("User '" + userJID
 				+ "' trying to upload web-form media on: " + entityId);
-		
-		boolean isUserAllowed = pubsub.matchUserCapability(userJID, entityId,
-				new OwnerDecorator(new ModeratorDecorator(new PublisherDecorator())));
 
-		if (!isUserAllowed) {
+        if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator(
+                new PublisherDecorator())))) {
 			LOGGER.debug("User '" + userJID
 					+ "' not allowed to uploade file on: " + entityId);
 			throw new UserNotAllowedException(userJID);
@@ -532,12 +505,9 @@ public class MediaDAO {
 
 		LOGGER.debug("User '" + userJID
 				+ "' trying to upload form-data media in: " + entityId);
-		
-		boolean isUserAllowed = pubsub.matchUserCapability(userJID, entityId,
-				new OwnerDecorator(new ModeratorDecorator(
-						new PublisherDecorator())));
 
-		if (!isUserAllowed) {
+        if (!isUserAllowed(userJID, entityId, new OwnerDecorator(new ModeratorDecorator(
+                new PublisherDecorator())))) {
 			LOGGER.debug("User '" + userJID
 					+ "' not allowed to upload file in: " + entityId);
 			throw new UserNotAllowedException(userJID);
@@ -845,6 +815,11 @@ public class MediaDAO {
 				.getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
 				+ File.separator + entityId;
 	}
+
+    private boolean isUserAllowed(String userJID, String entityId, CapabilitiesDecorator capabilities) {
+        PubSubClient pubSubClient = XMPPToolBox.getInstance().getPubSubClient();
+        return pubSubClient.matchUserCapability(userJID, entityId, capabilities);
+    }
 
 	// Thread responsible to store preview's file and metadata
 	private class StorePreviewThread extends Thread {

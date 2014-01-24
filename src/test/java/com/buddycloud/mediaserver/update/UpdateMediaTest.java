@@ -90,9 +90,7 @@ public class UpdateMediaTest extends MediaServerTest {
                 EasyMock.startsWith(URL))).andReturn(true);
 
         pubSubClient = xmppTest.getPubSubClient();
-        EasyMock.expect(pubSubClient.matchUserCapability(EasyMock.matches(BASE_USER),
-                EasyMock.matches(BASE_CHANNEL),
-                (CapabilitiesDecorator) EasyMock.notNull())).andReturn(true);
+
 
         EasyMock.replay(authClient);
         EasyMock.replay(pubSubClient);

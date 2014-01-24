@@ -110,7 +110,6 @@ public abstract class MediaServerTest {
     @Before
     public void setUp() throws Exception {
         testSetUp();
-        Thread.sleep(1000);
     }
 
     @After
