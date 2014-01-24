@@ -172,7 +172,8 @@ public class Main {
 		connection.addPacketSendingListener(new PacketListener() {
 			@Override
 			public void processPacket(Packet arg0) {
-				LOGGER.debug("S: " + arg0.toXML());
+				LOGGER.debug("S: " + arg0.toXML() + ". Timeout: " +
+                        SmackConfiguration.getPacketReplyTimeout());
 			}
 		}, iqFilter);
 
@@ -206,8 +207,6 @@ public class Main {
 			LOGGER.error("XMPP connection coudn't be started", e);
 			throw new CreateXMPPConnectionException(e.getMessage(), e);
 		}
-
-		addTraceListeners(connection);
 
 		return connection;
 	}

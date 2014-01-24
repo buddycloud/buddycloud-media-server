@@ -15,9 +15,9 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
-import java.util.Collection;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
+import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
+import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
+import org.jivesoftware.smack.SmackConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.AbstractComponent;
@@ -25,8 +25,8 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 
-import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
-import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
+import java.util.Collection;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Media Server XMPP Component Follows the XEP-0114
@@ -57,7 +57,8 @@ public class MediaServerComponent extends AbstractComponent {
 
 	public void sendPacket(Packet arg0) {
 		arg0.setFrom(getJID());
-		LOGGER.debug("S: " + arg0.toXML());
+		LOGGER.debug("S: " + arg0.toXML() + ". Timeout: " +
+                SmackConfiguration.getPacketReplyTimeout());
 		super.send(arg0);
 	}
 
