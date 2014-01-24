@@ -17,7 +17,6 @@ package com.buddycloud.mediaserver.xmpp;
 
 import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
 import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
-import org.jivesoftware.smack.SmackConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.AbstractComponent;
@@ -57,8 +56,7 @@ public class MediaServerComponent extends AbstractComponent {
 
 	public void sendPacket(Packet arg0) {
 		arg0.setFrom(getJID());
-		LOGGER.debug("S: " + arg0.toXML() + ". Timeout: " +
-                SmackConfiguration.getPacketReplyTimeout());
+		LOGGER.debug("S: " + arg0.toXML());
 		super.send(arg0);
 	}
 

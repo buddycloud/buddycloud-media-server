@@ -122,6 +122,7 @@ public class Main {
 
 		XMPPConnection connection = createAndStartConnection(configuration);
 		addTraceListeners(connection);
+        LOGGER.info("Buddycloud Media Server XMPP client connection started!");
 
         MediaServerComponent component;
         try {
