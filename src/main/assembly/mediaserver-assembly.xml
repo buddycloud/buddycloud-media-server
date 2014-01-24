@@ -3,7 +3,9 @@
   xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
   <id>buddycloud-mediaserver</id>
   <formats>
-    <format>zip</format>
+      <format>tar.gz</format>
+      <format>tar.bz2</format>
+      <format>zip</format>
   </formats>
   <baseDirectory>buddycloud-media-server</baseDirectory>
   <componentDescriptors>
