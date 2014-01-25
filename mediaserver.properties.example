@@ -6,7 +6,7 @@ http.port=8080
 http.tests.port=9090
 https.port=8443
 https.enabled=false
-https.keystore.path=/usr/share/buddycloud-media-server/jetty.jks
+https.keystore.path=/$HOME/.jetty/jetty.jks
 https.keystore.type=JKS
 https.keystore.password=password
 https.key.password=password
@@ -27,11 +27,11 @@ xmpp.connection.servicename=buddycloud.org
 xmpp.reply.timeout=30000
 
 # JDBC
-jdbc.db.url=jdbc:postgresql://localhost:5432/#DATABASE_NAME#?user=#DATABASE_USER#&password=#DATABASE_PASSWORD#
+jdbc.db.url=jdbc:postgresql://localhost:5432/buddycloud-media-server?user=postgres&password=postgres
 jdbc.driver.class=org.postgresql.Driver
 
 # File System
-media.storage.root=/usr/share/buddycloud-media-server/storage
+media.storage.root=/tmp
 
 # Max threshold beyond which files are written directly to disk, in bytes
 # Only used while uploading multipart form data files
@@ -39,4 +39,3 @@ media.todisk.threshold=1048576
 
 # Max filesize in bytes
 media.sizelimit=100000000
-
