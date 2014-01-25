@@ -25,7 +25,7 @@
   	<fileSet>
   		<outputDirectory></outputDirectory>
   		<includes>
-  			<include>mediaserver.properties</include>
+  			<include>mediaserver.properties.example</include>
   			<include>logback.xml</include>
   		</includes>
   	</fileSet>
