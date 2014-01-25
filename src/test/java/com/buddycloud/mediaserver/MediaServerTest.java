@@ -71,7 +71,8 @@ public abstract class MediaServerTest {
 	protected static final String BASE_CHANNEL = "testreg123@buddycloud.org";
 	protected static final String BASE_USER = "testreg123@buddycloud.org";
 
-	protected static final String BASE_URL = "http://localhost:" + HTTP_TEST_PORT;
+    protected static final String BASE_URL = "http://localhost:" + HTTP_TEST_PORT;
+    protected static final String XUGGLE_DIR = "/tmp/xuggle";
 
 	protected static RestletTest restletTest;
 	protected static XMPPTest xmppTest;
@@ -87,6 +88,7 @@ public abstract class MediaServerTest {
         dataSource = new MetaDataSource();
         gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
 
+        removeXuggleFolder();
         start();
         createSchema();
     }
@@ -96,6 +98,7 @@ public abstract class MediaServerTest {
         restletTest.shutdown();
         xmppTest.shutdown();
         dropSchema();
+        removeXuggleFolder();
     }
 
     @Before
@@ -106,6 +109,15 @@ public abstract class MediaServerTest {
     @After
     public void tearDown() throws Exception {
         testTearDown();
+    }
+
+    private static void removeXuggleFolder() {
+        File directory = new File(XUGGLE_DIR);
+        if (directory.exists()) {
+            try {
+                FileUtils.deleteDirectory(directory);
+            } catch (IOException ignored) {}
+        }
     }
 
     private static void buildConfiguration() {
