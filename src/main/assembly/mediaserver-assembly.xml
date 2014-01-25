@@ -7,7 +7,7 @@
       <format>tar.bz2</format>
       <format>zip</format>
   </formats>
-  <baseDirectory>${project.build.finalName}</baseDirectory>
+  <baseDirectory>${project.name}</baseDirectory>
   <componentDescriptors>
     <componentDescriptor>src/main/assembly/component.xml</componentDescriptor>
   </componentDescriptors>
