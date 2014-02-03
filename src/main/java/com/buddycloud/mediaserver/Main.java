@@ -16,7 +16,6 @@
 package com.buddycloud.mediaserver;
 
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.commons.exception.CreateXMPPConnectionException;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
@@ -51,11 +50,10 @@ public class Main {
 
         try {
             while (!startXMPPToolBox(configuration)) {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             }
         } catch (Exception e) {
             LOGGER.error("Error while starting XMPP client / component", e);
-            System.exit(1);
         }
 
         keepAlive();
@@ -204,9 +202,9 @@ public class Main {
 			connection.connect();
 			connection.login(userName,
 					configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_PASSWORD));
-		} catch (XMPPException e) {
+		} catch (org.jivesoftware.smack.XMPPException e) {
 			LOGGER.error("XMPP connection coudn't be started", e);
-			throw new CreateXMPPConnectionException(e.getMessage(), e);
+			throw new com.buddycloud.mediaserver.commons.exception.XMPPException(e.getMessage(), e);
 		}
 
 		return connection;

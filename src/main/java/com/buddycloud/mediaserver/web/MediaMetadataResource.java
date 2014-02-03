@@ -18,10 +18,7 @@ package com.buddycloud.mediaserver.web;
 import com.buddycloud.mediaserver.business.dao.DAOFactory;
 import com.buddycloud.mediaserver.business.dao.MediaDAO;
 import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.MediaNotFoundException;
-import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
-import com.buddycloud.mediaserver.commons.exception.MissingAuthenticationException;
-import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
+import com.buddycloud.mediaserver.commons.exception.*;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.restlet.Request;
 import org.restlet.data.MediaType;
@@ -70,6 +67,8 @@ public class MediaMetadataResource extends MediaServerResource {
         } catch (MissingAuthenticationException e) {
             setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
             return authenticationResponse();
+        } catch (XMPPException e) {
+            setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
         } catch (Throwable t) {
             return unexpectedError(t);
         }

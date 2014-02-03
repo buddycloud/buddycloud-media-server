@@ -21,6 +21,7 @@ import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.exception.MetadataSourceException;
 import com.buddycloud.mediaserver.commons.exception.MissingAuthenticationException;
 import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
+import com.buddycloud.mediaserver.commons.exception.XMPPException;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Request;
@@ -65,6 +66,8 @@ public class ChannelResource extends MediaServerResource {
 		} catch (MissingAuthenticationException e) {
             setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
             return authenticationResponse();
+        } catch (XMPPException e) {
+            setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
         } catch (Throwable t) {
             return unexpectedError(t);
         }
@@ -103,6 +106,8 @@ public class ChannelResource extends MediaServerResource {
 		} catch (MissingAuthenticationException e) {
             setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
             return authenticationResponse();
+        } catch (XMPPException e) {
+            setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
         } catch (Throwable t) {
             return unexpectedError(t);
         }

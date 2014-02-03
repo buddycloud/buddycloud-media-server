@@ -83,6 +83,8 @@ public class MediaResource extends MediaServerResource {
             setStatus(Status.CLIENT_ERROR_BAD_REQUEST);
         } catch (UserNotAllowedException e) {
             setStatus(Status.CLIENT_ERROR_FORBIDDEN);
+        } catch (XMPPException e) {
+            setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
         } catch (Throwable t) {
             return unexpectedError(t);
         }
@@ -115,6 +117,8 @@ public class MediaResource extends MediaServerResource {
         } catch (MissingAuthenticationException e) {
             setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
             return authenticationResponse();
+        } catch (XMPPException e) {
+            setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
         } catch (Throwable t) {
             return unexpectedError(t);
         }
@@ -150,6 +154,8 @@ public class MediaResource extends MediaServerResource {
         } catch (MissingAuthenticationException e) {
             setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
             return authenticationResponse();
+        } catch (XMPPException e) {
+            setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
         } catch (Throwable t) {
             return unexpectedError(t);
         }
@@ -196,6 +202,8 @@ public class MediaResource extends MediaServerResource {
         } catch (MissingAuthenticationException e) {
             setStatus(Status.CLIENT_ERROR_UNAUTHORIZED);
             return authenticationResponse();
+        } catch (XMPPException e) {
+            setStatus(Status.SERVER_ERROR_SERVICE_UNAVAILABLE);
         } catch (Throwable t) {
             return unexpectedError(t);
         }

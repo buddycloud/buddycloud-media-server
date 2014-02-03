@@ -15,6 +15,7 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
+import com.buddycloud.mediaserver.commons.exception.XMPPException;
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 import org.jivesoftware.smack.XMPPConnection;
 
@@ -60,10 +61,16 @@ public class XMPPToolBox {
     }
 
 	public AuthVerifier getAuthClient() {
+        if (!started) {
+            throw new XMPPException("XMPP component not ready");
+        }
 		return authClient;
 	}
 
 	public PubSubClient getPubSubClient() {
+        if (!started) {
+            throw new XMPPException("XMPP client not ready");
+        }
 		return pubSubClient;
 	}
 }
