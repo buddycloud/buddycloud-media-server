@@ -40,3 +40,5 @@ media.todisk.threshold=1048576
 # Max filesize in bytes
 media.sizelimit=100000000
 
+# API endpoint advertising via DISCO#info
+api.endpoint=https://example.com/api
