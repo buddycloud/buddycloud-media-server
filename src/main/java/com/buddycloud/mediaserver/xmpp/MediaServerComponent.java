@@ -126,7 +126,7 @@ public class MediaServerComponent extends AbstractComponent {
 			responseElement.addElement("feature").addAttribute("var", feature);
 		}
 		
-		String endPoint = configuration.getProperty(MediaServerConfiguration.API_ENDPOINT);
+		String endPoint = configuration.getProperty(MediaServerConfiguration.HTTP_ENDPOINT);
 		if (endPoint != null) {
 			DataForm x = new DataForm("result");
 			

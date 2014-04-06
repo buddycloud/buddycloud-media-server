@@ -52,6 +52,7 @@ public class MediaServerConfiguration {
 
 	// HTTP
 	public static final String HTTP_PORT = "http.port";
+	public static final String HTTP_ENDPOINT = "http.endpoint";
     public static final String HTTP_TESTS_PORT = "http.tests.port";
 	public static final String HTTPS_PORT = "https.port";
 	public static final String HTTPS_ENABLED = "https.enabled";
@@ -59,9 +60,6 @@ public class MediaServerConfiguration {
 	public static final String HTTPS_KEYSTORE_TYPE = "https.keystore.type";
 	public static final String HTTPS_KEYSTORE_PASSWORD = "https.keystore.password";
 	public static final String HTTPS_KEY_PASSWORD = "https.key.password";
-	
-	// API
-	public static final String API_ENDPOINT = "api.endpoint";
 
 	// CACHE
 	public static final String CACHE_MAX_AGE = "cache.max.age";
