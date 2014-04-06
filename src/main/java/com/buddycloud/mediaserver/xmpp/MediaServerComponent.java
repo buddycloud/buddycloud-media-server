@@ -23,6 +23,7 @@ import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.packet.DataForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
@@ -102,7 +103,7 @@ public class MediaServerComponent extends AbstractComponent {
 		return collector;
 	}
 
-        @Override
+    @Override
 	protected IQ handleDiscoInfo(IQ iq) {
 		final IQ replyPacket = IQ.createResultIQ(iq);
 		final Element responseElement = replyPacket.setChildElement("query",
@@ -126,7 +127,12 @@ public class MediaServerComponent extends AbstractComponent {
 			responseElement.addElement("feature").addAttribute("var", feature);
 		}
 		
-		String endPoint = configuration.getProperty(MediaServerConfiguration.HTTP_ENDPOINT);
+		addHttpEndPointDetails(responseElement);
+		return replyPacket;
+	}
+        
+    protected void addHttpEndPointDetails(Element responseElement) {
+    	String endPoint = configuration.getProperty(MediaServerConfiguration.HTTP_ENDPOINT);
 		if (endPoint != null) {
 			DataForm x = new DataForm("result");
 			
@@ -142,7 +148,6 @@ public class MediaServerComponent extends AbstractComponent {
 			
 			responseElement.add(x);
 		}
+    }
 
-		return replyPacket;
-	}
 }
