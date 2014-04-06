@@ -94,4 +94,30 @@ public class MediaServerComponent extends AbstractComponent {
 		collectors.add(collector);
 		return collector;
 	}
+
+        @Override
+	protected IQ handleDiscoInfo(IQ iq) {
+		final IQ replyPacket = IQ.createResultIQ(iq);
+		final Element responseElement = replyPacket.setChildElement("query",
+				NAMESPACE_DISCO_INFO);
+
+		// identity
+		responseElement.addElement("identity").addAttribute("category",
+				discoInfoIdentityCategory()).addAttribute("type",
+				discoInfoIdentityCategoryType())
+				.addAttribute("name", getName());
+		// features
+		responseElement.addElement("feature").addAttribute("var",
+				NAMESPACE_DISCO_INFO);
+		responseElement.addElement("feature").addAttribute("var",
+				NAMESPACE_XMPP_PING);
+		responseElement.addElement("feature").addAttribute("var",
+				NAMESPACE_LAST_ACTIVITY);
+		responseElement.addElement("feature").addAttribute("var",
+				NAMESPACE_ENTITY_TIME);
+		for (final String feature : discoInfoFeatureNamespaces()) {
+			responseElement.addElement("feature").addAttribute("var", feature);
+		}
+		return replyPacket;
+	}
 }
