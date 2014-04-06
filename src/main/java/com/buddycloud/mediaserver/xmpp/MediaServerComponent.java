@@ -15,8 +15,12 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
 import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
+
+import org.jivesoftware.smackx.FormField;
+import org.jivesoftware.smackx.packet.DataForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.AbstractComponent;
@@ -25,6 +29,7 @@ import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 
 import java.util.Collection;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
@@ -40,8 +45,10 @@ public class MediaServerComponent extends AbstractComponent {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MediaServerComponent.class);
 
 	protected final Collection<MediaServerPacketCollector> collectors = new ConcurrentLinkedQueue<MediaServerPacketCollector>();
+	private Properties configuration;
 
-	public MediaServerComponent() {
+	public MediaServerComponent(Properties configuration) {
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -118,6 +125,24 @@ public class MediaServerComponent extends AbstractComponent {
 		for (final String feature : discoInfoFeatureNamespaces()) {
 			responseElement.addElement("feature").addAttribute("var", feature);
 		}
+		
+		String endPoint = configuration.getProperty(MediaServerConfiguration.API_ENDPOINT);
+		if (endPoint != null) {
+			DataForm x = new DataForm("result");
+			
+			FormField formTypeField = new FormField("FORM_TYPE");
+			formTypeField.setType(FormField.TYPE_HIDDEN);
+			formTypeField.addValue(MediaServerConfiguration.BUDDYCLOUD_NS_API);
+			x.addField(formTypeField);
+			
+			FormField endPointField = new FormField(MediaServerConfiguration.API_ENDPOINT_FIELD_VAR);
+			endPointField.setType(FormField.TYPE_TEXT_SINGLE);
+			endPointField.addValue(endPoint);
+			x.addField(endPointField);
+			
+			responseElement.add(x);
+		}
+
 		return replyPacket;
 	}
 }

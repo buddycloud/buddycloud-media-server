@@ -59,6 +59,9 @@ public class MediaServerConfiguration {
 	public static final String HTTPS_KEYSTORE_TYPE = "https.keystore.type";
 	public static final String HTTPS_KEYSTORE_PASSWORD = "https.keystore.password";
 	public static final String HTTPS_KEY_PASSWORD = "https.key.password";
+	
+	// API
+	public static final String API_ENDPOINT = "api.endpoint";
 
 	// CACHE
 	public static final String CACHE_MAX_AGE = "cache.max.age";
@@ -87,6 +90,10 @@ public class MediaServerConfiguration {
 	private static MediaServerConfiguration instance = new MediaServerConfiguration();
 
 	private static final String CONFIGURATION_FILE = "mediaserver.properties";
+	
+	public static final String BUDDYCLOUD_NS_API = "http://buddycloud.org/v1/api";
+	public static final String API_ENDPOINT_FIELD_VAR = "endpoint";
+	
 	private static Logger LOGGER = LoggerFactory.getLogger(MediaServerConfiguration.class);
 
 	private Properties configuration;
