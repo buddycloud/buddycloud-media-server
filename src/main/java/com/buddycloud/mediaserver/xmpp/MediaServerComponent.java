@@ -23,11 +23,11 @@ import org.jivesoftware.smackx.FormField;
 import org.jivesoftware.smackx.packet.DataForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
-
 import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -40,9 +40,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class MediaServerComponent extends AbstractComponent {
 
-	private static final String DESCRIPTION = "An XMPP Media Server";
-	private static final String NAME = "Media Server";
+	public static final String DESCRIPTION = "An XMPP Media Server";
+	public static final String NAME = "Media Server";
 	private static final Logger LOGGER = LoggerFactory.getLogger(MediaServerComponent.class);
+
+	public static final String NS_DATAFORM = "jabber:x:data";
 
 	protected final Collection<MediaServerPacketCollector> collectors = new ConcurrentLinkedQueue<MediaServerPacketCollector>();
 	private Properties configuration;
@@ -133,21 +135,24 @@ public class MediaServerComponent extends AbstractComponent {
         
     protected void addHttpEndPointDetails(Element responseElement) {
     	String endPoint = configuration.getProperty(MediaServerConfiguration.HTTP_ENDPOINT);
-		if (endPoint != null) {
-			DataForm x = new DataForm("result");
-			
-			FormField formTypeField = new FormField("FORM_TYPE");
-			formTypeField.setType(FormField.TYPE_HIDDEN);
-			formTypeField.addValue(MediaServerConfiguration.BUDDYCLOUD_NS_API);
-			x.addField(formTypeField);
-			
-			FormField endPointField = new FormField(MediaServerConfiguration.API_ENDPOINT_FIELD_VAR);
-			endPointField.setType(FormField.TYPE_TEXT_SINGLE);
-			endPointField.addValue(endPoint);
-			x.addField(endPointField);
-
-			responseElement.add(x);
+		if (endPoint == null) {
+			return;
 		}
+
+		Element x = responseElement.addElement("x");			
+		x.setAttribute("xmlns", NS_DATAFORM);
+		x.setAttribute("type", "result");
+
+		Element formTypeField = x.addElement("field");
+		formTypeField.setAttribute("var", "FORM_TYPE");
+		formTypeField.setAttribute("type", FormField.TYPE_HIDDEN);
+		formTypeField.addElement("value").addText(MediaServerConfiguration.BUDDYCLOUD_NS_API);
+
+		Element endPointField = x.addElement("field");
+		endPointField.setAttribute("var", MediaServerConfiguration.API_ENDPOINT_FIELD_VAR);
+		endPointField.setAttribute("type", FormField.TYPE_TEXT_SINGLE);
+		endPointField.addElement("value").addText(endPoint);
+
     }
 
 }
