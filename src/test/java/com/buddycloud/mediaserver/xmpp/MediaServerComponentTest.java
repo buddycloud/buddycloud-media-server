@@ -15,48 +15,31 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.xmpp.Element;
-import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
-
-import org.dom4j.io.Document;
-import org.dom4j.io.DocumentFactory;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.packet.PacketExtension;
-import org.jivesoftware.smack.util.PacketParserUtils;
-import org.jivesoftware.smackx.FormField;
-import org.jivesoftware.smackx.packet.DataForm;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-
 import java.util.Properties;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smackx.packet.DiscoverInfo;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 
 public abstract class MediaServerComponentTest {
     
 	IQ discoRequest = null;
-	String packetId = "12345";
-	String to = "mediaserver.example.com";
-	String from = "me@example.com/media-lover";
+	final String packetId = "12345-67890-09876-54321";
+	final String to = "mediaserver.example.com";
+	final String from = "me@example.com/media-lover";
 	
 	@Before
 	public void setup() {
-		// TODO generate a disco info request
-		discoRequest = (IQ) new Packet() {
-			
-			@Override
-			public String toXML() {
-				// TODO Auto-generated method stub
-				return null;
-			}
-		};
-		discoRequest.setTo(to);
-		discoRequest.setFrom(from);
-		discoRequest.setPacketID(packetId);
+		IQ request = new DiscoverInfo();
+		request.setTo(to);
+		request.setFrom(from);
+		request.setPacketID(packetId);
+		
+		discoRequest = request;
 	}
 	
 	@Test
@@ -66,8 +49,7 @@ public abstract class MediaServerComponentTest {
 		component.collectPacket(discoRequest);
 		
 		// Check for standard XMPP library inclusions
-		
-		/*
+
 		  final Element responseElement = replyPacket.setChildElement("query",
 				NAMESPACE_DISCO_INFO);
 
@@ -77,19 +59,22 @@ public abstract class MediaServerComponentTest {
 				discoInfoIdentityCategoryType())
 				.addAttribute("name", getName());
 		AbstractComponent.NAMESPACE_DISCO_INFO;
-		AbstractComponent.NAMESPACE_XMPP_PING; (feature.var)
+		AbstractComponent.NAMESPACE_XMPP_PING;  (feature.var)
 		AbstractComponent.NAMESPACE_LAST_ACTIVITY; (feature.var)
 		AbstractComponent.NAMESPACE_ENTITY_TIME; (feature.var)
-		*/
+
 	}
 	
 	@Test
 	public void withApiEndPointInConfigurationServiceDiscoveryExtensionIncluded() throws Exception {
 		String endPoint = "https://api.buddycloud.com";
 		Properties properties = new Properties();
-		properties.put(MediaServerConfiguration.API_ENDPOINT, endPoit);
-	}
+		properties.put(MediaServerConfiguration.HTTP_ENDPOINT, endPoint);
+	
 		MediaServerComponent component = new MediaServerComponent(properties);
+		
+		
+		
 		component.collectPacket(discoRequest);
 		
 		// Check for standard XMPP library inclusions + service discovery extensions
@@ -111,3 +96,5 @@ public abstract class MediaServerComponentTest {
 		x. MediaServerConfiguration.API_ENDPOINT_FIELD_VAR = endPoint
 		*/
 	}
+	
+}
