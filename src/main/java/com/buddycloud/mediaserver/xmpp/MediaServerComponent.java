@@ -15,23 +15,21 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
-import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
+import java.util.Collection;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.AbstractComponent;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
-import org.jivesoftware.smackx.FormField;
-import org.jivesoftware.smackx.packet.DataForm;
-import org.jivesoftware.smackx.packet.DiscoverInfo;
-import org.jivesoftware.smackx.packet.DiscoverInfo.Identity;
 
-import java.util.Collection;
-import java.util.Properties;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
+import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
 
 /**
  * Media Server XMPP Component Follows the XEP-0114
@@ -103,39 +101,27 @@ public class MediaServerComponent extends AbstractComponent {
 		return collector;
 	}
 
-    protected IQ handleDiscoInfo(org.jivesoftware.smack.packet.IQ iq) {
-
-		DiscoverInfo info = new DiscoverInfo();
-		info.setTo(iq.getFrom().toString());
-		info.setPacketID(iq.getPacketID());
-		info.setFrom(iq.getFrom().toString());
-		
-		info.addFeature(NAMESPACE_DISCO_INFO);
-		info.addFeature(NAMESPACE_XMPP_PING);
-		info.addFeature(NAMESPACE_LAST_ACTIVITY);
-		info.addFeature(NAMESPACE_ENTITY_TIME);
-		
-		Identity identity = new Identity("component", getName(), "generic");
-		info.addIdentity(identity);
-		
+    protected IQ handleDiscoInfo(IQ iq) {
+    	IQ disco = super.handleDiscoInfo(iq);
     	String endPoint = configuration.getProperty(MediaServerConfiguration.HTTP_ENDPOINT);
 		if (endPoint != null) {
-			DataForm x = new DataForm("result");
+			Element queryEl = disco.getElement().element("query");
+			Element xEl = queryEl.addElement("x", "jabber:x:data");
+			xEl.addAttribute("type", "result");
 			
-			FormField formType = new FormField("FORM_TYPE");
-			formType.addValue(MediaServerConfiguration.BUDDYCLOUD_NS_API);
-			formType.setType(FormField.TYPE_HIDDEN);
-			x.addField(formType);
-			
-			FormField endpointField = new FormField(MediaServerConfiguration.API_ENDPOINT_FIELD_VAR);
-			endpointField.setType(FormField.TYPE_TEXT_SINGLE);
-			endpointField.addValue(endPoint);
-			x.addField(endpointField);
-
-			info.addDiscoveryExtension(x);
+			addField(xEl, "FORM_TYPE", "hidden", 
+					MediaServerConfiguration.BUDDYCLOUD_NS_API);
+			addField(xEl, MediaServerConfiguration.API_ENDPOINT_FIELD_VAR, 
+					"text-single", endPoint);
 		}
-
-		return (IQ) info;
+		return disco;
 	}
 
+	private void addField(Element xEl, String var, String type,
+			String value) {
+		Element fieldEl = xEl.addElement("field");
+		fieldEl.addAttribute("var", var);
+		fieldEl.addAttribute("type", type);
+		fieldEl.addElement("value").setText(value);
+	}
 }
