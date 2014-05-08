@@ -15,8 +15,11 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
-import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
-import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
+import java.util.Collection;
+import java.util.Properties;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.AbstractComponent;
@@ -24,8 +27,9 @@ import org.xmpp.packet.IQ;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
 
-import java.util.Collection;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketCollector;
+import com.buddycloud.mediaserver.xmpp.util.MediaServerPacketFilter;
 
 /**
  * Media Server XMPP Component Follows the XEP-0114
@@ -40,8 +44,10 @@ public class MediaServerComponent extends AbstractComponent {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MediaServerComponent.class);
 
 	protected final Collection<MediaServerPacketCollector> collectors = new ConcurrentLinkedQueue<MediaServerPacketCollector>();
+	private Properties configuration;
 
-	public MediaServerComponent() {
+	public MediaServerComponent(Properties configuration) {
+		this.configuration = configuration;
 	}
 
 	@Override
@@ -93,5 +99,29 @@ public class MediaServerComponent extends AbstractComponent {
 		// Add the collector to the list of active collectors.
 		collectors.add(collector);
 		return collector;
+	}
+
+    protected IQ handleDiscoInfo(IQ iq) {
+    	IQ disco = super.handleDiscoInfo(iq);
+    	String endPoint = configuration.getProperty(MediaServerConfiguration.HTTP_ENDPOINT);
+		if (endPoint != null) {
+			Element queryEl = disco.getElement().element("query");
+			Element xEl = queryEl.addElement("x", "jabber:x:data");
+			xEl.addAttribute("type", "result");
+			
+			addField(xEl, "FORM_TYPE", "hidden", 
+					MediaServerConfiguration.BUDDYCLOUD_NS_API);
+			addField(xEl, MediaServerConfiguration.API_ENDPOINT_FIELD_VAR, 
+					"text-single", endPoint);
+		}
+		return disco;
+	}
+
+	private void addField(Element xEl, String var, String type,
+			String value) {
+		Element fieldEl = xEl.addElement("field");
+		fieldEl.addAttribute("var", var);
+		fieldEl.addAttribute("type", type);
+		fieldEl.addElement("value").setText(value);
 	}
 }

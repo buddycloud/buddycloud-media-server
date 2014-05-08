@@ -48,47 +48,49 @@ You can configure the media server by copying `mediaserver.properties.example` t
 `mediaserver.properties` in the server's root directory, and then editing as 
 required. This file has multiple properties definitions:
 
-	# HTTP 
-	http.port=8080
-	http.tests.port=9090
-	https.port=8443
-	https.enabled=true
-	https.keystore.path=/$HOME/.jetty/jetty.jks
-	https.keystore.type=JSK
-	https.keystore.password=password
-	https.key.password=password
-	
-	# XMPP
-	xmpp.component.host=localhost
-	xmpp.component.port=5275
-	xmpp.component.subdomain=mediaserver.example.com
-	xmpp.component.secretkey=secret
-	
-	xmpp.connection.username=mediaserver-test
-	xmpp.connection.password=mediaserver-test
-	xmpp.connection.host=localhost
-	xmpp.connection.port=5222
-	xmpp.connection.servicename=example.com
-
-	# How much time it will wait for a response to an XMPP request (in milliseconds)
-    xmpp.reply.timeout=30000
-	
-	# JDBC
-	jdbc.db.url=jdbc:postgresql://localhost:5432/mediaserver?user=postgres&password=postgres
-	jdbc.driver.class=org.postgresql.Driver
-
-	# Max threshold beyond which files are written directly to disk, in bytes
-	# Only used while uploading multipart form data files
-	media.todisk.threshold=1048576
-	
-	# File System
-	media.storage.root=/tmp
-	media.sizelimit=1000240
-
+        # HTTP 
+        http.port=8080
+        http.tests.port=9090
+        http.endpoint=https://api.buddycloud.org/media-proxy
+        https.port=8443
+        https.enabled=true
+        https.keystore.path=/$HOME/.jetty/jetty.jks
+        https.keystore.type=JSK
+        https.keystore.password=password
+        https.key.password=password
+        
+        # XMPP
+        xmpp.component.host=localhost
+        xmpp.component.port=5275
+        xmpp.component.subdomain=mediaserver.example.com
+        xmpp.component.secretkey=secret
+        
+        xmpp.connection.username=mediaserver-test
+        xmpp.connection.password=mediaserver-test
+        xmpp.connection.host=localhost
+        xmpp.connection.port=5222
+        xmpp.connection.servicename=example.com 
+        
+        # How much time it will wait for a response to an XMPP request (in milliseconds)
+        xmpp.reply.timeout=30000
+        
+        # JDBC
+        jdbc.db.url=jdbc:postgresql://localhost:5432/mediaserver?user=postgres&password=postgres
+        jdbc.driver.class=org.postgresql.Driver
+        
+        # Max threshold beyond which files are written directly to disk, in bytes
+        # Only used while uploading multipart form data files
+        media.todisk.threshold=1048576
+        
+        # File System
+        media.storage.root=/tmp
+        media.sizelimit=1000240
+        
 The following configuration options are supported:
 
 HTTP related configurations:
 
+- **http.endpoint** (Optional): if provided the HTTP endpoint of the media server will be advertised via DISCO#info using XEP-0128 Service Discovery Extensions.
 - **https.enabled** (Optional): if the HTTPS is enabled (default is **false**). If is set to **true**
 you **must** provide the others *https* properties.
 - **https.port**: the port where the server will listen for HTTPS requests.

@@ -1,5 +1,6 @@
 .project
 .settings
 .classpath
-configuration.properties
+mediaserver.properties
 .DS_Store
+target

@@ -149,7 +149,7 @@ public class Main {
 		componentManager.setSecretKey(subdomain,
 				configuration.getProperty(MediaServerConfiguration.XMPP_COMPONENT_SECRETKEY));
 
-		MediaServerComponent mediaServer = new MediaServerComponent();
+		MediaServerComponent mediaServer = new MediaServerComponent(configuration);
 
 		try {
 			componentManager.addComponent(subdomain, mediaServer);

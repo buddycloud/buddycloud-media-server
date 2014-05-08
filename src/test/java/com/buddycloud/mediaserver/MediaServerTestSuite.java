@@ -25,6 +25,8 @@ import com.buddycloud.mediaserver.update.UpdateAvatarTest;
 import com.buddycloud.mediaserver.update.UpdateMediaTest;
 import com.buddycloud.mediaserver.upload.UploadAvatarTest;
 import com.buddycloud.mediaserver.upload.UploadMediaTest;
+import com.buddycloud.mediaserver.xmpp.MediaServerComponentTest;
+
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -44,6 +46,8 @@ import org.junit.runners.Suite;
         DownloadAvatarTest.class,
         // Delete
         DeleteMediaTest.class,
-        DeleteAvatarTest.class
+        DeleteAvatarTest.class,
+        // Disco
+        MediaServerComponentTest.class
 })
 public class MediaServerTestSuite {}

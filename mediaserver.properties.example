@@ -4,6 +4,7 @@ cache.max.age=86400
 # HTTP 
 http.port=8080
 http.tests.port=9090
+http.endpoint=https://api.buddycloud.org/media-proxy
 https.port=8443
 https.enabled=false
 https.keystore.path=/usr/share/buddycloud-media-server/jetty.jks
@@ -39,4 +40,3 @@ media.todisk.threshold=1048576
 
 # Max filesize in bytes
 media.sizelimit=100000000
-

@@ -52,6 +52,7 @@ public class MediaServerConfiguration {
 
 	// HTTP
 	public static final String HTTP_PORT = "http.port";
+	public static final String HTTP_ENDPOINT = "http.endpoint";
     public static final String HTTP_TESTS_PORT = "http.tests.port";
 	public static final String HTTPS_PORT = "https.port";
 	public static final String HTTPS_ENABLED = "https.enabled";
@@ -87,6 +88,10 @@ public class MediaServerConfiguration {
 	private static MediaServerConfiguration instance = new MediaServerConfiguration();
 
 	private static final String CONFIGURATION_FILE = "mediaserver.properties";
+	
+	public static final String BUDDYCLOUD_NS_API = "http://buddycloud.org/v1/api";
+	public static final String API_ENDPOINT_FIELD_VAR = "endpoint";
+	
 	private static Logger LOGGER = LoggerFactory.getLogger(MediaServerConfiguration.class);
 
 	private Properties configuration;
