@@ -51,7 +51,7 @@ required. This file has multiple properties definitions:
         # HTTP 
         http.port=8080
         http.tests.port=9090
-        http.endpoint=https://api.buddycloud.org/media
+        http.endpoint=https://api.buddycloud.org/media-proxy
         https.port=8443
         https.enabled=true
         https.keystore.path=/$HOME/.jetty/jetty.jks
