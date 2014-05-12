@@ -24,7 +24,27 @@ download media from public channels - any client has access.
 Usage
 -----
 
-The API is described in detail [here](https://buddycloud.org/wiki/Buddycloud_HTTP_API#.2F.3Cchannel.3E.2Fmedia.2F.3Citem.3E).
+#### Via the Buddycloud API
+
+The API endpoints are described in detail [here](https://buddycloud.org/wiki/Buddycloud_HTTP_API#.2F.3Cchannel.3E.2Fmedia.2F.3Citem.3E).
+
+#### Using the Media Server directly
+
+##### Discovering the HTTP endpoint
+
+TODO: Describe disco stanzas
+
+##### Generating transaction id
+
+TODO: Describe XEP 0070
+
+##### Listening for confirmation
+
+TODO: Describe reply for XEP 0070 confirmation
+
+##### Sending HTTP request
+
+TODO: Describe how to build the URL for post/get/delete
 
 Setup
 -----
