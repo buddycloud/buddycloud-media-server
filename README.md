@@ -32,7 +32,48 @@ The API endpoints are described in detail [here](https://buddycloud.org/wiki/Bud
 
 ##### Discovering the HTTP endpoint
 
-TODO: Describe disco stanzas
+In order to figure out which endpoint to send HTTP calls to, we use [XMPP Service Discovery] (http://xmpp.org/extensions/xep-0030.html) against the domain running the media server. In the folowing example, we use buddycloud.org as the target domain. We first list all services provided by buddycloud.org and then we pick the one with name "Media Server".
+
+disco#items against buddycloud.org
+```xml
+<iq to="buddycloud.org" type="get">
+  <query xmlns="http://jabber.org/protocol/disco#items" />
+</iq>
+
+<iq type="result" from="buddycloud.org">
+  <query xmlns="http://jabber.org/protocol/disco#items">
+    <item jid="mediaserver.buddycloud.org" />
+    <item jid="directory.buddycloud.org" />
+    <item jid="channels.buddycloud.org" />
+    <item jid="topics.buddycloud.org" />
+    <item jid="search.buddycloud.org" />
+    <item jid="anon.buddycloud.org" />
+  </query>
+</iq>
+```
+
+disco#info against mediaserver.buddycloud.org
+```xml
+<iq to="mediaserver.buddycloud.org" type="get">
+  <query xmlns="http://jabber.org/protocol/disco#info" />
+</iq>
+
+<iq type="result" from="mediaserver.buddycloud.org">
+  <query xmlns="http://jabber.org/protocol/disco#info">
+    <identity category="component" type="generic" name="Media Server" />
+    <feature var="http://jabber.org/protocol/disco#info" />
+    <feature var="urn:xmpp:ping" />
+    <feature var="jabber:iq:last" />
+    <feature var="urn:xmpp:time" />
+    <x xmlns="jabber:x:data" type="result">
+      <field var="FORM_TYPE" type="hidden"><value>http://buddycloud.org/v1/api</value></field>
+      <field var="endpoint" type="text-single"><value>https://demo.buddycloud.org/api/media-proxy</value></field>
+    </x>
+  </query>
+</iq>
+```
+
+The response of the disco#info query against the media server contains a dataform that holds information on how to communicate with the server. Then field named 'endpoint' will then give us the endpoint for HTTP calls. In the previous example, we should use **https://demo.buddycloud.org/api/media-proxy**.
 
 ##### Generating transaction id
 
