@@ -34,7 +34,7 @@ The API endpoints are described in detail [here](https://buddycloud.org/wiki/Bud
 
 In order to figure out which endpoint to send HTTP calls to, we use [XMPP Service Discovery] (http://xmpp.org/extensions/xep-0030.html) against the domain running the media server. In the folowing example, we use buddycloud.org as the target domain. We first list all services provided by buddycloud.org and then we pick the one with name "Media Server".
 
-disco#items against buddycloud.org
+disco#items against buddycloud.org:
 ```xml
 <iq to="buddycloud.org" type="get">
   <query xmlns="http://jabber.org/protocol/disco#items" />
@@ -52,7 +52,7 @@ disco#items against buddycloud.org
 </iq>
 ```
 
-disco#info against mediaserver.buddycloud.org
+disco#info against mediaserver.buddycloud.org:
 ```xml
 <iq to="mediaserver.buddycloud.org" type="get">
   <query xmlns="http://jabber.org/protocol/disco#info" />
@@ -75,13 +75,33 @@ disco#info against mediaserver.buddycloud.org
 
 The response of the disco#info query against the media server contains a dataform that holds information on how to communicate with the server. Then field named 'endpoint' will then give us the endpoint for HTTP calls. In the previous example, we should use **https://demo.buddycloud.org/api/media-proxy**.
 
-##### Generating transaction id
+##### Generating a transaction id
 
-TODO: Describe XEP 0070
+As per [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html), every transaction with the media server that requires authentication must have an unique identifier within the context of the client's interaction with the server. This identifier will be sent over to the media server via HTTP and then sent back to the client via XMPP in order to confirm the client's identity.
+
+For this example, we will use **a7374jnjlalasdf82** as a transaction id.
 
 ##### Listening for confirmation
 
-TODO: Describe reply for XEP 0070 confirmation
+Before sending the actual HTTP request, the client has to setup an XMPP listener for the confirmation request. The stanza sent by the media server complies with [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html) and will be in the lines of:
+
+```xml
+<iq type='get' 
+    from='mediaserver.buddycloud.org' 
+    id='1'>
+  <confirm xmlns='http://jabber.org/protocol/http-auth'
+           id='a7374jnjlalasdf82'
+           method='GET'/>
+</iq>
+```
+
+The client should simply confirm the request by replying to the stanza:
+
+```xml
+<iq type='result' 
+    to='mediaserver.buddycloud.org' 
+    id='1' />
+```
 
 ##### Sending HTTP request
 
