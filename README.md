@@ -103,9 +103,24 @@ The client should simply confirm the request by replying to the stanza:
     id='1' />
 ```
 
-##### Sending HTTP request
+##### Sending the HTTP request
 
-TODO: Describe how to build the URL for post/get/delete
+In order to build the URL for HTTP requests, we must consider the media endpoint, the channel the media was (or will be) posted and the media id (in case of GET or DELETE).
+
+The requests that require authentication must go with an authorization header, which should be the concatenation of the client's full jid, plus a ':', plus the transaction id, converted to base64 (URL safe). I.e., let's assume the client's full jid is media-user@example.com/media-resource and the transaction id is, again, a7374jnjlalasdf82:
+
+Authorization: urlbase64('media-user@example.com/media-resource:a7374jnjlalasdf82')
+Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==
+
+Note: the urlbase64 method should comply with http://tools.ietf.org/html/rfc4648#page-7. In python, for instance, that's base64.urlsafe_b64encode(s).
+
+The following curl examples perform media-related operations within the media-channel@example.com channel.
+
+**GET**
+
+**DELETE**
+
+**POST**
 
 Setup
 -----
