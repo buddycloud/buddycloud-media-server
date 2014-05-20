@@ -117,6 +117,12 @@ Note: the urlbase64 method should comply with http://tools.ietf.org/html/rfc4648
 
 The following curl examples perform media-related operations within the media-channel@example.com channel.
 
+**POST**
+
+```bash
+curl -X POST -H "Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" -F filename=localfile.jpg -F data=@localfile.jpg -F title="New media" -F description="New media description" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com
+```
+
 **GET**
 
 ```bash
@@ -127,12 +133,6 @@ curl -H "Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3
 
 ```bash
 curl -X DELETE -H "Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
-```
-
-**POST**
-
-```bash
-curl -X POST -H "Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" -F filename=localfile.jpg -F data=@localfile.jpg -F title="New media" -F description="New media description" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com
 ```
 
 Setup
