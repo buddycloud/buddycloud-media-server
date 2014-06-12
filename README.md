@@ -141,7 +141,7 @@ Setup
 The server is written on top of Java using [RESTlet](http://www.restlet.org/).
 
 It uses [Maven](http://maven.apache.org/) to build its packages. You can build
-the package manually or download it from [here](https://github.com/downloads/buddycloud/buddycloud-media-server/buddycloud-media-server-0.1.zip).
+the package manually or download it from [here](http://downloads.buddycloud.com/).
 
 After unpacking, you can then start it by invoking
 
