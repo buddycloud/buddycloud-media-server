@@ -15,15 +15,16 @@
  */
 package com.buddycloud.mediaserver.commons;
 
-import com.buddycloud.mediaserver.commons.exception.LoadConfigurationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.buddycloud.mediaserver.commons.exception.LoadConfigurationException;
 
 public class MediaServerConfiguration {
 
@@ -85,9 +86,10 @@ public class MediaServerConfiguration {
 	public static final int DEF_HTTP_PORT = 8080;
 	public static final boolean DEF_HTTPS_ENABLED = false;
 
-	private static MediaServerConfiguration instance = new MediaServerConfiguration();
+	private static MediaServerConfiguration instance;
 
 	private static final String CONFIGURATION_FILE = "mediaserver.properties";
+	public static final String CONFIGURATION_ENV = "mediaserver.configuration";
 	
 	public static final String BUDDYCLOUD_NS_API = "http://buddycloud.org/v1/api";
 	public static final String API_ENDPOINT_FIELD_VAR = "endpoint";
@@ -98,18 +100,22 @@ public class MediaServerConfiguration {
 
 	private MediaServerConfiguration() {
 		this.configuration = new Properties();
-        System.out.println(System.getProperty("user.dir"));
         try {
-            configuration.load(new FileInputStream(CONFIGURATION_FILE));
-			loadDefault();
-			validate();
-		} catch (IOException e) {
+			String confPath = new File(CONFIGURATION_FILE).exists() ? CONFIGURATION_FILE
+					: System.getProperty(CONFIGURATION_ENV);
+        	configuration.load(new FileInputStream(confPath));
+		} catch (Exception e) {
 			LOGGER.error("Configuration could not be loaded.", e);
 			throw new LoadConfigurationException(e.getMessage(), e);
 		}
+        loadDefault();
+        validate();
 	}
 
 	public static MediaServerConfiguration getInstance() {
+		if (instance == null) {
+			instance = new MediaServerConfiguration();
+		}
 		return instance;
 	}
 
@@ -117,7 +123,7 @@ public class MediaServerConfiguration {
 		return this.configuration;
 	}
 
-	private void loadDefault() {
+	public void loadDefault() {
         if (configuration.get(XMPP_REPLY_TIMEOUT) == null) {
             configuration.put(XMPP_REPLY_TIMEOUT, DEF_XMPP_REPLY_TIMEOUT);
         }

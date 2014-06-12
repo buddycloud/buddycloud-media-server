@@ -8,18 +8,27 @@
     <name>buddycloud-media-server</name>
     <profiles>
         <profile>
-            <id>mediaserver</id>
+            <id>default</id>
             <properties>
-                <assembly-config>mediaserver-assembly.xml</assembly-config>
+                <assembly-config>default-assembly.xml</assembly-config>
+                <assembly-append-assembly-id>true</assembly-append-assembly-id>
             </properties>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
         <profile>
+            <id>mediaserver</id>
+            <properties>
+                <assembly-config>mediaserver-assembly.xml</assembly-config>
+                <assembly-append-assembly-id>false</assembly-append-assembly-id>
+            </properties>
+        </profile>
+        <profile>
             <id>mediaserver-dir</id>
             <properties>
                 <assembly-config>mediaserver-dir-assembly.xml</assembly-config>
+                <assembly-append-assembly-id>false</assembly-append-assembly-id>
             </properties>
         </profile>
     </profiles>
@@ -253,11 +262,19 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/${assembly-config}</descriptor>
-                    </descriptors>
-                    <finalName>${project.artifactId}-${project.version}</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
+                    <archive>
+				      <manifest>
+				        <mainClass>com.buddycloud.mediaserver.Main</mainClass>
+				      </manifest>
+				    </archive>
+				    <descriptors>
+				      <descriptor>src/main/assembly/${assembly-config}</descriptor>
+				    </descriptors>
+				    <finalName>${project.artifactId}-${project.version}</finalName>
+				    <appendAssemblyId>${assembly-append-assembly-id}</appendAssemblyId>
+				    <descriptorRefs>
+				      <descriptorRef>jar-with-dependencies</descriptorRef>
+				    </descriptorRefs>
                 </configuration>
             </plugin>
             <!-- Jetty -->
