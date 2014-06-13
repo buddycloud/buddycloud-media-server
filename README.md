@@ -119,9 +119,9 @@ In order to build the URL for HTTP requests, we must consider the media endpoint
 
 The requests that require authentication must go with an authorization header, which should be the concatenation of the client's full jid, plus a ':', plus the transaction id, converted to base64 (URL safe). I.e., let's assume the client's full jid is media-user@example.com/media-resource and the transaction id is, again, a7374jnjlalasdf82:
 
-Authorization: urlbase64('media-user@example.com/media-resource:a7374jnjlalasdf82')
+Authorization: Basic urlbase64('media-user@example.com/media-resource:a7374jnjlalasdf82')
 
-Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==
+Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==
 
 Note: the urlbase64 method should comply with http://tools.ietf.org/html/rfc4648#page-7. In python, for instance, that's base64.urlsafe_b64encode(s).
 
@@ -130,19 +130,19 @@ The following curl examples perform media-related operations within the media-ch
 **POST**
 
 ```bash
-curl -X POST -H "Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" -F filename=localfile.jpg -F data=@localfile.jpg -F title="New media" -F description="New media description" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com
+curl -X POST -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" -F filename=localfile.jpg -F data=@localfile.jpg -F title="New media" -F description="New media description" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com
 ```
 
 **GET**
 
 ```bash
-curl -H "Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
+curl -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
 ```
 
 **DELETE**
 
 ```bash
-curl -X DELETE -H "Authorization: bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
+curl -X DELETE -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
 ```
 
 Setup
