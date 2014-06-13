@@ -1,340 +1,343 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.buddycloud.mediaserver</groupId>
-    <artifactId>buddycloud-media-server</artifactId>
-    <version>1.0</version>
-    <packaging>jar</packaging>
-    <name>buddycloud-media-server</name>
-    <profiles>
-        <profile>
-            <id>default</id>
-            <properties>
-                <assembly-config>default-assembly.xml</assembly-config>
-                <assembly-append-assembly-id>true</assembly-append-assembly-id>
-            </properties>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>mediaserver</id>
-            <properties>
-                <assembly-config>mediaserver-assembly.xml</assembly-config>
-                <assembly-append-assembly-id>false</assembly-append-assembly-id>
-            </properties>
-        </profile>
-        <profile>
-            <id>mediaserver-dir</id>
-            <properties>
-                <assembly-config>mediaserver-dir-assembly.xml</assembly-config>
-                <assembly-append-assembly-id>false</assembly-append-assembly-id>
-            </properties>
-        </profile>
-    </profiles>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-        </dependency>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.buddycloud.mediaserver</groupId>
+	<artifactId>buddycloud-media-server</artifactId>
+	<version>1.0</version>
+	<packaging>jar</packaging>
+	<name>buddycloud-media-server</name>
+	<profiles>
+		<profile>
+			<id>default</id>
+			<properties>
+				<assembly-config>default-assembly.xml</assembly-config>
+				<descriptor-ref>jar-with-dependencies</descriptor-ref>
+				<assembly-append-assembly-id>true</assembly-append-assembly-id>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>compressed</id>
+			<properties>
+				<assembly-config>compressed-assembly.xml</assembly-config>
+				<assembly-append-assembly-id>false</assembly-append-assembly-id>
+			</properties>
+		</profile>
+		<profile>
+			<id>uncompressed</id>
+			<properties>
+				<assembly-config>uncompressed-assembly.xml</assembly-config>
+				<assembly-append-assembly-id>false</assembly-append-assembly-id>
+			</properties>
+		</profile>
+	</profiles>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
 
-        <!-- EasyMock -->
-        <dependency>
-            <groupId>org.easymock</groupId>
-            <artifactId>easymock</artifactId>
-            <version>3.2</version>
-        </dependency>
+		<!-- EasyMock -->
+		<dependency>
+			<groupId>org.easymock</groupId>
+			<artifactId>easymock</artifactId>
+			<version>3.2</version>
+		</dependency>
 
-        <!-- Java Servlet -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
+		<!-- Java Servlet -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.0.1</version>
+			<scope>provided</scope>
+		</dependency>
 
-        <!-- Postgres -->
-        <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-901.jdbc4</version>
-        </dependency>
+		<!-- Postgres -->
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901.jdbc4</version>
+		</dependency>
 
-        <!-- HSQL -->
-        <dependency>
-            <groupId>org.hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.lazyluke</groupId>
-            <artifactId>log4jdbc-remix</artifactId>
-            <version>0.2.7</version>
-        </dependency>
+		<!-- HSQL -->
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.lazyluke</groupId>
+			<artifactId>log4jdbc-remix</artifactId>
+			<version>0.2.7</version>
+		</dependency>
 
-        <!-- Gson: Java to Json conversion -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.2.4</version>
-            <scope>compile</scope>
-        </dependency>
+		<!-- Gson: Java to Json conversion -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+			<scope>compile</scope>
+		</dependency>
 
-        <!-- c3p0 -->
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.2</version>
-        </dependency>
+		<!-- c3p0 -->
+		<dependency>
+			<groupId>com.mchange</groupId>
+			<artifactId>c3p0</artifactId>
+			<version>0.9.2</version>
+		</dependency>
 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.0.13</version>
-        </dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.0.13</version>
+		</dependency>
 
 
-        <!-- Apache Commons -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.8</version>
-        </dependency>
+		<!-- Apache Commons -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.8</version>
+		</dependency>
 
-        <!-- thumbnailator -->
-        <dependency>
-            <groupId>net.coobird</groupId>
-            <artifactId>thumbnailator</artifactId>
-            <version>[0.4, 0.5)</version>
-        </dependency>
+		<!-- thumbnailator -->
+		<dependency>
+			<groupId>net.coobird</groupId>
+			<artifactId>thumbnailator</artifactId>
+			<version>[0.4, 0.5)</version>
+		</dependency>
 
-        <!-- java-image-scaling -->
-        <dependency>
-            <groupId>com.mortennobel</groupId>
-            <artifactId>java-image-scaling</artifactId>
-            <version>0.8.5</version>
-        </dependency>
+		<!-- java-image-scaling -->
+		<dependency>
+			<groupId>com.mortennobel</groupId>
+			<artifactId>java-image-scaling</artifactId>
+			<version>0.8.5</version>
+		</dependency>
 
-        <!-- Xuggle -->
-        <dependency>
-            <groupId>xuggle</groupId>
-            <artifactId>xuggle-xuggler</artifactId>
-            <version>5.4</version>
-        </dependency>
+		<!-- Xuggle -->
+		<dependency>
+			<groupId>xuggle</groupId>
+			<artifactId>xuggle-xuggler</artifactId>
+			<version>5.4</version>
+		</dependency>
 
-        <!-- XMPP -->
-        <dependency>
-            <groupId>org.igniterealtime.smack</groupId>
-            <artifactId>smack</artifactId>
-            <version>3.2.1-MODIFIED</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/smack.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.igniterealtime.smack</groupId>
-            <artifactId>smackx</artifactId>
-            <version>3.2.1-MODIFIED</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/smackx.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.igniterealtime</groupId>
-            <artifactId>whack</artifactId>
-            <version>1.0.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/whack.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.igniterealtime</groupId>
-            <artifactId>tinder</artifactId>
-            <version>1.2.3</version>
-        </dependency>
-        <!-- <dependency> <groupId>org.wave-protocol</groupId> <artifactId>whack</artifactId>
-            <version>1.0.0</version> </dependency> -->
-        <dependency>
-            <groupId>xpp3</groupId>
-            <artifactId>xpp3</artifactId>
-            <version>1.1.4c</version>
-        </dependency>
+		<!-- XMPP -->
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack</artifactId>
+			<version>3.2.1-MODIFIED</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/smack.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smackx</artifactId>
+			<version>3.2.1-MODIFIED</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/smackx.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>whack</artifactId>
+			<version>1.0.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/whack.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime</groupId>
+			<artifactId>tinder</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<!-- <dependency> <groupId>org.wave-protocol</groupId> <artifactId>whack</artifactId> 
+			<version>1.0.0</version> </dependency> -->
+		<dependency>
+			<groupId>xpp3</groupId>
+			<artifactId>xpp3</artifactId>
+			<version>1.1.4c</version>
+		</dependency>
 
-        <!-- JBcrypt -->
-        <dependency>
-            <groupId>org.mindrot</groupId>
-            <artifactId>jbcrypt</artifactId>
-            <version>0.3m</version>
-        </dependency>
+		<!-- JBcrypt -->
+		<dependency>
+			<groupId>org.mindrot</groupId>
+			<artifactId>jbcrypt</artifactId>
+			<version>0.3m</version>
+		</dependency>
 
-        <!-- RESTLET -->
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.fileupload</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.json</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.jetty</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.html</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.ssl</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.crypto</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
-            <version>${restlet-version}</version>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>com.buddycloud.mediaserver.Main</mainClass>
-                </configuration>
-            </plugin>
+		<!-- RESTLET -->
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.fileupload</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.json</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.jetty</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.html</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.ssl</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jse</groupId>
+			<artifactId>org.restlet.ext.crypto</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet.jee</groupId>
+			<artifactId>org.restlet.ext.servlet</artifactId>
+			<version>${restlet-version}</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<inherited>true</inherited>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>com.buddycloud.mediaserver.Main</mainClass>
+				</configuration>
+			</plugin>
 
-            <!-- Tomcat <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>tomcat-maven-plugin</artifactId>
-                <configuration> <warFile>${project.build.directory}/${project.build.finalName}.war</warFile>
-                </configuration> </plugin> -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.3</version>
-                <executions>
-                    <execution>
-                        <id>package-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <archive>
-				      <manifest>
-				        <mainClass>com.buddycloud.mediaserver.Main</mainClass>
-				      </manifest>
-				    </archive>
-				    <descriptors>
-				      <descriptor>src/main/assembly/${assembly-config}</descriptor>
-				    </descriptors>
-				    <finalName>${project.artifactId}-${project.version}</finalName>
-				    <appendAssemblyId>${assembly-append-assembly-id}</appendAssemblyId>
-				    <descriptorRefs>
-				      <descriptorRef>jar-with-dependencies</descriptorRef>
-				    </descriptorRefs>
-                </configuration>
-            </plugin>
-            <plugin>
-                  <groupId>com.github.goldin</groupId>
-                  <artifactId>copy-maven-plugin</artifactId>
-                  <version>0.2.5</version>
-                  <executions>
-                    <execution>
-                      <id>create-archive</id>
-                      <phase>package</phase>
-                      <goals>
-                        <goal>copy</goal>
-                      </goals>
-                      <configuration>
-                        <resources>
-                          <resource>
-                            <targetPath>${project.build.directory}</targetPath>
-                            <file>target/${project.build.finalName}.jar</file>
-                            <destFileName>${project.artifactId}.jar</destFileName>
-                          </resource>
-                          <resource>
-                            <targetPath>${project.build.directory}</targetPath>
-                            <file>${project.build.directory}/${project.build.finalName}-${project.build.withDependencies}.jar</file>
-                            <destFileName>${project.artifactId}-${project.build.withDependencies}.jar</destFileName>
-                          </resource>
-                        </resources>
-                      </configuration>
-                    </execution>
-                  </executions>
-                </plugin>
-            <!-- Jetty -->
-            <plugin>
-                <groupId>org.mortbay.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>8.1.3.v20120416</version>
-            </plugin>
-        </plugins>
-    </build>
-    <properties>
-        <restlet-version>2.2-M6</restlet-version>
-        <project.build.withDependencies>jar-with-dependencies</project.build.withDependencies>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-    <repositories>
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-        <repository>
-            <id>xuggle repo</id>
-            <url>http://xuggle.googlecode.com/svn/trunk/repo/share/java/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-      <pluginRepository>
-        <id>evgenyg</id>
-        <name>Evgeny Goldin repo</name>
-        <url>http://evgenyg.artifactoryonline.com/evgenyg/repo/com/github/goldin/</url>
-      </pluginRepository>
-    </pluginRepositories>
+			<!-- Tomcat <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>tomcat-maven-plugin</artifactId> 
+				<configuration> <warFile>${project.build.directory}/${project.build.finalName}.war</warFile> 
+				</configuration> </plugin> -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.3</version>
+				<executions>
+					<execution>
+						<id>package-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.buddycloud.mediaserver.Main</mainClass>
+						</manifest>
+					</archive>
+					<ignoreMissingDescriptor>true</ignoreMissingDescriptor>
+					<descriptorRefs>
+						<descriptorRef>${descriptor-ref}</descriptorRef>
+					</descriptorRefs>
+					<descriptors>
+						<descriptor>src/main/assembly/${assembly-config}</descriptor>
+					</descriptors>
+					<finalName>${project.artifactId}-${project.version}</finalName>
+					<appendAssemblyId>${assembly-append-assembly-id}</appendAssemblyId>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.goldin</groupId>
+				<artifactId>copy-maven-plugin</artifactId>
+				<version>0.2.5</version>
+				<executions>
+					<execution>
+						<id>create-archive</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+						    <failIfNotFound>false</failIfNotFound>
+							<resources>
+								<resource>
+									<targetPath>${project.build.directory}</targetPath>
+									<file>target/${project.build.finalName}.jar</file>
+									<destFileName>${project.artifactId}.jar</destFileName>
+								</resource>
+								<resource>
+									<targetPath>${project.build.directory}</targetPath>
+									<file>${project.build.directory}/${project.build.finalName}-${project.build.withDependencies}.jar</file>
+									<destFileName>${project.artifactId}-${project.build.withDependencies}.jar</destFileName>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Jetty -->
+			<plugin>
+				<groupId>org.mortbay.jetty</groupId>
+				<artifactId>jetty-maven-plugin</artifactId>
+				<version>8.1.3.v20120416</version>
+			</plugin>
+		</plugins>
+	</build>
+	<properties>
+		<restlet-version>2.2-M6</restlet-version>
+		<project.build.withDependencies>jar-with-dependencies</project.build.withDependencies>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+	<repositories>
+		<repository>
+			<id>maven-restlet</id>
+			<name>Public online Restlet repository</name>
+			<url>http://maven.restlet.org</url>
+		</repository>
+		<repository>
+			<id>xuggle repo</id>
+			<url>http://xuggle.googlecode.com/svn/trunk/repo/share/java/</url>
+		</repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>evgenyg</id>
+			<name>Evgeny Goldin repo</name>
+			<url>http://evgenyg.artifactoryonline.com/evgenyg/repo/com/github/goldin/</url>
+		</pluginRepository>
+	</pluginRepositories>
 </project>
 
