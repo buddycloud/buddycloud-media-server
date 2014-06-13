@@ -3,11 +3,10 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="buddycloud media-server"
-NAME="buddycloud-media-server"
 RUNFROM=/usr/share/buddycloud-media-server
 DAEMON=/usr/bin/java
-DAEMON_ARGS="-Djava.awt.headless=true -cp .:*:lib/* com.buddycloud.mediaserver.Main"
+JAR_FILE="$(ls $RUNFROM/buddycloud-media-server-jar-with-dependencies.jar)"
+DAEMON_ARGS=" -Xms1024m -Xmx1024m -XX:-OmitStackTraceInFastThrow -Djava.awt.headless=true -jar $JAR_FILE"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/buddycloud-media-server
 
