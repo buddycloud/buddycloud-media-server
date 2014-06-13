@@ -21,6 +21,8 @@ download media from public channels - any client has access.
 [xep]: http://xmpp.org/extensions/xep-0070.html
 [pubsub]: https://buddycloud.org/wiki/XMPP_XEP#Follower_Management
 
+__Build status:__ [![Build Status](https://travis-ci.org/buddycloud/buddycloud-media-server.svg?branch=master)](https://travis-ci.org/buddycloud/buddycloud-media-server) 
+
 Usage
 -----
 
