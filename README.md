@@ -37,6 +37,7 @@ The API endpoints are described in detail [here](https://buddycloud.org/wiki/Bud
 In order to figure out which endpoint to send HTTP calls to, we use [XMPP Service Discovery] (http://xmpp.org/extensions/xep-0030.html) against the domain running the media server. In the folowing example, we use buddycloud.org as the target domain. We first list all services provided by buddycloud.org and then we pick the one with name "Media Server".
 
 disco#items against buddycloud.org:
+
 ```xml
 <iq to="buddycloud.org" type="get">
   <query xmlns="http://jabber.org/protocol/disco#items" />
@@ -55,6 +56,7 @@ disco#items against buddycloud.org:
 ```
 
 disco#info against mediaserver.buddycloud.org:
+
 ```xml
 <iq to="mediaserver.buddycloud.org" type="get">
   <query xmlns="http://jabber.org/protocol/disco#info" />
@@ -76,6 +78,12 @@ disco#info against mediaserver.buddycloud.org:
 ```
 
 The response of the disco#info query against the media server contains a dataform that holds information on how to communicate with the server. Then field named 'endpoint' will then give us the endpoint for HTTP calls. In the previous example, we should use **https://demo.buddycloud.org/api/media-proxy**.
+
+The endpoint can be advertised by adding the following key (example data) to your `mediaserver.properties`:
+
+```
+http.endpoint=https://api.buddycloud.org/media-proxy
+```
 
 ##### Generating a transaction id
 
