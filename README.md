@@ -155,7 +155,10 @@ the package manually or download it from [here](http://downloads.buddycloud.com/
 
 After unpacking, you can then start it by invoking
 
-    bash mediaserver
+```
+    mvn package
+    java -jar target/buddycloud-media-server-jar-with-dependencies.jar
+```
 
 The server needs to be configured to point to a Buddycloud and XMPP server. 
 See the *Configuration* section.
