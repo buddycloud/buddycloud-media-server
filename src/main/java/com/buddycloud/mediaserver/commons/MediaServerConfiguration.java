@@ -72,25 +72,25 @@ public class MediaServerConfiguration {
 	 * mediaserver.properties default values
 	 */
     // XMPP
-    public static final int DEF_XMPP_REPLY_TIMEOUT = 30000; // 30 seconds
+    public static final Integer DEF_XMPP_REPLY_TIMEOUT = 30000; // 30 seconds
 
 	// CACHE
-	public static final int DEF_CACHE_MAX_AGE = 86400; //1 day;
+	public static final Integer DEF_CACHE_MAX_AGE = 86400; //1 day;
 	
 	// JDBC
 	public static final String DEF_JDBC_DRIVER_CLASS_PROPERTY = "org.postgresql.Driver";
 	
 	// File System
-    public static final long DEF_MEDIA_SIZE_LIMIT = 104857600;
-	public static final long DEF_MEDIA_TO_DISK_THRESHOLD = 1048576;
+    public static final Long DEF_MEDIA_SIZE_LIMIT = 104857600L;
+	public static final Long DEF_MEDIA_TO_DISK_THRESHOLD = 1048576L;
 
 	// HTTP
-    public static final int DEF_HTTP_TESTS_PORT = 9091;
-	public static final int DEF_HTTP_PORT = 8080;
-	public static final boolean DEF_HTTPS_ENABLED = false;
+    public static final Integer DEF_HTTP_TESTS_PORT = 9091;
+	public static final Integer DEF_HTTP_PORT = 8080;
+	public static final Boolean DEF_HTTPS_ENABLED = false;
 	
 	// XMPP sec
-	private static final boolean DEF_XMPP_CONNECTION_SASL = true;
+	private static final Boolean DEF_XMPP_CONNECTION_SASL = true;
 	private static final String DEF_XMPP_CONNECTION_SECURITY = SecurityMode.enabled.toString();
 
 	private static MediaServerConfiguration instance;
@@ -132,11 +132,11 @@ public class MediaServerConfiguration {
 
 	public void loadDefault() {
         if (configuration.get(XMPP_REPLY_TIMEOUT) == null) {
-            configuration.put(XMPP_REPLY_TIMEOUT, DEF_XMPP_REPLY_TIMEOUT);
+            configuration.put(XMPP_REPLY_TIMEOUT, DEF_XMPP_REPLY_TIMEOUT.toString());
         }
 
 		if (configuration.get(CACHE_MAX_AGE) == null) {
-			configuration.put(CACHE_MAX_AGE, DEF_CACHE_MAX_AGE);
+			configuration.put(CACHE_MAX_AGE, DEF_CACHE_MAX_AGE.toString());
 		}
 		
 		if (configuration.get(JDBC_DRIVER_CLASS_PROPERTY) == null) {
@@ -146,28 +146,28 @@ public class MediaServerConfiguration {
 		
 		if (configuration.get(MEDIA_TO_DISK_THRESHOLD_PROPERTY) == null) {
 			configuration.put(MEDIA_TO_DISK_THRESHOLD_PROPERTY,
-					DEF_MEDIA_TO_DISK_THRESHOLD);
+					DEF_MEDIA_TO_DISK_THRESHOLD.toString());
 		}
 
         if (configuration.get(MEDIA_SIZE_LIMIT_PROPERTY) == null) {
             configuration.put(MEDIA_SIZE_LIMIT_PROPERTY,
-                    DEF_MEDIA_SIZE_LIMIT);
+                    DEF_MEDIA_SIZE_LIMIT.toString());
         }
 
 		if (configuration.get(HTTP_PORT) == null) {
-			configuration.put(HTTP_PORT, DEF_HTTP_PORT);
+			configuration.put(HTTP_PORT, DEF_HTTP_PORT.toString());
 		}
 
         if (configuration.get(HTTP_TESTS_PORT) == null) {
-			configuration.put(HTTP_TESTS_PORT, DEF_HTTP_TESTS_PORT);
+			configuration.put(HTTP_TESTS_PORT, DEF_HTTP_TESTS_PORT.toString());
 		}
 
 		if (configuration.get(HTTPS_ENABLED) == null) {
-			configuration.put(HTTPS_ENABLED, DEF_HTTPS_ENABLED);
+			configuration.put(HTTPS_ENABLED, DEF_HTTPS_ENABLED.toString());
 		}
 		
 		if (configuration.get(XMPP_CONNECTION_SASL) == null) {
-			configuration.put(XMPP_CONNECTION_SASL, DEF_XMPP_CONNECTION_SASL);
+			configuration.put(XMPP_CONNECTION_SASL, DEF_XMPP_CONNECTION_SASL.toString());
 		}
 		
 		if (configuration.get(XMPP_CONNECTION_SECURITY) == null) {

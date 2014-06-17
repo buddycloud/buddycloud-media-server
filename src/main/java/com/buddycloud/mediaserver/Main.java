@@ -113,7 +113,8 @@ public class Main {
 	}
 
     private static void setXMPPReplyTimeout(Properties configuration) {
-        int xmppReplyTimeout = Integer.valueOf(configuration.getProperty(MediaServerConfiguration.XMPP_REPLY_TIMEOUT), 60);
+        int xmppReplyTimeout = Integer.valueOf(configuration.getProperty(
+        		MediaServerConfiguration.XMPP_REPLY_TIMEOUT));
         SmackConfiguration.setPacketReplyTimeout(xmppReplyTimeout);
     }
 
