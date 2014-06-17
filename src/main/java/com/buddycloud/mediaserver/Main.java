@@ -20,6 +20,7 @@ import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
@@ -196,6 +197,11 @@ public class Main {
 		ConnectionConfiguration cc = new ConnectionConfiguration(host,
 				Integer.parseInt(configuration
 						.getProperty(MediaServerConfiguration.XMPP_CONNECTION_PORT)), serviceName);
+		
+		cc.setSASLAuthenticationEnabled(Boolean.valueOf(configuration
+				.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SASL)));
+		cc.setSecurityMode(SecurityMode.valueOf(configuration
+				.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SECURITY)));
 
 		XMPPConnection connection = new XMPPConnection(cc);
 		try {

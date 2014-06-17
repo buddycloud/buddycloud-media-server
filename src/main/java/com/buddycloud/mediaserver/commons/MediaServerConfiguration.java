@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +49,8 @@ public class MediaServerConfiguration {
 	public static final String XMPP_CONNECTION_HOST = "xmpp.connection.host";
 	public static final String XMPP_CONNECTION_PORT = "xmpp.connection.port";
 	public static final String XMPP_CONNECTION_SERVICENAME = "xmpp.connection.servicename";
+	public static final String XMPP_CONNECTION_SASL = "xmpp.connection.saslenabled";
+	public static final String XMPP_CONNECTION_SECURITY = "xmpp.connection.securitymode";
 
     public static final String XMPP_REPLY_TIMEOUT = "xmpp.reply.timeout";
 
@@ -85,6 +88,10 @@ public class MediaServerConfiguration {
     public static final int DEF_HTTP_TESTS_PORT = 9091;
 	public static final int DEF_HTTP_PORT = 8080;
 	public static final boolean DEF_HTTPS_ENABLED = false;
+	
+	// XMPP sec
+	private static final boolean DEF_XMPP_CONNECTION_SASL = true;
+	private static final String DEF_XMPP_CONNECTION_SECURITY = SecurityMode.enabled.toString();
 
 	private static MediaServerConfiguration instance;
 
@@ -157,6 +164,14 @@ public class MediaServerConfiguration {
 
 		if (configuration.get(HTTPS_ENABLED) == null) {
 			configuration.put(HTTPS_ENABLED, DEF_HTTPS_ENABLED);
+		}
+		
+		if (configuration.get(XMPP_CONNECTION_SASL) == null) {
+			configuration.put(XMPP_CONNECTION_SASL, DEF_XMPP_CONNECTION_SASL);
+		}
+		
+		if (configuration.get(XMPP_CONNECTION_SECURITY) == null) {
+			configuration.put(XMPP_CONNECTION_SECURITY, DEF_XMPP_CONNECTION_SECURITY);
 		}
 	}
 
