@@ -15,17 +15,17 @@
  */
 package com.buddycloud.mediaserver.web;
 
-import com.buddycloud.mediaserver.commons.AuthBean;
-import com.buddycloud.mediaserver.commons.Constants;
-import com.buddycloud.mediaserver.commons.exception.MissingAuthenticationException;
-import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
-import com.buddycloud.mediaserver.xmpp.AuthVerifier;
-import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
-import org.apache.commons.codec.binary.Base64;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentMap;
+
 import org.restlet.Message;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.*;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeScheme;
+import org.restlet.data.MediaType;
+import org.restlet.data.Status;
 import org.restlet.engine.header.Header;
 import org.restlet.representation.EmptyRepresentation;
 import org.restlet.representation.Representation;
@@ -36,9 +36,13 @@ import org.restlet.util.Series;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentMap;
+import com.buddycloud.mediaserver.commons.AuthBean;
+import com.buddycloud.mediaserver.commons.Constants;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.commons.exception.MissingAuthenticationException;
+import com.buddycloud.mediaserver.commons.exception.UserNotAllowedException;
+import com.buddycloud.mediaserver.xmpp.AuthVerifier;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public abstract class MediaServerResource extends ServerResource {
 	
@@ -159,10 +163,19 @@ public abstract class MediaServerResource extends ServerResource {
             throw new MissingAuthenticationException();
         }
 
+        String endpointProp = MediaServerConfiguration.getInstance().getConfiguration().getProperty(
+        		MediaServerConfiguration.HTTP_ENDPOINT);
+        String resourceURL = null;
+        if (endpointProp == null) {
+        	resourceURL = request.getResourceRef().getIdentifier();
+        } else {
+        	resourceURL = endpointProp + request.getResourceRef().getPath();
+        }
+        
         String userJID = authBean.getUserJID();
         if (authenticate) {
             AuthVerifier authClient = XMPPToolBox.getInstance().getAuthClient();
-            if (!authClient.verifyRequest(userJID, authBean.getTransactionID(), request.getResourceRef().getIdentifier())) {
+            if (!authClient.verifyRequest(userJID, authBean.getTransactionID(), resourceURL)) {
                 throw new UserNotAllowedException(userJID);
             }
         }

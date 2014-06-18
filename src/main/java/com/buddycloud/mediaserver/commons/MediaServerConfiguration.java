@@ -15,7 +15,6 @@
  */
 package com.buddycloud.mediaserver.commons;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,7 +107,7 @@ public class MediaServerConfiguration {
 	private MediaServerConfiguration() {
 		this.configuration = new Properties();
         try {
-			String confPath = new File(CONFIGURATION_FILE).exists() ? CONFIGURATION_FILE
+			String confPath = System.getProperty(CONFIGURATION_ENV) == null ? CONFIGURATION_FILE
 					: System.getProperty(CONFIGURATION_ENV);
         	configuration.load(new FileInputStream(confPath));
 		} catch (Exception e) {

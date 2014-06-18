@@ -49,7 +49,14 @@ import java.text.DateFormat;
 import java.util.Properties;
 
 public abstract class MediaServerTest {
-    protected static final String HTTP_TEST_PORT = "9321";
+	
+	static {
+		System.setProperty(MediaServerConfiguration.CONFIGURATION_ENV,
+				"resources/tests/mediaserver.properties");
+	}
+	
+    protected static final String HTTP_TEST_PORT = MediaServerConfiguration.getInstance()
+            .getConfiguration().getProperty(MediaServerConfiguration.HTTP_TESTS_PORT);
 
     protected static final String TEST_JDBC_DRIVER_CLASS = "org.hsqldb.jdbcDriver";
     protected static final String TEST_JDBC_DB_URL = "jdbc:hsqldb:mem:test;user=sa;sql.syntax_pgs=true";
@@ -81,8 +88,6 @@ public abstract class MediaServerTest {
 
     @BeforeClass
     public static void prepareEnv() throws Exception {
-    	System.setProperty(MediaServerConfiguration.CONFIGURATION_ENV, 
-    			"resources/tests/mediaserver.properties");
         buildConfiguration();
         dataSource = new MetaDataSource();
         gson = new GsonBuilder().setDateFormat(DateFormat.FULL, DateFormat.FULL).create();
