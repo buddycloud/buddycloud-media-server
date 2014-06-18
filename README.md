@@ -93,24 +93,24 @@ For this example, we will use **a7374jnjlalasdf82** as a transaction id.
 
 ##### Listening for confirmation
 
-Before sending the actual HTTP request, the client has to setup an XMPP listener for the confirmation request. The stanza sent by the media server complies with [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html) and will be in the lines of:
+Before sending the actual HTTP request, the client has to setup an XMPP listener for the confirmation request. The message sent by the media server complies with [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html) and will be in the lines of:
 
 ```xml
-<iq type='get' 
-    from='mediaserver.buddycloud.org' 
-    id='1'>
-  <confirm xmlns='http://jabber.org/protocol/http-auth'
-           id='a7374jnjlalasdf82'
-           method='GET'/>
-</iq>
+<message type="normal" from="mediaserver.buddycloud.org">
+  <thread>a8da1a353de44aea831e6b9da588b72e</thread>
+  <body>Confirmation message for transaction a7374jnjlalasdf82</body>
+  <confirm xmlns="http://jabber.org/protocol/http-auth" url="https://demo.buddycloud.org/api/media-proxy/media-channel@example.com" id="a7374jnjlalasdf82" method="GET" />
+</message>
 ```
 
-The client should simply confirm the request by replying to the stanza:
+The client should simply confirm the request by replying to the message:
 
 ```xml
-<iq type='result' 
-    to='mediaserver.buddycloud.org' 
-    id='1' />
+<message type="normal" to="mediaserver.buddycloud.org">
+  <thread>a8da1a353de44aea831e6b9da588b72e</thread>
+  <body>Confirmation message for transaction a7374jnjlalasdf82</body>
+  <confirm xmlns="http://jabber.org/protocol/http-auth" url="https://demo.buddycloud.org/api/media-proxy/media-channel@example.com" id="a7374jnjlalasdf82" method="GET" />
+</message>
 ```
 
 ##### Sending the HTTP request
@@ -192,6 +192,12 @@ required. This file has multiple properties definitions:
         xmpp.connection.host=localhost
         xmpp.connection.port=5222
         xmpp.connection.servicename=example.com 
+        
+        # Whether the client will use SASL authentication when logging into the server (true|false).
+        xmpp.connection.saslenabled=true
+        
+        # TLS security mode used when making the connection (disabled|enabled|required).
+        xmpp.connection.securitymode=enabled
         
         # How much time it will wait for a response to an XMPP request (in milliseconds)
         xmpp.reply.timeout=30000
