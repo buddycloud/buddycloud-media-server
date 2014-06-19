@@ -85,13 +85,27 @@ The endpoint can be advertised by adding the following key (example data) to you
 http.endpoint=https://api.buddycloud.org/media-proxy
 ```
 
-##### Generating a transaction id
+##### If media belongs to a public channel
+
+You don't need an ```Authorization``` header. Notice that if you're building a web frontend, embedding public media from the media-server means just creating an ```<img>``` tag. 
+
+**GET**
+
+```bash
+curl https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
+```
+
+##### If media belongs to a private channel
+
+You need to verify your request via XMPP and generate an ```Authorization``` header as following: 
+
+###### Generating a transaction id
 
 As per [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html), every transaction with the media server that requires authentication must have an unique identifier within the context of the client's interaction with the server. This identifier will be sent over to the media server via HTTP and then sent back to the client via XMPP in order to confirm the client's identity.
 
 For this example, we will use **a7374jnjlalasdf82** as a transaction id.
 
-##### Listening for confirmation
+###### Listening for confirmation
 
 Before sending the actual HTTP request, the client has to setup an XMPP listener for the confirmation request. The message sent by the media server complies with [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html) and will be in the lines of:
 
@@ -113,7 +127,7 @@ The client should simply confirm the request by replying to the message:
 </message>
 ```
 
-##### Sending the HTTP request
+###### Sending the HTTP request
 
 In order to build the URL for HTTP requests, we must consider the media endpoint, the channel the media was (or will be) posted and the media id (in case of GET or DELETE).
 
