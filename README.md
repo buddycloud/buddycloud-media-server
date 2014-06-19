@@ -71,18 +71,18 @@ disco#info against mediaserver.buddycloud.org:
     <feature var="urn:xmpp:time" />
     <x xmlns="jabber:x:data" type="result">
       <field var="FORM_TYPE" type="hidden"><value>http://buddycloud.org/v1/api</value></field>
-      <field var="endpoint" type="text-single"><value>https://demo.buddycloud.org/api/media-proxy</value></field>
+      <field var="endpoint" type="text-single"><value>https://demo.buddycloud.org/api/media_proxy</value></field>
     </x>
   </query>
 </iq>
 ```
 
-The response of the disco#info query against the media server contains a dataform that holds information on how to communicate with the server. Then field named 'endpoint' will then give us the endpoint for HTTP calls. In the previous example, we should use **https://demo.buddycloud.org/api/media-proxy**.
+The response of the disco#info query against the media server contains a dataform that holds information on how to communicate with the server. Then field named 'endpoint' will then give us the endpoint for HTTP calls. In the previous example, we should use **https://demo.buddycloud.org/api/media_proxy**.
 
 The endpoint can be advertised by adding the following key (example data) to your `mediaserver.properties`:
 
 ```
-http.endpoint=https://api.buddycloud.org/media-proxy
+http.endpoint=https://api.buddycloud.org/media_proxy
 ```
 
 ##### If media belongs to a public channel
@@ -92,7 +92,7 @@ You don't need an ```Authorization``` header. Notice that if you're building a w
 **GET**
 
 ```bash
-curl https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
+curl https://demo.buddycloud.org/api/media_proxy/media-channel@example.com/mediaId
 ```
 
 ##### If media belongs to a private channel
@@ -113,7 +113,7 @@ Before sending the actual HTTP request, the client has to setup an XMPP listener
 <message type="normal" from="mediaserver.buddycloud.org">
   <thread>a8da1a353de44aea831e6b9da588b72e</thread>
   <body>Confirmation message for transaction a7374jnjlalasdf82</body>
-  <confirm xmlns="http://jabber.org/protocol/http-auth" url="https://demo.buddycloud.org/api/media-proxy/media-channel@example.com" id="a7374jnjlalasdf82" method="GET" />
+  <confirm xmlns="http://jabber.org/protocol/http-auth" url="https://demo.buddycloud.org/api/media_proxy/media-channel@example.com" id="a7374jnjlalasdf82" method="GET" />
 </message>
 ```
 
@@ -123,7 +123,7 @@ The client should simply confirm the request by replying to the message:
 <message type="normal" to="mediaserver.buddycloud.org">
   <thread>a8da1a353de44aea831e6b9da588b72e</thread>
   <body>Confirmation message for transaction a7374jnjlalasdf82</body>
-  <confirm xmlns="http://jabber.org/protocol/http-auth" url="https://demo.buddycloud.org/api/media-proxy/media-channel@example.com" id="a7374jnjlalasdf82" method="GET" />
+  <confirm xmlns="http://jabber.org/protocol/http-auth" url="https://demo.buddycloud.org/api/media_proxy/media-channel@example.com" id="a7374jnjlalasdf82" method="GET" />
 </message>
 ```
 
@@ -144,19 +144,19 @@ The following curl examples perform media-related operations within the media-ch
 **POST**
 
 ```bash
-curl -X POST -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" -F filename=localfile.jpg -F data=@localfile.jpg -F title="New media" -F description="New media description" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com
+curl -X POST -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" -F filename=localfile.jpg -F data=@localfile.jpg -F title="New media" -F description="New media description" https://demo.buddycloud.org/api/media_proxy/media-channel@example.com
 ```
 
 **GET**
 
 ```bash
-curl -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
+curl -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media_proxy/media-channel@example.com/mediaId
 ```
 
 **DELETE**
 
 ```bash
-curl -X DELETE -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media-proxy/media-channel@example.com/mediaId
+curl -X DELETE -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media_proxy/media-channel@example.com/mediaId
 ```
 
 Setup
@@ -187,7 +187,7 @@ required. This file has multiple properties definitions:
         # HTTP 
         http.port=8080
         http.tests.port=9090
-        http.endpoint=https://api.buddycloud.org/media-proxy
+        http.endpoint=https://api.buddycloud.org/media_proxy
         https.port=8443
         https.enabled=true
         https.keystore.path=/$HOME/.jetty/jetty.jks
