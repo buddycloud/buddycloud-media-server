@@ -11,7 +11,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jivesoftware.smackx.pubsub;
+package com.buddycloud.mediaserver.xmpp.util;
 
 /**
  * This enumeration represents the access models for the pubsub node
@@ -36,6 +36,6 @@ public enum AccessModel
 	/** Only those on a whitelist may subscribe and retrieve items */
 	whitelist,
 	
-	/**  */
+	/** Anyone using the same server may view as 'open', externally 'authorize' */
 	local;
 }
