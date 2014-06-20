@@ -16,6 +16,9 @@
 package com.buddycloud.mediaserver.xmpp.pubsub;
 
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
+import com.buddycloud.mediaserver.xmpp.util.AccessModel;
+import com.buddycloud.mediaserver.xmpp.util.ConfigurationForm;
+
 import org.jivesoftware.smack.Connection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.IQ.Type;
@@ -24,7 +27,13 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.DiscoverInfo;
 import org.jivesoftware.smackx.packet.DiscoverItems;
 import org.jivesoftware.smackx.packet.RSMSet;
-import org.jivesoftware.smackx.pubsub.*;
+import org.jivesoftware.smackx.pubsub.Affiliation;
+import org.jivesoftware.smackx.pubsub.AffiliationsExtension;
+import org.jivesoftware.smackx.pubsub.ConfigureForm;
+import org.jivesoftware.smackx.pubsub.Node;
+import org.jivesoftware.smackx.pubsub.NodeExtension;
+import org.jivesoftware.smackx.pubsub.PubSubElementType;
+import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.packet.PubSub;
 import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 import org.slf4j.Logger;
@@ -245,8 +254,8 @@ public class PubSubClient {
 		if (node != null) {
 			try {
 				ConfigureForm config = node.getNodeConfiguration();
-
-				return config.getAccessModel().equals(AccessModel.open);
+				ConfigurationForm form = new ConfigurationForm(config);
+				return form.getBuddycloudAccessModel().equals(AccessModel.open);
 			} catch (XMPPException e) {
 				LOGGER.warn("Could not get node '" + node.getId() + "' "
 						+ "access model", e);
