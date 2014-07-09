@@ -13,16 +13,14 @@
  */
 package com.buddycloud.mediaserver.xmpp.util;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.jivesoftware.smackx.Form;
-import org.jivesoftware.smackx.FormField;
-import org.jivesoftware.smackx.packet.DataForm;
 import org.jivesoftware.smackx.pubsub.ConfigureForm;
 import org.jivesoftware.smackx.pubsub.ConfigureNodeFields;
 import org.jivesoftware.smackx.pubsub.FormType;
+import org.jivesoftware.smackx.pubsub.LeafNode;
+import org.jivesoftware.smackx.pubsub.PubSubManager;
+import org.jivesoftware.smackx.xdata.Form;
+import org.jivesoftware.smackx.xdata.FormField;
+import org.jivesoftware.smackx.xdata.packet.DataForm;
 
 /**
  * A decorator for a {@link Form} to easily enable reading and updating
@@ -63,7 +61,7 @@ public class ConfigurationForm extends ConfigureForm
 	 * Create a new form for configuring a node.  This would typically only be used 
 	 * when creating and configuring a node at the same time via {@link PubSubManager#createNode(String, Form)}, since 
 	 * configuration of an existing node is typically accomplished by calling {@link LeafNode#getNodeConfiguration()} and
-	 * using the resulting form to create a answer form.  See {@link #ConfigureForm(Form)}.
+	 * using the resulting form to create a answer form.  See {@link #ConfigurationForm(Form)}.
 	 * @param formType
 	 */
 	public ConfigurationForm(FormType formType)
@@ -75,7 +73,7 @@ public class ConfigurationForm extends ConfigureForm
 	{
 		FormField formField = getField(field.getFieldName());
 
-		return formField.getValues().next();
+		return formField.getValues().get(0);
 	}
 
 	public AccessModel getBuddycloudAccessModel() {

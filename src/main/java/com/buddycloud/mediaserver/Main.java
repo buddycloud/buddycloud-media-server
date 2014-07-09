@@ -19,11 +19,13 @@ import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.web.MediaServerApplication;
 import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
 import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
+
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.whack.ExternalComponentManager;
 import org.restlet.Component;
 import org.restlet.Context;
@@ -115,7 +117,7 @@ public class Main {
     private static void setXMPPReplyTimeout(Properties configuration) {
         int xmppReplyTimeout = Integer.valueOf(configuration.getProperty(
         		MediaServerConfiguration.XMPP_REPLY_TIMEOUT));
-        SmackConfiguration.setPacketReplyTimeout(xmppReplyTimeout);
+        SmackConfiguration.setDefaultPacketReplyTimeout(xmppReplyTimeout);
     }
 
 	private static boolean startXMPPToolBox(Properties configuration) {
@@ -199,17 +201,15 @@ public class Main {
 				Integer.parseInt(configuration
 						.getProperty(MediaServerConfiguration.XMPP_CONNECTION_PORT)), serviceName);
 		
-		cc.setSASLAuthenticationEnabled(Boolean.valueOf(configuration
-				.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SASL)));
 		cc.setSecurityMode(SecurityMode.valueOf(configuration
 				.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SECURITY)));
 
-		XMPPConnection connection = new XMPPConnection(cc);
+		XMPPConnection connection = new XMPPTCPConnection(cc);
 		try {
 			connection.connect();
 			connection.login(userName,
 					configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_PASSWORD));
-		} catch (org.jivesoftware.smack.XMPPException e) {
+		} catch (Exception e) {
 			LOGGER.error("XMPP connection coudn't be started", e);
 			throw new com.buddycloud.mediaserver.commons.exception.XMPPException(e.getMessage(), e);
 		}

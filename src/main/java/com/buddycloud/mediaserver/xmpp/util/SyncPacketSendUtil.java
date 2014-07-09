@@ -17,7 +17,7 @@ package com.buddycloud.mediaserver.xmpp.util;
 
 import org.dom4j.Element;
 import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.SmackException;
 import org.xmpp.packet.Packet;
 
 import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
@@ -42,8 +42,7 @@ public final class SyncPacketSendUtil {
 		response.cancel();
 
 		if (result == null) {
-			throw new XMPPException("No response from client '"
-					+ packet.getTo() + "'");
+			throw new SmackException.NoResponseException();
 		} else if (result.getError() != null) {
 			throw new Exception(result.getError().getText());
 		}
@@ -58,6 +57,6 @@ public final class SyncPacketSendUtil {
 	public static Packet getReply(MediaServerComponent component, Packet packet)
 			throws Exception {
 		return getReply(component, packet,
-				SmackConfiguration.getPacketReplyTimeout());
+				SmackConfiguration.getDefaultPacketReplyTimeout());
 	}
 }

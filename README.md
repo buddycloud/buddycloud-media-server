@@ -207,9 +207,6 @@ required. This file has multiple properties definitions:
         xmpp.connection.port=5222
         xmpp.connection.servicename=example.com 
         
-        # Whether the client will use SASL authentication when logging into the server (true|false).
-        xmpp.connection.saslenabled=true
-        
         # TLS security mode used when making the connection (disabled|enabled|required).
         xmpp.connection.securitymode=enabled
         
