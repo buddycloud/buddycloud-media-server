@@ -167,7 +167,7 @@ The server is written on top of Java using [RESTlet](http://www.restlet.org/).
 It uses [Maven](http://maven.apache.org/) to build its packages. You can build
 the package manually or download it from [here](http://downloads.buddycloud.com/).
 
-After unpacking, you can then start it by invoking
+After unpacking, you can then start it by invoking:
 
 ```
     mvn package
@@ -176,6 +176,8 @@ After unpacking, you can then start it by invoking
 
 The server needs to be configured to point to a Buddycloud and XMPP server. 
 See the *Configuration* section.
+
+Setup database tables using the script at https://raw.githubusercontent.com/buddycloud/buddycloud-media-server/master/resources/schema/create_schema.sql
 
 Configuration
 -------------
