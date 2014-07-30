@@ -137,13 +137,23 @@
 		<!-- XMPP -->
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smack</artifactId>
-			<version>3.2.1-MODIFIED</version>
+			<artifactId>smack-core</artifactId>
+			<version>${smack-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime.smack</groupId>
-			<artifactId>smackx</artifactId>
-			<version>3.2.1-MODIFIED</version>
+			<artifactId>smack-extensions</artifactId>
+			<version>${smack-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack-tcp</artifactId>
+			<version>${smack-version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.igniterealtime.smack</groupId>
+			<artifactId>smack-resolver-javax</artifactId>
+			<version>${smack-version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.igniterealtime</groupId>
@@ -157,11 +167,6 @@
 		</dependency>
 		<!-- <dependency> <groupId>org.wave-protocol</groupId> <artifactId>whack</artifactId> 
 			<version>1.0.0</version> </dependency> -->
-		<dependency>
-			<groupId>xpp3</groupId>
-			<artifactId>xpp3</artifactId>
-			<version>1.1.4c</version>
-		</dependency>
 
 		<!-- JBcrypt -->
 		<dependency>
@@ -314,6 +319,7 @@
 		<restlet-version>2.2-M6</restlet-version>
 		<project.build.withDependencies>jar-with-dependencies</project.build.withDependencies>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<smack-version>4.0.1-SNAPSHOT</smack-version>
 	</properties>
 	<repositories>
 		<repository>
@@ -329,6 +335,12 @@
 			<id>local</id>
 			<url>file://${basedir}/.m2</url>
 		</repository>
+		<repository>
+         <id>snapshots-repo</id>
+         <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+         <releases><enabled>false</enabled></releases>
+         <snapshots><enabled>true</enabled></snapshots>
+       </repository>
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>

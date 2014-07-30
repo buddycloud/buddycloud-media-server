@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 buddycloud
+ * Copyright 2012-2014 buddycloud
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,29 +19,31 @@ import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator
 import com.buddycloud.mediaserver.xmpp.util.AccessModel;
 import com.buddycloud.mediaserver.xmpp.util.ConfigurationForm;
 
-import org.jivesoftware.smack.Connection;
+import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.packet.IQ.Type;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
-import org.jivesoftware.smackx.packet.DiscoverInfo;
-import org.jivesoftware.smackx.packet.DiscoverItems;
-import org.jivesoftware.smackx.packet.RSMSet;
+import org.jivesoftware.smackx.disco.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.disco.packet.DiscoverInfo;
+import org.jivesoftware.smackx.disco.packet.DiscoverItems;
+import org.jivesoftware.smackx.rsm.RSMManager;
+import org.jivesoftware.smackx.rsm.packet.RSMSet;
+import org.jivesoftware.smackx.rsm.provider.RSMProvider;
 import org.jivesoftware.smackx.pubsub.Affiliation;
-import org.jivesoftware.smackx.pubsub.AffiliationsExtension;
 import org.jivesoftware.smackx.pubsub.ConfigureForm;
 import org.jivesoftware.smackx.pubsub.Node;
-import org.jivesoftware.smackx.pubsub.NodeExtension;
 import org.jivesoftware.smackx.pubsub.PubSubElementType;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
-import org.jivesoftware.smackx.pubsub.packet.PubSub;
 import org.jivesoftware.smackx.pubsub.packet.PubSubNamespace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.JID;
 
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +54,10 @@ import java.util.Map;
  *
  */
 public class PubSubClient {
+	static {
+		RSMProvider.registerWithProviderManager();
+	}
+
     private static final String IDENTITY_CATEGORY = "pubsub";
     private static final String IDENTITY_TYPE = "channels";
 
@@ -59,28 +65,29 @@ public class PubSubClient {
 
     private Map<String, PubSubManager> pubSubManagersCache = new HashMap<String, PubSubManager>();
     private Map<String, String> serversCache = new HashMap<String, String>();
-    private Connection connection;
+    private XMPPConnection connection;
 
 
-	public PubSubClient(Connection connection) {
+	public PubSubClient(XMPPConnection connection) {
         this.connection = connection;
 		init();
 	}
 
-
 	private void init() {
-		Object affiliationsProvider = ProviderManager.getInstance()
+		// TODO This appears to be a workaround for a bug of Smack's PubSub
+		// implementation and should be reported upstream
+		Object affiliationsProvider = ProviderManager
 				.getExtensionProvider(
 						PubSubElementType.AFFILIATIONS.getElementName(),
 						PubSubNamespace.BASIC.getXmlns());
-		ProviderManager.getInstance().addExtensionProvider(
+		ProviderManager.addExtensionProvider(
 				PubSubElementType.AFFILIATIONS.getElementName(),
 				PubSubNamespace.OWNER.getXmlns(), affiliationsProvider);
 
-		Object affiliationProvider = ProviderManager.getInstance()
+		Object affiliationProvider = ProviderManager
 				.getExtensionProvider("affiliation",
 						PubSubNamespace.BASIC.getXmlns());
-		ProviderManager.getInstance().addExtensionProvider("affiliation",
+		ProviderManager.addExtensionProvider("affiliation",
 				PubSubNamespace.OWNER.getXmlns(), affiliationProvider);
 	}
 
@@ -98,7 +105,7 @@ public class PubSubClient {
             try {
                 LOGGER.debug("Getting " + entityId + " node at channel server [" + serverAddress + "]");
                 node = manager.getNode("/user/" + entityId + "/posts");
-            } catch (XMPPException e) {
+            } catch (Exception e) {
                 LOGGER.error("Error while getting " + entityId + "node", e);
             }
         }
@@ -118,26 +125,24 @@ public class PubSubClient {
         try {
             LOGGER.debug("Discover nodes for domain [" + domain + "]");
             discoverItems = pubSubManager.discoverNodes(null);
-        } catch (XMPPException e) {
+        } catch (Exception e) {
             LOGGER.error("Error while trying to fetch domain [" + domain + "] node", e);
             return null;
         }
 
-        Iterator<DiscoverItems.Item> items = discoverItems.getItems();
-        while (items.hasNext()) {
-            String entityID = items.next().getEntityID();
+        for (DiscoverItems.Item item : discoverItems.getItems()) {
+            String entityID = item.getEntityID();
             DiscoverInfo discoverInfo;
             try {
                 LOGGER.debug("Discover identities for entity [" + entityID + "]");
                 discoverInfo = discoManager.discoverInfo(entityID);
-            } catch (XMPPException e) {
+            } catch (Exception e) {
                 LOGGER.error("Error while trying to fetch [" + entityID + "] identities");
                 continue;
             }
 
-            Iterator<DiscoverInfo.Identity> identities = discoverInfo.getIdentities();
-            while (identities.hasNext()) {
-                if (isChannelServerIdentity(identities.next())) {
+            for (DiscoverInfo.Identity identity : discoverInfo.getIdentities()) {
+                if (isChannelServerIdentity(identity)) {
                     return entityID;
                 }
             }
@@ -162,23 +167,15 @@ public class PubSubClient {
     }
 
 	private Affiliation getAffiliation(Node node, String userBareJID)
-			throws XMPPException {
-
-        PubSub request = node.createPubsubPacket(Type.GET, new NodeExtension(
-                PubSubElementType.AFFILIATIONS, node.getId()),
-                PubSubNamespace.OWNER);
+			throws XMPPException, NoResponseException, NotConnectedException {
 
         int itemCount = 0;
+        // Limit to 10 results per query if possible
+        RSMSet rsmSet = new RSMSet(10);
+        List<PacketExtension> additionalExtensions = Collections.singletonList((PacketExtension) rsmSet);
         while (true) {
-
-            PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
-
-            AffiliationsExtension subElem = (AffiliationsExtension) reply
-                    .getExtension(
-                            PubSubElementType.AFFILIATIONS.getElementName(),
-                            PubSubNamespace.BASIC.getXmlns());
-
-            List<Affiliation> affiliations = subElem.getAffiliations();
+            List<PacketExtension> returnedExtensions = new LinkedList<PacketExtension>();
+            List<Affiliation> affiliations = node.getAffiliations(additionalExtensions, returnedExtensions);
 
             for (Affiliation affiliation : affiliations) {
                 if (affiliation.getNodeId().equals(userBareJID)) {
@@ -188,14 +185,16 @@ public class PubSubClient {
 
             itemCount += affiliations.size();
 
-            if (reply.getRsmSet() == null
-                    || itemCount == reply.getRsmSet().getCount()) {
+            RSMSet replyRSMSet = RSMManager.getRSMSet(returnedExtensions);
+            if (replyRSMSet == null
+                    || itemCount == replyRSMSet.getCount()) {
+				// If there was no rsmSet extension in the reply, then the
+				// server does not support RSM and returned all affiliations and
+				// we are done here.
                 break;
             }
 
-            RSMSet rsmSet = new RSMSet();
-            rsmSet.setAfter(reply.getRsmSet().getLast());
-            request.setRsmSet(rsmSet);
+            rsmSet.setAfter(replyRSMSet.getLast());
         }
 
 		return null;
@@ -225,7 +224,7 @@ public class PubSubClient {
 			try {
                 LOGGER.debug("Getting " + userBareJID + " affiliation for node [" + node.getId() + "]");
 				affiliation = getAffiliation(node, userBareJID);
-			} catch (XMPPException e) {
+			} catch (Exception e) {
 				LOGGER.warn("Could not read node '" + node.getId()
 						+ " affiliation for '" + userBareJID + "'", e);
 
@@ -246,7 +245,7 @@ public class PubSubClient {
 	/**
 	 * Verifies if a channel is public.
 	 * @param entityId channel to be verified.
-	 * @return if {@param entityId} is public.
+	 * @return if {@code entityId} is public.
 	 */
 	public boolean isChannelPublic(String entityId) {
 		Node node = getNode(entityId);
@@ -256,7 +255,7 @@ public class PubSubClient {
 				ConfigureForm config = node.getNodeConfiguration();
 				ConfigurationForm form = new ConfigurationForm(config);
 				return form.getBuddycloudAccessModel().equals(AccessModel.open);
-			} catch (XMPPException e) {
+			} catch (Exception e) {
 				LOGGER.warn("Could not get node '" + node.getId() + "' "
 						+ "access model", e);
 			}

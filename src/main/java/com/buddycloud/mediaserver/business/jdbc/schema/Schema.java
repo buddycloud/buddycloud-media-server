@@ -33,7 +33,6 @@ public class Schema {
 	private static final String SQL_CREATE_SCHEMA_FILE = "resources/schema/create_schema.sql";
 	private static final String SQL_DROP_SCHEMA_FILE = "resources/schema/drop_schema.sql";
 
-	@SuppressWarnings("unchecked")
 	public void runScript(MetaDataSource dataSource, String sqlFile)
 			throws IOException, FileNotFoundException, SQLException {
 		List<String> readLines = IOUtils

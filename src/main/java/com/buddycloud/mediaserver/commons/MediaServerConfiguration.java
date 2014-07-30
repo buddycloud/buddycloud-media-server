@@ -48,7 +48,6 @@ public class MediaServerConfiguration {
 	public static final String XMPP_CONNECTION_HOST = "xmpp.connection.host";
 	public static final String XMPP_CONNECTION_PORT = "xmpp.connection.port";
 	public static final String XMPP_CONNECTION_SERVICENAME = "xmpp.connection.servicename";
-	public static final String XMPP_CONNECTION_SASL = "xmpp.connection.saslenabled";
 	public static final String XMPP_CONNECTION_SECURITY = "xmpp.connection.securitymode";
 
     public static final String XMPP_REPLY_TIMEOUT = "xmpp.reply.timeout";
@@ -89,7 +88,6 @@ public class MediaServerConfiguration {
 	public static final Boolean DEF_HTTPS_ENABLED = false;
 	
 	// XMPP sec
-	private static final Boolean DEF_XMPP_CONNECTION_SASL = true;
 	private static final String DEF_XMPP_CONNECTION_SECURITY = SecurityMode.enabled.toString();
 
 	private static MediaServerConfiguration instance;
@@ -163,10 +161,6 @@ public class MediaServerConfiguration {
 
 		if (configuration.get(HTTPS_ENABLED) == null) {
 			configuration.put(HTTPS_ENABLED, DEF_HTTPS_ENABLED.toString());
-		}
-		
-		if (configuration.get(XMPP_CONNECTION_SASL) == null) {
-			configuration.put(XMPP_CONNECTION_SASL, DEF_XMPP_CONNECTION_SASL.toString());
 		}
 		
 		if (configuration.get(XMPP_CONNECTION_SECURITY) == null) {

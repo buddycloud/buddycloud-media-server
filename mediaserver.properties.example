@@ -24,9 +24,6 @@ xmpp.connection.host=crater.buddycloud.org
 xmpp.connection.port=5222
 xmpp.connection.servicename=buddycloud.org
 
-# Whether the client will use SASL authentication when logging into the server (true|false).
-xmpp.connection.saslenabled=true
-
 # TLS security mode used when making the connection (disabled|enabled|required).
 xmpp.connection.securitymode=enabled
 

@@ -88,7 +88,7 @@ public class MediaDAO {
 	 * @param mediaId media to be deleted.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
-	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@code userJID} is not allowed to perform this operation.
 	 */
 	public void deleteMedia(String userJID, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
@@ -154,7 +154,7 @@ public class MediaDAO {
      * @param entityId media channel's id.
      * @param mediaId the media's id
      * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
-     * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
+     * @throws UserNotAllowedException this {@code userJID} is not allowed to perform this operation.
      * @throws MediaNotFoundException if there is not such media metadata
      */
     public String getMediaInfo(String userJID, String entityId, String mediaId)
@@ -194,7 +194,7 @@ public class MediaDAO {
 	 * @param userJID the user that is trying to request the media lsit.
 	 * @param entityId media channel's id.
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
-	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@code userJID} is not allowed to perform this operation.
 	 */
 	public String getMediasInfo(String userJID, String entityId, Integer max, String after)
 			throws UserNotAllowedException, MetadataSourceException {
@@ -225,7 +225,7 @@ public class MediaDAO {
 	 * @throws MetadataSourceException if something goes wrong while retrieving media's metadata.
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting media file.
-	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@code userJID} is not allowed to perform this operation.
 	 */
 	public MediaFile<File> getMedia(String userJID, String entityId, String mediaId)
 			throws MetadataSourceException, MediaNotFoundException,
@@ -264,7 +264,7 @@ public class MediaDAO {
 	 * @param entityId avatar's channel.
 	 * @return avatar file.
 	 * @throws MetadataSourceException if something goes wrong while retrieving avatar's metadata.
-	 * @throws MediaNotFoundException there is no media representing {@param entityId} avatar.
+	 * @throws MediaNotFoundException there is no media representing {@code entityId} avatar.
 	 */
 	public MediaFile<File> getAvatar(String entityId) throws MetadataSourceException,
             MediaNotFoundException, IOException {
@@ -300,7 +300,7 @@ public class MediaDAO {
 	 * @throws MediaNotFoundException there is no media with such id.
 	 * @throws IOException if something goes wrong while getting preview file.
 	 * @throws InvalidPreviewFormatException if the client is not requesting media from an image or video.
-	 * @throws UserNotAllowedException this {@param userJID} is not allowed to perform this operation.
+	 * @throws UserNotAllowedException this {@code userJID} is not allowed to perform this operation.
 	 */	
 	public MediaFile<byte[]> getMediaPreview(String userJID, String entityId,
 			String mediaId, Integer maxHeight, Integer maxWidth)
@@ -429,7 +429,7 @@ public class MediaDAO {
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws UserNotAllowedException the user {@param userJID} is now allowed to upload media in this channel.
+	 * @throws UserNotAllowedException the user {@code userJID} is now allowed to upload media in this channel.
 	 */
 	public String insertWebFormMedia(String userJID, String entityId, Form form,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
@@ -498,7 +498,7 @@ public class MediaDAO {
 	 * @param isAvatar if the media to be uploaded is an avatar.
 	 * @return media's metadata, if the upload ends with success
 	 * @throws FileUploadException the is something wrong with the request.
-	 * @throws UserNotAllowedException the user {@param userJID} is now allowed to upload media in this channel.
+	 * @throws UserNotAllowedException the user {@code userJID} is now allowed to upload media in this channel.
 	 */
 	public String insertFormDataMedia(String userJID, String entityId, Request request,
 			boolean isAvatar) throws FileUploadException, UserNotAllowedException {
