@@ -23,9 +23,12 @@ import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Status;
 import org.restlet.resource.ClientResource;
+import org.restlet.resource.ResourceException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -65,11 +68,16 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Override
     protected void testSetUp() throws Exception {
-        setupFilesAndDB();
         setupMocks();
     }
 
     private void setupFilesAndDB() throws Exception {
+        setupFiles();
+        Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
+        dataSource.storeMedia(media);
+    }
+    
+    private void setupFiles() throws Exception {
         File destDir = new File(configuration
                 .getProperty(MediaServerConfiguration.MEDIA_STORAGE_ROOT_PROPERTY)
                 + File.separator + BASE_CHANNEL);
@@ -79,9 +87,6 @@ public class DownloadImageTest extends MediaServerTest {
 
         FileUtils.copyFile(new File(TEST_FILE_PATH + TEST_IMAGE_NAME), new File(
                 destDir + File.separator + MEDIA_ID));
-
-        Media media = buildMedia(MEDIA_ID, TEST_FILE_PATH + TEST_IMAGE_NAME);
-        dataSource.storeMedia(media);
     }
 
     private void setupMocks() {
@@ -96,6 +101,7 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Test
 	public void downloadImage() throws Exception {
+		setupFilesAndDB();
 		ClientResource client = new ClientResource(URL);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
@@ -114,6 +120,7 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Test
 	public void downloadImageParamAuth() throws Exception {
+		setupFilesAndDB();
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
@@ -134,6 +141,7 @@ public class DownloadImageTest extends MediaServerTest {
 
     @Test
     public void downloadImagePreview() throws Exception {
+    	setupFilesAndDB();
         int height = 50;
         int width = 50;
         String completeUrl = URL + "?maxheight=" + height + "&maxwidth=" + width;
@@ -160,6 +168,7 @@ public class DownloadImageTest extends MediaServerTest {
 
     @Test
     public void downloadPreviewBiggerThanImage() throws Exception {
+    	setupFilesAndDB();
         BufferedImage originalImage = ImageIO.read(new File(TEST_FILE_PATH + TEST_IMAGE_NAME));
         int height = originalImage.getHeight() + 1;
         int width = originalImage.getWidth() + 1;
@@ -192,6 +201,7 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Test
 	public void downloadImagePreviewParamAuth() throws Exception {
+		setupFilesAndDB();
 		int height = 50;
 		int width = 50;
 		Base64 encoder = new Base64(true);
@@ -216,5 +226,32 @@ public class DownloadImageTest extends MediaServerTest {
 		final String previewId = dataSource.getPreviewId(MEDIA_ID, height,
 				width);
 		dataSource.deletePreview(previewId);
+	}
+	
+	@Test
+	public void downloadFileExistsMediaNull() throws Exception {
+		setupFiles();
+		ClientResource client = new ClientResource(URL);
+		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
+				BASE_TOKEN);
+
+		File file = new File(TEST_OUTPUT_DIR + File.separator
+				+ "downloaded.jpg");
+		FileOutputStream outputStream = FileUtils.openOutputStream(file);
+		try {
+			client.get().write(outputStream);
+			Assert.fail();
+		} catch (Exception e) {
+			Assert.assertTrue(e instanceof ResourceException);
+			ResourceException re = (ResourceException) e;
+			Assert.assertEquals(Status.CLIENT_ERROR_NOT_FOUND, re.getStatus());
+		} finally {
+			outputStream.close();
+		}
+
+        assertTrue(file.exists());
+
+        // Delete downloaded file
+        FileUtils.deleteDirectory(new File(TEST_OUTPUT_DIR));
 	}
 }
