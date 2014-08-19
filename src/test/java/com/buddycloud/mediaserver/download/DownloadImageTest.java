@@ -68,7 +68,8 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Override
     protected void testSetUp() throws Exception {
-        setupMocks();
+		setupFilesAndDB();
+		setupMocks();
     }
 
     private void setupFilesAndDB() throws Exception {
@@ -101,7 +102,6 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Test
 	public void downloadImage() throws Exception {
-		setupFilesAndDB();
 		ClientResource client = new ClientResource(URL);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
@@ -120,7 +120,6 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Test
 	public void downloadImageParamAuth() throws Exception {
-		setupFilesAndDB();
 		Base64 encoder = new Base64(true);
 		String authStr = BASE_USER + ":" + BASE_TOKEN;
 
@@ -141,7 +140,6 @@ public class DownloadImageTest extends MediaServerTest {
 
     @Test
     public void downloadImagePreview() throws Exception {
-    	setupFilesAndDB();
         int height = 50;
         int width = 50;
         String completeUrl = URL + "?maxheight=" + height + "&maxwidth=" + width;
@@ -168,7 +166,6 @@ public class DownloadImageTest extends MediaServerTest {
 
     @Test
     public void downloadPreviewBiggerThanImage() throws Exception {
-    	setupFilesAndDB();
         BufferedImage originalImage = ImageIO.read(new File(TEST_FILE_PATH + TEST_IMAGE_NAME));
         int height = originalImage.getHeight() + 1;
         int width = originalImage.getWidth() + 1;
@@ -201,7 +198,6 @@ public class DownloadImageTest extends MediaServerTest {
 
 	@Test
 	public void downloadImagePreviewParamAuth() throws Exception {
-		setupFilesAndDB();
 		int height = 50;
 		int width = 50;
 		Base64 encoder = new Base64(true);
@@ -230,7 +226,7 @@ public class DownloadImageTest extends MediaServerTest {
 	
 	@Test
 	public void downloadFileExistsMediaNull() throws Exception {
-		setupFiles();
+		dataSource.deleteMedia(MEDIA_ID);
 		ClientResource client = new ClientResource(URL);
 		client.setChallengeResponse(ChallengeScheme.HTTP_BASIC, BASE_USER,
 				BASE_TOKEN);
