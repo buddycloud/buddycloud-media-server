@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 public class ImageUtils {
 
-	private ImageUtils() {
+	protected ImageUtils() {
 	}
 
     private static ImageWriteParam getParams(ImageWriter writer) {
@@ -122,6 +122,9 @@ public class ImageUtils {
     }
 
 	public static boolean isImage(String extension) {
+		if (null == extension) {
+			return false;
+		}
 		return Arrays.binarySearch(FORMATS, extension.toLowerCase()) >= 0;
 	}
 	
@@ -129,7 +132,7 @@ public class ImageUtils {
 		return img.getHeight() == img.getWidth();
 	}
 
-	private static final String[] FORMATS = { "001", "2bp", "360", "3fr",
+	protected static final String[] FORMATS = { "001", "2bp", "360", "3fr",
 			"411", "73i", "8pbs", "8xi", "abm", "acr", "adc", "afx", "agif",
 			"agp", "aic", "ais", "albm", "apd", "apm", "apng", "aps", "apx",
 			"ari", "arr", "art", "artwork", "arw", "arw", "asw", "avatar",
