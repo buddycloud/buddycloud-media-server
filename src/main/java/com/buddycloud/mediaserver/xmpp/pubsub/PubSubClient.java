@@ -47,26 +47,25 @@ import java.util.Map;
 
 /**
  * XMPP client that handles PubSub (XEP-0060) operations.
+ * 
  * @see <a href="http://xmpp.org/extensions/xep-0060.html">XEP-0060</a>
  * @author Rodrigo Duarte Sousa - rodrigodsousa@gmail.com
- *
+ * 
  */
 public class PubSubClient {
-    private static final String IDENTITY_CATEGORY = "pubsub";
-    private static final String IDENTITY_TYPE = "channels";
+	private static final String IDENTITY_CATEGORY = "pubsub";
+	private static final String IDENTITY_TYPE = "channels";
 
 	private static Logger LOGGER = LoggerFactory.getLogger(PubSubClient.class);
 
-    private Map<String, PubSubManager> pubSubManagersCache = new HashMap<String, PubSubManager>();
-    private Map<String, String> serversCache = new HashMap<String, String>();
-    private Connection connection;
-
+	private Map<String, PubSubManager> pubSubManagersCache = new HashMap<String, PubSubManager>();
+	private Map<String, String> serversCache = new HashMap<String, String>();
+	private Connection connection;
 
 	public PubSubClient(Connection connection) {
-        this.connection = connection;
+		this.connection = connection;
 		init();
 	}
-
 
 	private void init() {
 		Object affiliationsProvider = ProviderManager.getInstance()
@@ -85,145 +84,160 @@ public class PubSubClient {
 	}
 
 	private Node getNode(String entityId) {
-        JID entityJID = new JID(entityId);
-        String serverAddress = getChannelServerAddress(entityJID.getDomain());
-        Node node = null;
-        if (serverAddress != null) {
-            PubSubManager manager = pubSubManagersCache.get(serverAddress);
-            if (manager == null) {
-                manager = new PubSubManager(connection, serverAddress);
-                pubSubManagersCache.put(serverAddress, manager);
-            }
+		JID entityJID = new JID(entityId);
+		String serverAddress = getChannelServerAddress(entityJID.getDomain());
+		Node node = null;
+		if (serverAddress != null) {
+			PubSubManager manager = pubSubManagersCache.get(serverAddress);
+			if (manager == null) {
+				manager = new PubSubManager(connection, serverAddress);
+				pubSubManagersCache.put(serverAddress, manager);
+			}
 
-            try {
-                LOGGER.debug("Getting " + entityId + " node at channel server [" + serverAddress + "]");
-                node = manager.getNode("/user/" + entityId + "/posts");
-            } catch (XMPPException e) {
-                LOGGER.error("Error while getting " + entityId + "node", e);
-            }
-        }
+			try {
+				LOGGER.debug("Getting " + entityId
+						+ " node at channel server [" + serverAddress + "]");
+				node = manager.getNode("/user/" + entityId + "/posts");
+			} catch (XMPPException e) {
+				LOGGER.error("Error while getting " + entityId + "node", e);
+			}
+		}
 
-        return node;
+		return node;
 	}
 
-    private boolean isChannelServerIdentity(DiscoverInfo.Identity identity) {
-        return identity.getCategory().equals(IDENTITY_CATEGORY) && identity.getType().equals(IDENTITY_TYPE);
-    }
+	private boolean isChannelServerIdentity(DiscoverInfo.Identity identity) {
+		return identity.getCategory().equals(IDENTITY_CATEGORY)
+				&& identity.getType().equals(IDENTITY_TYPE);
+	}
 
-    private String discoverDomainServer(String domain) {
-        ServiceDiscoveryManager discoManager = ServiceDiscoveryManager.getInstanceFor(connection);
-        PubSubManager pubSubManager = new PubSubManager(connection, domain);
+	private String discoverDomainServer(String domain) {
+		ServiceDiscoveryManager discoManager = ServiceDiscoveryManager
+				.getInstanceFor(connection);
+		PubSubManager pubSubManager = new PubSubManager(connection, domain);
 
-        DiscoverItems discoverItems;
-        try {
-            LOGGER.debug("Discover nodes for domain [" + domain + "]");
-            discoverItems = pubSubManager.discoverNodes(null);
-        } catch (XMPPException e) {
-            LOGGER.error("Error while trying to fetch domain [" + domain + "] node", e);
-            return null;
-        }
+		DiscoverItems discoverItems;
+		try {
+			LOGGER.debug("Discover nodes for domain [" + domain + "]");
+			discoverItems = pubSubManager.discoverNodes(null);
+		} catch (XMPPException e) {
+			LOGGER.error("Error while trying to fetch domain [" + domain
+					+ "] node", e);
+			return null;
+		}
 
-        Iterator<DiscoverItems.Item> items = discoverItems.getItems();
-        while (items.hasNext()) {
-            String entityID = items.next().getEntityID();
-            DiscoverInfo discoverInfo;
-            try {
-                LOGGER.debug("Discover identities for entity [" + entityID + "]");
-                discoverInfo = discoManager.discoverInfo(entityID);
-            } catch (XMPPException e) {
-                LOGGER.error("Error while trying to fetch [" + entityID + "] identities");
-                continue;
-            }
+		Iterator<DiscoverItems.Item> items = discoverItems.getItems();
+		while (items.hasNext()) {
+			String entityID = items.next().getEntityID();
+			DiscoverInfo discoverInfo;
+			try {
+				LOGGER.debug("Discover identities for entity [" + entityID
+						+ "]");
+				discoverInfo = discoManager.discoverInfo(entityID);
+			} catch (XMPPException e) {
+				LOGGER.error("Error while trying to fetch [" + entityID
+						+ "] identities");
+				continue;
+			}
 
-            Iterator<DiscoverInfo.Identity> identities = discoverInfo.getIdentities();
-            while (identities.hasNext()) {
-                if (isChannelServerIdentity(identities.next())) {
-                    return entityID;
-                }
-            }
-        }
+			Iterator<DiscoverInfo.Identity> identities = discoverInfo
+					.getIdentities();
+			while (identities.hasNext()) {
+				if (isChannelServerIdentity(identities.next())) {
+					return entityID;
+				}
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
-    private String getChannelServerAddress(String domain) {
-        String serverAddress = serversCache.get(domain);
-        if (serverAddress == null) {
-            LOGGER.debug("Server cache doesn't contains the channel server for domain [" + domain + "]");
-            serverAddress = discoverDomainServer(domain);
+	private String getChannelServerAddress(String domain) {
+		String serverAddress = serversCache.get(domain);
+		if (serverAddress == null) {
+			LOGGER.debug("Server cache doesn't contains the channel server for domain ["
+					+ domain + "]");
+			serverAddress = discoverDomainServer(domain);
 
-            if (serverAddress != null) {
-                LOGGER.debug("Channel server for domain [" + domain + "] discovered: " + serverAddress);
-                serversCache.put(domain, serverAddress);
-            }
-        }
+			if (serverAddress != null) {
+				LOGGER.debug("Channel server for domain [" + domain
+						+ "] discovered: " + serverAddress);
+				serversCache.put(domain, serverAddress);
+			}
+		}
 
-        return serverAddress;
-    }
+		return serverAddress;
+	}
 
 	private Affiliation getAffiliation(Node node, String userBareJID)
 			throws XMPPException {
 
-        PubSub request = node.createPubsubPacket(Type.GET, new NodeExtension(
-                PubSubElementType.AFFILIATIONS, node.getId()),
-                PubSubNamespace.OWNER);
+		PubSub request = node.createPubsubPacket(Type.GET, new NodeExtension(
+				PubSubElementType.AFFILIATIONS, node.getId()),
+				PubSubNamespace.OWNER);
 
-        int itemCount = 0;
-        while (true) {
+		int itemCount = 0;
+		while (true) {
 
-            PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
+			PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
 
-            AffiliationsExtension subElem = (AffiliationsExtension) reply
-                    .getExtension(
-                            PubSubElementType.AFFILIATIONS.getElementName(),
-                            PubSubNamespace.BASIC.getXmlns());
+			AffiliationsExtension subElem = (AffiliationsExtension) reply
+					.getExtension(
+							PubSubElementType.AFFILIATIONS.getElementName(),
+							PubSubNamespace.BASIC.getXmlns());
 
-            List<Affiliation> affiliations = subElem.getAffiliations();
+			List<Affiliation> affiliations = subElem.getAffiliations();
 
-            for (Affiliation affiliation : affiliations) {
-                if (affiliation.getNodeId().equals(userBareJID)) {
-                    return affiliation;
-                }
-            }
+			for (Affiliation affiliation : affiliations) {
+				if (affiliation.getNodeId().equals(userBareJID)) {
+					return affiliation;
+				}
+			}
 
-            itemCount += affiliations.size();
+			itemCount += affiliations.size();
 
-            if (reply.getRsmSet() == null
-                    || itemCount == reply.getRsmSet().getCount()) {
-                break;
-            }
+			if (reply.getRsmSet() == null
+					|| itemCount == reply.getRsmSet().getCount()) {
+				break;
+			}
 
-            RSMSet rsmSet = new RSMSet();
-            rsmSet.setAfter(reply.getRsmSet().getLast());
-            request.setRsmSet(rsmSet);
-        }
+			RSMSet rsmSet = new RSMSet();
+			rsmSet.setAfter(reply.getRsmSet().getLast());
+			request.setRsmSet(rsmSet);
+		}
 
 		return null;
 	}
 
 	/**
-	 * Verifies if an user has the desired capability (member, moderator,
-	 * owner or publisher).
-	 * @param userJID the user Jabber Id.
-	 * @param entityId channel id.
-	 * @param capability decorator that represents the desired capabilities.
+	 * Verifies if an user has the desired capability (member, moderator, owner
+	 * or publisher).
+	 * 
+	 * @param userJID
+	 *            the user Jabber Id.
+	 * @param entityId
+	 *            channel id.
+	 * @param capability
+	 *            decorator that represents the desired capabilities.
 	 * @return if the user has the desired capabilities.
 	 */
 	public boolean matchUserCapability(String userJID, String entityId,
 			CapabilitiesDecorator capability) {
-        String userBareJID = new JID(userJID).toBareJID();
+		String userBareJID = new JID(userJID).toBareJID();
 
-		// Workaround for #86 (The channel's owner is sometimes not part of <affiliations/>) buddycloud-server issue
+		// Workaround for #86 (The channel's owner is sometimes not part of
+		// <affiliations/>) buddycloud-server issue
 		if (userBareJID.equals(entityId)) {
 			return true;
 		}
-		
+
 		Node node = getNode(entityId);
 		if (node != null) {
 			Affiliation affiliation;
 
 			try {
-                LOGGER.debug("Getting " + userBareJID + " affiliation for node [" + node.getId() + "]");
+				LOGGER.debug("Getting " + userBareJID
+						+ " affiliation for node [" + node.getId() + "]");
 				affiliation = getAffiliation(node, userBareJID);
 			} catch (XMPPException e) {
 				LOGGER.warn("Could not read node '" + node.getId()
@@ -233,7 +247,10 @@ public class PubSubClient {
 			}
 
 			if (affiliation != null) {
-				LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(userBareJID + " affiliation: "
+							+ affiliation.getType().toString());
+				}
 				return capability.isUserAllowed(affiliation.getType()
 						.toString());
 			}
@@ -244,8 +261,12 @@ public class PubSubClient {
 
 	/**
 	 * Verifies if a channel is public.
-	 * @param entityId channel to be verified.
-	 * @return if {@param entityId} is public.
+	 * 
+	 * @param entityId
+	 *            channel to be verified.
+	 * @return if
+	 * @param entityId
+	 *            is public.
 	 */
 	public boolean isChannelPublic(String entityId) {
 		Node node = getNode(entityId);
