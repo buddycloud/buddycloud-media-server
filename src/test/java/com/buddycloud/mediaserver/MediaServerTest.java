@@ -71,7 +71,7 @@ public abstract class MediaServerTest {
 
 	protected static final String MEDIA_ID = generateRandomString();
 
-    protected static final String SCHEMA_SCRIPTS_PATH = "resources/schema/";
+    protected static final String SCHEMA_SCRIPTS_PATH = "postgres/";
 
 	protected static final String BASE_TOKEN = "secret";
 	protected static final String BASE_CHANNEL = "testreg123@buddycloud.org";
@@ -139,11 +139,11 @@ public abstract class MediaServerTest {
     }
 
     private static void createSchema() throws IOException, SQLException {
-        load("create_schema");
+        load("base-hbsql");
     }
 
     private static void dropSchema() throws IOException, SQLException {
-        load("drop_schema");
+        load("drop-schema");
     }
 
     public static void load(final String scriptName) throws SQLException, IOException {
