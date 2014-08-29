@@ -13,7 +13,6 @@ public class ImageUtilsTest {
 
 	@Before
 	public void setUp() throws Exception {
-		imageUtils = new ImageUtils();
 	}
 
 	@After
@@ -22,17 +21,17 @@ public class ImageUtilsTest {
 
 	@Test
 	public void isImageReturnsFalseIfFileHasNoExtension() {
-		assertFalse(imageUtils.isImage(null));
+		assertFalse(ImageUtils.isImage(null));
 	}
 	
 	@Test
 	public void isImageReturnsFalseForNonImage() {
-		assertFalse(imageUtils.isImage("buddycloud"));
+		assertFalse(ImageUtils.isImage("buddycloud"));
 	}
 	
 	@Test
 	public void isImageReturnsTrueForImage() {
-		assertTrue(imageUtils.isImage("jpeg"));
+		assertTrue(ImageUtils.isImage("jpeg"));
 	}
 
 }

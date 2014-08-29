@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 public class ImageUtils {
 
-	protected ImageUtils() {
+	private ImageUtils() {
 	}
 
     private static ImageWriteParam getParams(ImageWriter writer) {
