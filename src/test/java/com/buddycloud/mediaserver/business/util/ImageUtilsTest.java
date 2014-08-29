@@ -9,16 +9,6 @@ import org.junit.Test;
 
 public class ImageUtilsTest {
 
-	private ImageUtils imageUtils;
-
-	@Before
-	public void setUp() throws Exception {
-	}
-
-	@After
-	public void tearDown() throws Exception {
-	}
-
 	@Test
 	public void isImageReturnsFalseIfFileHasNoExtension() {
 		assertFalse(ImageUtils.isImage(null));
