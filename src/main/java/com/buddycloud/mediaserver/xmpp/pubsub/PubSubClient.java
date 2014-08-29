@@ -232,9 +232,8 @@ public class PubSubClient {
 				return false;
 			}
 
-            LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
-
 			if (affiliation != null) {
+				LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
 				return capability.isUserAllowed(affiliation.getType()
 						.toString());
 			}
