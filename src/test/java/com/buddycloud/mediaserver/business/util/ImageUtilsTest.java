@@ -9,8 +9,6 @@ import org.junit.Test;
 
 public class ImageUtilsTest {
 
-	private ImageUtils imageUtils;
-
 	@Before
 	public void setUp() throws Exception {
 	}
