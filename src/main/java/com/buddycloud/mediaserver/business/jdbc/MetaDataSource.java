@@ -100,15 +100,11 @@ public class MetaDataSource {
 
 		PreparedStatement statement = null;
 		try {
-			String extension = media.getFileExtension();
-			if (null == extension) {
-				extension = "";
-			}
 			statement = prepareStatement(Queries.SAVE_MEDIA, media.getId(),
 					media.getFileName(), media.getEntityId(),
 					media.getAuthor(), media.getTitle(),
 					media.getDescription(), media.getMimeType(),
-					extension, media.getShaChecksum(),
+					media.getFileExtension(), media.getShaChecksum(),
 					media.getFileSize(), media.getLength(), media.getHeight(),
 					media.getWidth());
 			
