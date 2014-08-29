@@ -179,7 +179,7 @@ After unpacking, you can then start it by invoking:
 The server needs to be configured to point to a Buddycloud and XMPP server. 
 See the *Configuration* section.
 
-Setup database tables using the script at https://raw.githubusercontent.com/buddycloud/buddycloud-media-server/master/resources/schema/create_schema.sql
+Setup database tables using the scripts at https://raw.githubusercontent.com/buddycloud/buddycloud-media-server/master/postgres
 
 Configuration
 -------------
