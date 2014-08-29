@@ -249,7 +249,7 @@ public class PubSubClient {
 			if (affiliation != null) {
 				if (LOGGER.isDebugEnabled()) {
 					LOGGER.debug(userBareJID + " affiliation: "
-							+ affiliation.getType().toString());
+							+ affiliation.getType());
 				}
 				return capability.isUserAllowed(affiliation.getType()
 						.toString());
