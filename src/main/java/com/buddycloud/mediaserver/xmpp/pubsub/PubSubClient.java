@@ -15,6 +15,7 @@
  */
 package com.buddycloud.mediaserver.xmpp.pubsub;
 
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 import com.buddycloud.mediaserver.xmpp.util.AccessModel;
 import com.buddycloud.mediaserver.xmpp.util.ConfigurationForm;
@@ -44,6 +45,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * XMPP client that handles PubSub (XEP-0060) operations.
@@ -61,9 +63,11 @@ public class PubSubClient {
 	private Map<String, PubSubManager> pubSubManagersCache = new HashMap<String, PubSubManager>();
 	private Map<String, String> serversCache = new HashMap<String, String>();
 	private Connection connection;
+	private Properties configuration;
 
-	public PubSubClient(Connection connection) {
+	public PubSubClient(Connection connection, Properties configuration) {
 		this.connection = connection;
+		this.configuration = configuration;
 		init();
 	}
 
@@ -81,6 +85,9 @@ public class PubSubClient {
 						PubSubNamespace.BASIC.getXmlns());
 		ProviderManager.getInstance().addExtensionProvider("affiliation",
 				PubSubNamespace.OWNER.getXmlns(), affiliationProvider);
+		
+		JID user = new JID(configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_USERNAME));
+		getChannelServerAddress(configuration.getProperty(user.getDomain()));
 	}
 
 	private Node getNode(String entityId) {
