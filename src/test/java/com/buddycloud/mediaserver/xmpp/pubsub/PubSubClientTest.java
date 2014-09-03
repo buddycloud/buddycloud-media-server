@@ -1,13 +1,8 @@
 package com.buddycloud.mediaserver.xmpp.pubsub;
 
-import static org.junit.Assert.*;
-
 import java.util.Properties;
 
 import org.jivesoftware.smack.Connection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smackx.packet.DiscoverItems;
-import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,9 +16,6 @@ public class PubSubClientTest {
 	private Properties configuration;
 	private Connection connection;
 	private PubSubManagerFactory factory;
-	private PubSubManager manager;
-	private DiscoverItems items;
-
 	@Before
 	public void setUp() throws Exception {
 		connection = Mockito.mock(Connection.class);
@@ -37,16 +29,15 @@ public class PubSubClientTest {
 
 	@Test(expected=NullPointerException.class)
 	public void discoverIsAttemptedOnConnection() throws Exception {
-		String jid = "marty@mcfly.org";
 		String domain = "mcfly.org";
 		
 		Mockito.when(
 				configuration
-						.getProperty(MediaServerConfiguration.XMPP_CONNECTION_USERNAME))
-				.thenReturn(jid);
+						.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SERVICENAME))
+				.thenReturn(domain);
 		Mockito.when(factory.create(domain)).thenReturn(null);
 		
-		PubSubClient client = new PubSubClient(connection, configuration, factory);
+		new PubSubClient(connection, configuration, factory);
 		
 	}
 

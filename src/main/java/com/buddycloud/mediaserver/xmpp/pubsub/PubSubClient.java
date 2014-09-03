@@ -67,7 +67,8 @@ public class PubSubClient {
 	private Properties configuration;
 	private PubSubManagerFactory pubsubManagerFactory;
 
-	public PubSubClient(Connection connection, Properties configuration, PubSubManagerFactory factory) {
+	public PubSubClient(Connection connection, Properties configuration,
+			PubSubManagerFactory factory) {
 		this.connection = connection;
 		this.configuration = configuration;
 		if (null != factory) {
@@ -75,18 +76,18 @@ public class PubSubClient {
 		}
 		init();
 	}
-	
+
 	public PubSubClient(Connection connection, Properties configuration) {
-        this(connection, configuration, null);
+		this(connection, configuration, null);
 	}
-	
+
 	private PubSubManagerFactory getPubSubManagerFactory() {
 		if (null == pubsubManagerFactory) {
 			pubsubManagerFactory = new PubSubManagerFactory(connection);
 		}
 		return pubsubManagerFactory;
 	}
-	
+
 	public void setPubSubManagerFactory(PubSubManagerFactory factory) {
 		this.pubsubManagerFactory = factory;
 	}
@@ -105,9 +106,9 @@ public class PubSubClient {
 						PubSubNamespace.BASIC.getXmlns());
 		ProviderManager.getInstance().addExtensionProvider("affiliation",
 				PubSubNamespace.OWNER.getXmlns(), affiliationProvider);
-		
-		JID user = new JID(configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_USERNAME));
-		getChannelServerAddress(user.getDomain());
+
+		getChannelServerAddress(configuration
+				.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SERVICENAME));
 	}
 
 	private Node getNode(String entityId) {
@@ -115,7 +116,8 @@ public class PubSubClient {
 		String serverAddress = getChannelServerAddress(entityJID.getDomain());
 		Node node = null;
 		if (serverAddress != null) {
-			PubSubManager manager = getPubSubManagerFactory().create(serverAddress);
+			PubSubManager manager = getPubSubManagerFactory().create(
+					serverAddress);
 			if (manager == null) {
 				manager = new PubSubManager(connection, serverAddress);
 				pubSubManagersCache.put(serverAddress, manager);
