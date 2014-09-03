@@ -107,7 +107,7 @@ public class PubSubClient {
 				PubSubNamespace.OWNER.getXmlns(), affiliationProvider);
 		
 		JID user = new JID(configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_USERNAME));
-		getChannelServerAddress(configuration.getProperty(user.getDomain()));
+		getChannelServerAddress(user.getDomain());
 	}
 
 	private Node getNode(String entityId) {
