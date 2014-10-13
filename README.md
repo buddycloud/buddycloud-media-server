@@ -21,8 +21,10 @@ download media from public channels - any client has access.
 [xep]: http://xmpp.org/extensions/xep-0070.html
 [pubsub]: https://buddycloud.org/wiki/XMPP_XEP#Follower_Management
 
-__Build status:__ [![Build Status](https://travis-ci.org/buddycloud/buddycloud-media-server.svg?branch=master)](https://travis-ci.org/buddycloud/buddycloud-media-server) 
-
+__Build status:__ 
+  * Released version: [![Build Status](https://travis-ci.org/buddycloud/buddycloud-media-server.svg?branch=master)](https://travis-ci.org/buddycloud/buddycloud-media-server) 
+  * Development version: [![Build Status](https://travis-ci.org/buddycloud/buddycloud-media-server.svg?branch=develop)](https://travis-ci.org/buddycloud/buddycloud-media-server) 
+  
 Usage
 -----
 
@@ -177,7 +179,7 @@ After unpacking, you can then start it by invoking:
 The server needs to be configured to point to a Buddycloud and XMPP server. 
 See the *Configuration* section.
 
-Setup database tables using the script at https://raw.githubusercontent.com/buddycloud/buddycloud-media-server/master/resources/schema/create_schema.sql
+Setup database tables using the scripts at https://raw.githubusercontent.com/buddycloud/buddycloud-media-server/master/postgres
 
 Configuration
 -------------

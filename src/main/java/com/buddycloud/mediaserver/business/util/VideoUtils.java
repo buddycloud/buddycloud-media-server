@@ -110,6 +110,9 @@ public class VideoUtils {
 	}
 
 	public static boolean isVideo(String extension) {
+		if (null == extension) {
+			return false;
+		}
 		return Arrays.binarySearch(FORMATS, extension.toLowerCase()) >= 0;
 	}
 

@@ -63,4 +63,3 @@ CREATE TABLE avatars(
 );
 
 CREATE UNIQUE INDEX entity_idx ON avatars (entityId);
-
