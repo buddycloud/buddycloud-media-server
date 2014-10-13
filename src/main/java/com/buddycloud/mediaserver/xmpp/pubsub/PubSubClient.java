@@ -172,7 +172,8 @@ public class PubSubClient {
         while (true) {
 
             PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
-
+ 
+            LOGGER.debug("Affiliations reply " + reply.toXML());
             AffiliationsExtension subElem = (AffiliationsExtension) reply
                     .getExtension(
                             PubSubElementType.AFFILIATIONS.getElementName(),
@@ -231,16 +232,17 @@ public class PubSubClient {
 
 				return false;
 			}
+			
+			if (null == affiliation) {
+				LOGGER.debug("User " + userBareJID + " has no affiliation to node " + node.getId());
+				return false;
+			}
 
             LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
 
-			if (affiliation != null) {
-				return capability.isUserAllowed(affiliation.getType()
-						.toString());
-			}
+			return capability.isUserAllowed(affiliation.getType()
+			    .toString());
 		}
-
-		return false;
 	}
 
 	/**
