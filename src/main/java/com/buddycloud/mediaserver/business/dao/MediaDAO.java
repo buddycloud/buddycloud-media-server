@@ -249,12 +249,11 @@ public class MediaDAO {
 
 		String fullDirectoryPath = getDirectory(entityId);
 		File file = new File(fullDirectoryPath + File.separator + mediaId);
-
-		if (!file.exists()) {
+        Media media = dataSource.getMedia(mediaId);
+        
+		if (!file.exists() || (null == media)) {
 			throw new MediaNotFoundException(mediaId, entityId);
 		}
-
-        Media media = dataSource.getMedia(mediaId);
 
         return new MediaFile<File>(media.getMimeType(), file, media.getLastUpdatedDate());
 	}
