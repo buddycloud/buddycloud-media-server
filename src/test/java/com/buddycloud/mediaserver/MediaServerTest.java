@@ -23,8 +23,10 @@ import com.buddycloud.mediaserver.business.util.MimeTypeMapping;
 import com.buddycloud.mediaserver.business.util.VideoUtils;
 import com.buddycloud.mediaserver.commons.Constants;
 import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.commons.configuration.FileLoader;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -41,6 +43,7 @@ import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.StringRepresentation;
 
 import javax.imageio.ImageIO;
+
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.sql.SQLException;
@@ -51,7 +54,7 @@ import java.util.Properties;
 public abstract class MediaServerTest {
 	
 	static {
-		System.setProperty(MediaServerConfiguration.CONFIGURATION_ENV,
+		System.setProperty(FileLoader.CONFIGURATION_ENV,
 				"resources/tests/mediaserver.properties");
 	}
 	
@@ -71,7 +74,7 @@ public abstract class MediaServerTest {
 
 	protected static final String MEDIA_ID = generateRandomString();
 
-    protected static final String SCHEMA_SCRIPTS_PATH = "resources/schema/";
+    protected static final String SCHEMA_SCRIPTS_PATH = "postgres/";
 
 	protected static final String BASE_TOKEN = "secret";
 	protected static final String BASE_CHANNEL = "testreg123@buddycloud.org";
@@ -139,11 +142,11 @@ public abstract class MediaServerTest {
     }
 
     private static void createSchema() throws IOException, SQLException {
-        load("create_schema");
+        load("base-hbsql");
     }
 
     private static void dropSchema() throws IOException, SQLException {
-        load("drop_schema");
+        load("drop-schema");
     }
 
     public static void load(final String scriptName) throws SQLException, IOException {

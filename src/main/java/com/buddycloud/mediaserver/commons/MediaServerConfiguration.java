@@ -1,17 +1,15 @@
 /*
  * Copyright 2012 buddycloud
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package com.buddycloud.mediaserver.commons;
 
@@ -24,208 +22,215 @@ import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.buddycloud.mediaserver.commons.configuration.ConfigurationException;
+import com.buddycloud.mediaserver.commons.configuration.DatabaseLoader;
+import com.buddycloud.mediaserver.commons.configuration.FileLoader;
+import com.buddycloud.mediaserver.commons.configuration.Loader;
 import com.buddycloud.mediaserver.commons.exception.LoadConfigurationException;
 
 public class MediaServerConfiguration {
 
-	// File System
-	public static final String MEDIA_STORAGE_ROOT_PROPERTY = "media.storage.root";
-	public static final String MEDIA_SIZE_LIMIT_PROPERTY = "media.sizelimit";
-    public static final String MEDIA_TO_DISK_THRESHOLD_PROPERTY = "media.todisk.threshold";
+  // File System
+  public static final String MEDIA_STORAGE_ROOT_PROPERTY = "media.storage.root";
+  public static final String MEDIA_SIZE_LIMIT_PROPERTY = "media.sizelimit";
+  public static final String MEDIA_TO_DISK_THRESHOLD_PROPERTY = "media.todisk.threshold";
 
-	// JDBC
-	public static final String JDBC_DRIVER_CLASS_PROPERTY = "jdbc.driver.class";
-	public static final String JDBC_DB_URL_PROPERTY = "jdbc.db.url";
+  // JDBC
+  public static final String JDBC_DRIVER_CLASS_PROPERTY = "jdbc.driver.class";
+  public static final String JDBC_DB_URL_PROPERTY = "jdbc.db.url";
 
-	// XMPP
-	public static final String XMPP_COMPONENT_HOST = "xmpp.component.host";
-	public static final String XMPP_COMPONENT_PORT = "xmpp.component.port";
-	public static final String XMPP_COMPONENT_SUBDOMAIN = "xmpp.component.subdomain";
-	public static final String XMPP_COMPONENT_SECRETKEY = "xmpp.component.secretkey";
+  // XMPP
+  public static final String XMPP_COMPONENT_HOST = "xmpp.component.host";
+  public static final String XMPP_COMPONENT_PORT = "xmpp.component.port";
+  public static final String XMPP_COMPONENT_SUBDOMAIN = "xmpp.component.subdomain";
+  public static final String XMPP_COMPONENT_SECRETKEY = "xmpp.component.secretkey";
 
-	public static final String XMPP_CONNECTION_USERNAME = "xmpp.connection.username";
-	public static final String XMPP_CONNECTION_PASSWORD = "xmpp.connection.password";
-	public static final String XMPP_CONNECTION_HOST = "xmpp.connection.host";
-	public static final String XMPP_CONNECTION_PORT = "xmpp.connection.port";
-	public static final String XMPP_CONNECTION_SERVICENAME = "xmpp.connection.servicename";
-	public static final String XMPP_CONNECTION_SASL = "xmpp.connection.saslenabled";
-	public static final String XMPP_CONNECTION_SECURITY = "xmpp.connection.securitymode";
+  public static final String XMPP_CONNECTION_USERNAME = "xmpp.connection.username";
+  public static final String XMPP_CONNECTION_PASSWORD = "xmpp.connection.password";
+  public static final String XMPP_CONNECTION_HOST = "xmpp.connection.host";
+  public static final String XMPP_CONNECTION_PORT = "xmpp.connection.port";
+  public static final String XMPP_CONNECTION_SERVICENAME = "xmpp.connection.servicename";
+  public static final String XMPP_CONNECTION_SASL = "xmpp.connection.saslenabled";
+  public static final String XMPP_CONNECTION_SECURITY = "xmpp.connection.securitymode";
 
-    public static final String XMPP_REPLY_TIMEOUT = "xmpp.reply.timeout";
+  public static final String XMPP_REPLY_TIMEOUT = "xmpp.reply.timeout";
 
-	// HTTP
-	public static final String HTTP_PORT = "http.port";
-	public static final String HTTP_ENDPOINT = "http.endpoint";
-    public static final String HTTP_TESTS_PORT = "http.tests.port";
-	public static final String HTTPS_PORT = "https.port";
-	public static final String HTTPS_ENABLED = "https.enabled";
-	public static final String HTTPS_KEYSTORE_PATH = "https.keystore.path";
-	public static final String HTTPS_KEYSTORE_TYPE = "https.keystore.type";
-	public static final String HTTPS_KEYSTORE_PASSWORD = "https.keystore.password";
-	public static final String HTTPS_KEY_PASSWORD = "https.key.password";
+  // HTTP
+  public static final String HTTP_PORT = "http.port";
+  public static final String HTTP_ENDPOINT = "http.endpoint";
+  public static final String HTTP_TESTS_PORT = "http.tests.port";
+  public static final String HTTPS_PORT = "https.port";
+  public static final String HTTPS_ENABLED = "https.enabled";
+  public static final String HTTPS_KEYSTORE_PATH = "https.keystore.path";
+  public static final String HTTPS_KEYSTORE_TYPE = "https.keystore.type";
+  public static final String HTTPS_KEYSTORE_PASSWORD = "https.keystore.password";
+  public static final String HTTPS_KEY_PASSWORD = "https.key.password";
 
-	// CACHE
-	public static final String CACHE_MAX_AGE = "cache.max.age";
+  // CACHE
+  public static final String CACHE_MAX_AGE = "cache.max.age";
 
-	/*
-	 * mediaserver.properties default values
-	 */
-    // XMPP
-    public static final Integer DEF_XMPP_REPLY_TIMEOUT = 30000; // 30 seconds
+  /*
+   * mediaserver.properties default values
+   */
+  // XMPP
+  public static final Integer DEF_XMPP_REPLY_TIMEOUT = 30000; // 30 seconds
 
-	// CACHE
-	public static final Integer DEF_CACHE_MAX_AGE = 86400; //1 day;
-	
-	// JDBC
-	public static final String DEF_JDBC_DRIVER_CLASS_PROPERTY = "org.postgresql.Driver";
-	
-	// File System
-    public static final Long DEF_MEDIA_SIZE_LIMIT = 104857600L;
-	public static final Long DEF_MEDIA_TO_DISK_THRESHOLD = 1048576L;
+  // CACHE
+  public static final Integer DEF_CACHE_MAX_AGE = 86400; // 1 day;
 
-	// HTTP
-    public static final Integer DEF_HTTP_TESTS_PORT = 9091;
-	public static final Integer DEF_HTTP_PORT = 8080;
-	public static final Boolean DEF_HTTPS_ENABLED = false;
-	
-	// XMPP sec
-	private static final Boolean DEF_XMPP_CONNECTION_SASL = true;
-	private static final String DEF_XMPP_CONNECTION_SECURITY = SecurityMode.enabled.toString();
+  // JDBC
+  public static final String DEF_JDBC_DRIVER_CLASS_PROPERTY = "org.postgresql.Driver";
 
-	private static MediaServerConfiguration instance;
+  // File System
+  public static final Long DEF_MEDIA_SIZE_LIMIT = 104857600L;
+  public static final Long DEF_MEDIA_TO_DISK_THRESHOLD = 1048576L;
 
-	private static final String CONFIGURATION_FILE = "mediaserver.properties";
-	public static final String CONFIGURATION_ENV = "mediaserver.configuration";
-	
-	public static final String BUDDYCLOUD_NS_API = "http://buddycloud.org/v1/api";
-	public static final String API_ENDPOINT_FIELD_VAR = "endpoint";
-	
-	private static Logger LOGGER = LoggerFactory.getLogger(MediaServerConfiguration.class);
+  // HTTP
+  public static final Integer DEF_HTTP_TESTS_PORT = 9091;
+  public static final Integer DEF_HTTP_PORT = 8080;
+  public static final Boolean DEF_HTTPS_ENABLED = false;
 
-	private Properties configuration;
+  // XMPP sec
+  private static final Boolean DEF_XMPP_CONNECTION_SASL = true;
+  private static final String DEF_XMPP_CONNECTION_SECURITY = SecurityMode.enabled.toString();
 
-	private MediaServerConfiguration() {
-		this.configuration = new Properties();
-        try {
-			String confPath = System.getProperty(CONFIGURATION_ENV) == null ? CONFIGURATION_FILE
-					: System.getProperty(CONFIGURATION_ENV);
-        	configuration.load(new FileInputStream(confPath));
-		} catch (Exception e) {
-			LOGGER.error("Configuration could not be loaded.", e);
-			throw new LoadConfigurationException(e.getMessage(), e);
-		}
-        loadDefault();
-        validate();
-	}
+  private static MediaServerConfiguration instance;
 
-	public static MediaServerConfiguration getInstance() {
-		if (instance == null) {
-			instance = new MediaServerConfiguration();
-		}
-		return instance;
-	}
+  public static final String BUDDYCLOUD_NS_API = "http://buddycloud.org/v1/api";
+  public static final String API_ENDPOINT_FIELD_VAR = "endpoint";
 
-	public Properties getConfiguration() {
-		return this.configuration;
-	}
+  private static Logger LOGGER = LoggerFactory.getLogger(MediaServerConfiguration.class);
 
-	public void loadDefault() {
-        if (configuration.get(XMPP_REPLY_TIMEOUT) == null) {
-            configuration.put(XMPP_REPLY_TIMEOUT, DEF_XMPP_REPLY_TIMEOUT.toString());
-        }
+  private Properties configuration;
 
-		if (configuration.get(CACHE_MAX_AGE) == null) {
-			configuration.put(CACHE_MAX_AGE, DEF_CACHE_MAX_AGE.toString());
-		}
-		
-		if (configuration.get(JDBC_DRIVER_CLASS_PROPERTY) == null) {
-			configuration.put(JDBC_DRIVER_CLASS_PROPERTY,
-					DEF_JDBC_DRIVER_CLASS_PROPERTY);			
-		}
-		
-		if (configuration.get(MEDIA_TO_DISK_THRESHOLD_PROPERTY) == null) {
-			configuration.put(MEDIA_TO_DISK_THRESHOLD_PROPERTY,
-					DEF_MEDIA_TO_DISK_THRESHOLD.toString());
-		}
+  public static final String DATABASE_ENV = "DATABASE";
 
-        if (configuration.get(MEDIA_SIZE_LIMIT_PROPERTY) == null) {
-            configuration.put(MEDIA_SIZE_LIMIT_PROPERTY,
-                    DEF_MEDIA_SIZE_LIMIT.toString());
-        }
+  private MediaServerConfiguration() {
+    this.configuration = new Properties();
 
-		if (configuration.get(HTTP_PORT) == null) {
-			configuration.put(HTTP_PORT, DEF_HTTP_PORT.toString());
-		}
+    try {
+      String databaseConnectionString = System.getenv(DATABASE_ENV);
+      Loader loader = null;
 
-        if (configuration.get(HTTP_TESTS_PORT) == null) {
-			configuration.put(HTTP_TESTS_PORT, DEF_HTTP_TESTS_PORT.toString());
-		}
+      if (null == databaseConnectionString) {
+        loader = new FileLoader(this.configuration);
+      } else {
+        loader = new DatabaseLoader(this.configuration, databaseConnectionString);
+      }
+      loader.load();
 
-		if (configuration.get(HTTPS_ENABLED) == null) {
-			configuration.put(HTTPS_ENABLED, DEF_HTTPS_ENABLED.toString());
-		}
-		
-		if (configuration.get(XMPP_CONNECTION_SASL) == null) {
-			configuration.put(XMPP_CONNECTION_SASL, DEF_XMPP_CONNECTION_SASL.toString());
-		}
-		
-		if (configuration.get(XMPP_CONNECTION_SECURITY) == null) {
-			configuration.put(XMPP_CONNECTION_SECURITY, DEF_XMPP_CONNECTION_SECURITY);
-		}
-	}
+    } catch (ConfigurationException e) {
+      LOGGER.error(e.getMessage());
+      System.exit(1);
+    }
 
-	private void validate() {
-		List<String> missingProperties = new ArrayList<String>();
+    loadDefault();
+    validate();
+  }
 
-		if (configuration.get(MEDIA_STORAGE_ROOT_PROPERTY) == null) {
-			missingProperties.add(MEDIA_STORAGE_ROOT_PROPERTY);
-		}
+  public static MediaServerConfiguration getInstance() {
+    if (instance == null) {
+      instance = new MediaServerConfiguration();
+    }
+    return instance;
+  }
 
-		if (configuration.get(JDBC_DB_URL_PROPERTY) == null) {
-			missingProperties.add(JDBC_DB_URL_PROPERTY);
-		}
+  public Properties getConfiguration() {
+    return this.configuration;
+  }
 
-		if (configuration.get(XMPP_COMPONENT_HOST) == null) {
-			missingProperties.add(XMPP_COMPONENT_HOST);
-		}
+  public void loadDefault() {
+    if (configuration.get(XMPP_REPLY_TIMEOUT) == null) {
+      configuration.put(XMPP_REPLY_TIMEOUT, DEF_XMPP_REPLY_TIMEOUT.toString());
+    }
 
-		if (configuration.get(XMPP_COMPONENT_PORT) == null) {
-			missingProperties.add(XMPP_COMPONENT_PORT);
-		}
+    if (configuration.get(CACHE_MAX_AGE) == null) {
+      configuration.put(CACHE_MAX_AGE, DEF_CACHE_MAX_AGE.toString());
+    }
 
-		if (configuration.get(XMPP_COMPONENT_SUBDOMAIN) == null) {
-			missingProperties.add(XMPP_COMPONENT_SUBDOMAIN);
-		}
+    if (configuration.get(JDBC_DRIVER_CLASS_PROPERTY) == null) {
+      configuration.put(JDBC_DRIVER_CLASS_PROPERTY, DEF_JDBC_DRIVER_CLASS_PROPERTY);
+    }
 
-		if (configuration.get(XMPP_COMPONENT_SECRETKEY) == null) {
-			missingProperties.add(XMPP_COMPONENT_SECRETKEY);
-		}
+    if (configuration.get(MEDIA_TO_DISK_THRESHOLD_PROPERTY) == null) {
+      configuration.put(MEDIA_TO_DISK_THRESHOLD_PROPERTY, DEF_MEDIA_TO_DISK_THRESHOLD.toString());
+    }
 
-		if (configuration.get(XMPP_CONNECTION_USERNAME) == null) {
-			missingProperties.add(XMPP_CONNECTION_USERNAME);
-		}
+    if (configuration.get(MEDIA_SIZE_LIMIT_PROPERTY) == null) {
+      configuration.put(MEDIA_SIZE_LIMIT_PROPERTY, DEF_MEDIA_SIZE_LIMIT.toString());
+    }
 
-		if (configuration.get(XMPP_CONNECTION_PASSWORD) == null) {
-			missingProperties.add(XMPP_CONNECTION_PASSWORD);
-		}
+    if (configuration.get(HTTP_PORT) == null) {
+      configuration.put(HTTP_PORT, DEF_HTTP_PORT.toString());
+    }
 
-		if (configuration.get(XMPP_COMPONENT_HOST) == null) {
-			missingProperties.add(XMPP_COMPONENT_HOST);
-		}
+    if (configuration.get(HTTP_TESTS_PORT) == null) {
+      configuration.put(HTTP_TESTS_PORT, DEF_HTTP_TESTS_PORT.toString());
+    }
 
-		if (configuration.get(XMPP_CONNECTION_PORT) == null) {
-			missingProperties.add(XMPP_CONNECTION_PORT);
-		}
+    if (configuration.get(HTTPS_ENABLED) == null) {
+      configuration.put(HTTPS_ENABLED, DEF_HTTPS_ENABLED.toString());
+    }
 
-		if (configuration.get(XMPP_CONNECTION_SERVICENAME) == null) {
-			missingProperties.add(XMPP_CONNECTION_SERVICENAME);
-		}
+    if (configuration.get(XMPP_CONNECTION_SASL) == null) {
+      configuration.put(XMPP_CONNECTION_SASL, DEF_XMPP_CONNECTION_SASL.toString());
+    }
 
-		if (missingProperties.size() > 0) {
-			throw new LoadConfigurationException(
-					"Media Server configuration could not be loaded. "
-							+ "The following mandatory properties are missing: "
-							+ missingProperties);
-		}
-	}
+    if (configuration.get(XMPP_CONNECTION_SECURITY) == null) {
+      configuration.put(XMPP_CONNECTION_SECURITY, DEF_XMPP_CONNECTION_SECURITY);
+    }
+  }
+
+  private void validate() {
+    List<String> missingProperties = new ArrayList<String>();
+
+    if (configuration.get(MEDIA_STORAGE_ROOT_PROPERTY) == null) {
+      missingProperties.add(MEDIA_STORAGE_ROOT_PROPERTY);
+    }
+
+    if (configuration.get(JDBC_DB_URL_PROPERTY) == null) {
+      missingProperties.add(JDBC_DB_URL_PROPERTY);
+    }
+
+    if (configuration.get(XMPP_COMPONENT_HOST) == null) {
+      missingProperties.add(XMPP_COMPONENT_HOST);
+    }
+
+    if (configuration.get(XMPP_COMPONENT_PORT) == null) {
+      missingProperties.add(XMPP_COMPONENT_PORT);
+    }
+
+    if (configuration.get(XMPP_COMPONENT_SUBDOMAIN) == null) {
+      missingProperties.add(XMPP_COMPONENT_SUBDOMAIN);
+    }
+
+    if (configuration.get(XMPP_COMPONENT_SECRETKEY) == null) {
+      missingProperties.add(XMPP_COMPONENT_SECRETKEY);
+    }
+
+    if (configuration.get(XMPP_CONNECTION_USERNAME) == null) {
+      missingProperties.add(XMPP_CONNECTION_USERNAME);
+    }
+
+    if (configuration.get(XMPP_CONNECTION_PASSWORD) == null) {
+      missingProperties.add(XMPP_CONNECTION_PASSWORD);
+    }
+
+    if (configuration.get(XMPP_COMPONENT_HOST) == null) {
+      missingProperties.add(XMPP_COMPONENT_HOST);
+    }
+
+    if (configuration.get(XMPP_CONNECTION_PORT) == null) {
+      missingProperties.add(XMPP_CONNECTION_PORT);
+    }
+
+    if (configuration.get(XMPP_CONNECTION_SERVICENAME) == null) {
+      missingProperties.add(XMPP_CONNECTION_SERVICENAME);
+    }
+
+    if (missingProperties.size() > 0) {
+      throw new LoadConfigurationException("Media Server configuration could not be loaded. "
+          + "The following mandatory properties are missing: " + missingProperties);
+    }
+  }
 }

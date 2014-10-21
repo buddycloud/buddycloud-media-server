@@ -122,6 +122,9 @@ public class ImageUtils {
     }
 
 	public static boolean isImage(String extension) {
+		if (null == extension) {
+			return false;
+		}
 		return Arrays.binarySearch(FORMATS, extension.toLowerCase()) >= 0;
 	}
 	
