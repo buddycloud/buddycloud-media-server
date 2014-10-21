@@ -132,7 +132,7 @@ public class Main {
             return false;
         }
 
-		XMPPToolBox.getInstance().start(component, connection);
+		XMPPToolBox.getInstance().start(component, connection, configuration);
 		
 		LOGGER.info("Buddycloud Media Server XMPP component started!");
 

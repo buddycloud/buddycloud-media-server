@@ -15,6 +15,8 @@
  */
 package com.buddycloud.mediaserver.xmpp.pubsub;
 
+import com.buddycloud.mediaserver.business.util.PubSubManagerFactory;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
 import com.buddycloud.mediaserver.xmpp.pubsub.capabilities.CapabilitiesDecorator;
 import com.buddycloud.mediaserver.xmpp.util.AccessModel;
 import com.buddycloud.mediaserver.xmpp.util.ConfigurationForm;
@@ -44,6 +46,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * XMPP client that handles PubSub (XEP-0060) operations.
@@ -61,10 +64,32 @@ public class PubSubClient {
 	private Map<String, PubSubManager> pubSubManagersCache = new HashMap<String, PubSubManager>();
 	private Map<String, String> serversCache = new HashMap<String, String>();
 	private Connection connection;
+	private Properties configuration;
+	private PubSubManagerFactory pubsubManagerFactory;
 
-	public PubSubClient(Connection connection) {
+	public PubSubClient(Connection connection, Properties configuration,
+			PubSubManagerFactory factory) {
 		this.connection = connection;
+		this.configuration = configuration;
+		if (null != factory) {
+			setPubSubManagerFactory(factory);
+		}
 		init();
+	}
+
+	public PubSubClient(Connection connection, Properties configuration) {
+		this(connection, configuration, null);
+	}
+
+	private PubSubManagerFactory getPubSubManagerFactory() {
+		if (null == pubsubManagerFactory) {
+			pubsubManagerFactory = new PubSubManagerFactory(connection);
+		}
+		return pubsubManagerFactory;
+	}
+
+	public void setPubSubManagerFactory(PubSubManagerFactory factory) {
+		this.pubsubManagerFactory = factory;
 	}
 
 	private void init() {
@@ -81,6 +106,9 @@ public class PubSubClient {
 						PubSubNamespace.BASIC.getXmlns());
 		ProviderManager.getInstance().addExtensionProvider("affiliation",
 				PubSubNamespace.OWNER.getXmlns(), affiliationProvider);
+
+		getChannelServerAddress(configuration
+				.getProperty(MediaServerConfiguration.XMPP_CONNECTION_SERVICENAME));
 	}
 
 	private Node getNode(String entityId) {
@@ -88,7 +116,8 @@ public class PubSubClient {
 		String serverAddress = getChannelServerAddress(entityJID.getDomain());
 		Node node = null;
 		if (serverAddress != null) {
-			PubSubManager manager = pubSubManagersCache.get(serverAddress);
+			PubSubManager manager = getPubSubManagerFactory().create(
+					serverAddress);
 			if (manager == null) {
 				manager = new PubSubManager(connection, serverAddress);
 				pubSubManagersCache.put(serverAddress, manager);
@@ -114,7 +143,7 @@ public class PubSubClient {
 	private String discoverDomainServer(String domain) {
 		ServiceDiscoveryManager discoManager = ServiceDiscoveryManager
 				.getInstanceFor(connection);
-		PubSubManager pubSubManager = new PubSubManager(connection, domain);
+		PubSubManager pubSubManager = getPubSubManagerFactory().create(domain);
 
 		DiscoverItems discoverItems;
 		try {
