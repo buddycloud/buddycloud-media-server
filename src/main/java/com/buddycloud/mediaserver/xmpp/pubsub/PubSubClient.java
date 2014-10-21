@@ -208,12 +208,13 @@ public class PubSubClient {
 		int itemCount = 0;
 		while (true) {
 
-			PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
-
-			AffiliationsExtension subElem = (AffiliationsExtension) reply
-					.getExtension(
-							PubSubElementType.AFFILIATIONS.getElementName(),
-							PubSubNamespace.BASIC.getXmlns());
+            PubSub reply = (PubSub) node.sendPubsubPacket(Type.GET, request);
+ 
+            LOGGER.debug("Affiliations reply " + reply.toXML());
+            AffiliationsExtension subElem = (AffiliationsExtension) reply
+                    .getExtension(
+                            PubSubElementType.AFFILIATIONS.getElementName(),
+                            PubSubNamespace.BASIC.getXmlns());
 
 			List<Affiliation> affiliations = subElem.getAffiliations();
 
@@ -261,31 +262,32 @@ public class PubSubClient {
 		}
 
 		Node node = getNode(entityId);
-		if (node != null) {
-			Affiliation affiliation;
+		if (node == null) {
+		    return false;
+		}
+		Affiliation affiliation;
 
-			try {
-				LOGGER.debug("Getting " + userBareJID
-						+ " affiliation for node [" + node.getId() + "]");
-				affiliation = getAffiliation(node, userBareJID);
-			} catch (XMPPException e) {
-				LOGGER.warn("Could not read node '" + node.getId()
-						+ " affiliation for '" + userBareJID + "'", e);
+		try {
+			LOGGER.debug("Getting " + userBareJID
+				+ " affiliation for node [" + node.getId() + "]");
+			affiliation = getAffiliation(node, userBareJID);
+		} catch (XMPPException e) {
+			LOGGER.warn("Could not read node '" + node.getId()
+				+ " affiliation for '" + userBareJID + "'", e);
 
-				return false;
-			}
-
-			if (affiliation != null) {
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug(userBareJID + " affiliation: "
-							+ affiliation.getType());
-				}
-				return capability.isUserAllowed(affiliation.getType()
-						.toString());
-			}
+		    return false;
+		}
+			
+		if (null == affiliation) {
+			LOGGER.debug("User " + userBareJID + " has no affiliation to node " + node.getId());
+			return false;
 		}
 
-		return false;
+		LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
+
+		return capability.isUserAllowed(affiliation.getType()
+	        .toString());
+
 	}
 
 	/**
