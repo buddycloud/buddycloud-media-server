@@ -8,5 +8,5 @@ if [ "$DATABASE" != "" ]; then
     OPTS=" $OPTS -DDATABASE=\"$DATABASE\""
 fi
 
-cd buddycloud-server-java
+cd buddycloud-media-server
 java $OPTS -jar target/buddycloud-media-server-jar-with-dependencies.jar
