@@ -21,20 +21,61 @@ download media from public channels - any client has access.
 [xep]: http://xmpp.org/extensions/xep-0070.html
 [pubsub]: https://buddycloud.org/wiki/XMPP_XEP#Follower_Management
 
-__Build status:__ 
+# Build status:
+
   * Released version: [![Build Status](https://travis-ci.org/buddycloud/buddycloud-media-server.svg?branch=master)](https://travis-ci.org/buddycloud/buddycloud-media-server) 
   * Development version: [![Build Status](https://travis-ci.org/buddycloud/buddycloud-media-server.svg?branch=develop)](https://travis-ci.org/buddycloud/buddycloud-media-server) 
-  
-Usage
------
 
-#### Via the Buddycloud API
+# Deployment
+
+__Note:__ Always ensure that you have a database/XMPP server set up and running first.
+
+## Running manually
+
+```
+mvn package
+java -jar target/buddycloud-media-server-<VERSION>-jar-with-dependencies.jar
+```
+
+`mediaserver.properties` must be in the classpath.
+
+## Docker
+
+```
+docker run -d buddycloud/media-server
+```
+
+__Note:__ Don't forget to expose the HTTP port (plus additional as required).
+
+### Configuration
+
+When running with docker there are two methods which you can use to configure the server. For more information see [configuration parameters](https://github.com/buddycloud/buddycloud-media-server#configuration).
+
+#### Mounted volume configuration
+
+'Mounted volume' configuration works the same as including a `mediaserver.properties` file. In this case you need to mount your configuration directory at `/config/media-server` on the docker image.  The media server is set up to check this directory for config files.
+
+#### Database configuration
+
+Starting a docker container with the environment variable of `DATABASE` set to a postgresql connection string will load configuration from the database, e.g.:
+
+```
+docker run -d DATABASE="jdbc:postgresql://localhost:5432/media-server?user=media&password=tellnoone" buddycloud/media-server
+```
+
+### Datastorage
+
+You'll also need a mount a volume to store your media files. Ensure the mounted location matches that in your configuration.
+
+# Usage
+
+## Via the Buddycloud API
 
 The API endpoints are described in detail [here](https://buddycloud.org/wiki/Buddycloud_HTTP_API#.2F.3Cchannel.3E.2Fmedia.2F.3Citem.3E).
 
-#### Using the Media Server directly
+## Using the Media Server directly
 
-##### Discovering the HTTP endpoint
+### Discovering the HTTP endpoint
 
 In order to figure out which endpoint to send HTTP calls to, we use [XMPP Service Discovery] (http://xmpp.org/extensions/xep-0030.html) against the domain running the media server. In the folowing example, we use buddycloud.org as the target domain. We first list all services provided by buddycloud.org and then we pick the one with name "Media Server".
 
@@ -87,7 +128,7 @@ The endpoint can be advertised by adding the following key (example data) to you
 http.endpoint=https://api.buddycloud.org/media_proxy
 ```
 
-##### If media belongs to a public channel
+### If media belongs to a public channel
 
 You don't need an ```Authorization``` header. Notice that if you're building a web frontend, embedding public media from the media-server means just creating an ```<img>``` tag. 
 
@@ -97,17 +138,17 @@ You don't need an ```Authorization``` header. Notice that if you're building a w
 curl https://demo.buddycloud.org/api/media_proxy/media-channel@example.com/mediaId
 ```
 
-##### If media belongs to a private channel
+### If media belongs to a private channel
 
 You need to verify your request via XMPP and generate an ```Authorization``` header as following: 
 
-###### Generating a transaction id
+#### Generating a transaction id
 
 As per [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html), every transaction with the media server that requires authentication must have an unique identifier within the context of the client's interaction with the server. This identifier will be sent over to the media server via HTTP and then sent back to the client via XMPP in order to confirm the client's identity.
 
 For this example, we will use **a7374jnjlalasdf82** as a transaction id.
 
-###### Listening for confirmation
+#### Listening for confirmation
 
 Before sending the actual HTTP request, the client has to setup an XMPP listener for the confirmation request. The message sent by the media server complies with [XEP 0070](http://www.xmpp.org/extensions/xep-0070.html) and will be in the lines of:
 
@@ -161,33 +202,40 @@ curl -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZT
 curl -X DELETE -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media_proxy/media-channel@example.com/mediaId
 ```
 
-Setup
------
+# Setup
 
 The server is written on top of Java using [RESTlet](http://www.restlet.org/).
 
 It uses [Maven](http://maven.apache.org/) to build its packages. You can build
 the package manually or download it from [here](http://downloads.buddycloud.com/).
 
-After unpacking, you can then start it by invoking:
-
-```
-    mvn package
-    java -jar target/buddycloud-media-server-jar-with-dependencies.jar
-```
-
-The server needs to be configured to point to a Buddycloud and XMPP server. 
-See the *Configuration* section.
-
 Setup database tables using the scripts at https://raw.githubusercontent.com/buddycloud/buddycloud-media-server/master/postgres
 
-Configuration
--------------
+## Configuration
+
+### File configuration
 
 You can configure the media server by copying `mediaserver.properties.example` to 
 `mediaserver.properties` in the server's root directory, and then editing as 
-required. This file has multiple properties definitions:
+required.
 
+The server is able to pick up a `mediaserver.properties` file up from anywhere in the system path.
+
+### Database configuration
+
+Set an environment variable as per the following example:
+
+```
+DATABASE="jdbc:postgresql://localhost:5432/buddycloud-server?user=buddycloud&password=tellnoone"
+```
+
+The server will then use the database values to configure itself, the configuration.properties file will be ignored.
+
+### Configuration file
+
+This file has multiple properties definitions:
+
+```
         # HTTP 
         http.port=8080
         http.tests.port=9090
@@ -231,7 +279,9 @@ required. This file has multiple properties definitions:
         # File System
         media.storage.root=/tmp
         media.sizelimit=1000240
-        
+ 
+```
+
 The following configuration options are supported:
 
 HTTP related configurations:
@@ -246,7 +296,6 @@ you **must** provide the others *https* properties.
 - **https.key.password**: the HTTPS key password.
 - **http.port** (Optional): the HTTP port where the server will listen for HTTP requests (default is *8080*).
 - **http.tests.port** (Optional): the HTTP port where the server will listen for HTTP requests while running tests (default is *9090*).
-
 
 XMPP related:
 
