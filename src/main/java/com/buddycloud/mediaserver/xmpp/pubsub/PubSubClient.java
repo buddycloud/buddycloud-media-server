@@ -233,31 +233,32 @@ public class PubSubClient {
 		}
 
 		Node node = getNode(entityId);
-		if (node != null) {
-			Affiliation affiliation;
-
-			try {
-				LOGGER.debug("Getting " + userBareJID
-						+ " affiliation for node [" + node.getId() + "]");
-				affiliation = getAffiliation(node, userBareJID);
-			} catch (XMPPException e) {
-				LOGGER.warn("Could not read node '" + node.getId()
-						+ " affiliation for '" + userBareJID + "'", e);
-
-				return false;
-			}
-			
-			if (null == affiliation) {
-				LOGGER.debug("User " + userBareJID + " has no affiliation to node " + node.getId());
-				return false;
-			}
-
-
-            LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
-
-			return capability.isUserAllowed(affiliation.getType()
-			    .toString());
+		if (node == null) {
+		    return false;
 		}
+		Affiliation affiliation;
+
+		try {
+			LOGGER.debug("Getting " + userBareJID
+				+ " affiliation for node [" + node.getId() + "]");
+			affiliation = getAffiliation(node, userBareJID);
+		} catch (XMPPException e) {
+			LOGGER.warn("Could not read node '" + node.getId()
+				+ " affiliation for '" + userBareJID + "'", e);
+
+		    return false;
+		}
+			
+		if (null == affiliation) {
+			LOGGER.debug("User " + userBareJID + " has no affiliation to node " + node.getId());
+			return false;
+		}
+
+		LOGGER.debug(userBareJID + " affiliation: " + affiliation.getType().toString());
+
+		return capability.isUserAllowed(affiliation.getType()
+	        .toString());
+
 	}
 
 	/**
