@@ -33,7 +33,8 @@ __Note:__ Always ensure that you have a database/XMPP server set up and running 
 ## Running manually
 
 ```
-java -jar buddycloud-media-server-<VERSION>-jar-with-dependencies.jar
+mvn package
+java -jar target/buddycloud-media-server-<VERSION>-jar-with-dependencies.jar
 ```
 
 `mediaserver.properties` must be in the classpath.
@@ -46,9 +47,21 @@ docker run -d buddycloud/media-server
 
 __Note:__ Don't forget to expose the HTTP port (plus additional as required).
 
-### Mounted volume configuration
+### Configuration
+
+When running with docker there are two methods which you can use to configure the server. For more information see [configuration parameters](https://github.com/buddycloud/buddycloud-media-server#configuration).
+
+#### Mounted volume configuration
 
 'Mounted volume' configuration works the same as including a `mediaserver.properties` file. In this case you need to mount your configuration directory at `/config/media-server` on the docker image.  The media server is set up to check this directory for config files.
+
+#### Database configuration
+
+Starting a docker container with the environment variable of `DATABASE` set to a postgresql connection string will load configuration from the database, e.g.:
+
+```
+docker run -d DATABASE="jdbc:postgresql://localhost:5432/media-server?user=media&password=tellnoone" buddycloud/media-server
+```
 
 ### Datastorage
 
@@ -189,32 +202,40 @@ curl -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZT
 curl -X DELETE -H "Authorization: Basic bWVkaWEtdXNlckBleGFtcGxlLmNvbS9tZWRpYS1yZXNvdXJjZTphNzM3NGpuamxhbGFzZGY4Mg==" https://demo.buddycloud.org/api/media_proxy/media-channel@example.com/mediaId
 ```
 
-Setup
------
+# Setup
 
 The server is written on top of Java using [RESTlet](http://www.restlet.org/).
 
 It uses [Maven](http://maven.apache.org/) to build its packages. You can build
 the package manually or download it from [here](http://downloads.buddycloud.com/).
 
-After unpacking, you can then start it by invoking:
-
-```
-    mvn package
-    java -jar target/buddycloud-media-server-jar-with-dependencies.jar
-```
-
-The server needs to be configured to point to a Buddycloud and XMPP server. 
-See the *Configuration* section.
-
 Setup database tables using the scripts at https://raw.githubusercontent.com/buddycloud/buddycloud-media-server/master/postgres
 
-# Configuration
+## Configuration
+
+### File configuration
 
 You can configure the media server by copying `mediaserver.properties.example` to 
 `mediaserver.properties` in the server's root directory, and then editing as 
-required. This file has multiple properties definitions:
+required.
 
+The server is able to pick up a `mediaserver.properties` file up from anywhere in the system path.
+
+### Database configuration
+
+Set an environment variable as per the following example:
+
+```
+DATABASE="jdbc:postgresql://localhost:5432/buddycloud-server?user=buddycloud&password=tellnoone"
+```
+
+The server will then use the database values to configure itself, the configuration.properties file will be ignored.
+
+### Configuration file
+
+This file has multiple properties definitions:
+
+```
         # HTTP 
         http.port=8080
         http.tests.port=9090
@@ -258,7 +279,9 @@ required. This file has multiple properties definitions:
         # File System
         media.storage.root=/tmp
         media.sizelimit=1000240
-        
+ 
+```
+
 The following configuration options are supported:
 
 HTTP related configurations:
@@ -273,7 +296,6 @@ you **must** provide the others *https* properties.
 - **https.key.password**: the HTTPS key password.
 - **http.port** (Optional): the HTTP port where the server will listen for HTTP requests (default is *8080*).
 - **http.tests.port** (Optional): the HTTP port where the server will listen for HTTP requests while running tests (default is *9090*).
-
 
 XMPP related:
 
