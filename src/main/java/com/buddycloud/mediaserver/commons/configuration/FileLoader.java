@@ -21,11 +21,16 @@ public class FileLoader implements Loader {
   }
 
   public void load() throws ConfigurationException {
-
+    
     try {
-      String confPath = (System.getProperty(CONFIGURATION_ENV) == null) ? CONFIGURATION_FILE
-              : System.getProperty(CONFIGURATION_ENV);
-      readFile(new FileInputStream(confPath));
+      InputStream confFile = this.getClass().getClassLoader().getResourceAsStream(CONFIGURATION_FILE);
+      if (null == confFile) {
+        
+        String confPath = (System.getProperty(CONFIGURATION_ENV) == null) ? CONFIGURATION_FILE
+                : System.getProperty(CONFIGURATION_ENV);
+        confFile = new FileInputStream(confPath);
+      }
+      readFile(confFile);
     } catch (IOException e) {
       LOGGER.error("Configuration could not be loaded.", e);
       throw new ConfigurationException(e.getMessage());
