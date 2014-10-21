@@ -105,7 +105,7 @@ public class ImageUtils {
 	public static BufferedImage cropMaximumSquare(BufferedImage img) throws IOException {
 		int smallerSide = img.getHeight() <= img.getWidth() ? img.getHeight() : img.getWidth();
         final BufferedImage cropedImg  =
-                Thumbnails.of(img).sourceRegion(Positions.CENTER, smallerSide/2, smallerSide/2).size(smallerSide, smallerSide).asBufferedImage();
+                Thumbnails.of(img).sourceRegion(Positions.CENTER, smallerSide, smallerSide).size(smallerSide, smallerSide).asBufferedImage();
         return cropedImg;
 	}
 
