@@ -5,9 +5,6 @@ CREATE TABLE "configuration" ("key" TEXT NOT NULL,
             "updated" TIMESTAMP);
 
 INSERT INTO schema_version (version, "when", description)
-       VALUES (8, 'now', 'Added configuration table');
+       VALUES (2, NOW(), 'Added configuration table');
 
 COMMIT;
-
-INSERT INTO schema_version (version, "when", description)
-       VALUES (2, NOW(), 'Add configuration table');
