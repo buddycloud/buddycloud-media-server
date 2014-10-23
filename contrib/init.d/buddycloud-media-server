@@ -7,7 +7,8 @@ RUNFROM=/usr/share/buddycloud-media-server
 DAEMON=/usr/bin/java
 JAR_FILE="$(ls $RUNFROM/buddycloud-media-server-jar-with-dependencies.jar)"
 JAR_FILE="$(basename $JAR_FILE)"
-DAEMON_ARGS=" -Xms1024m -Xmx1024m -XX:-OmitStackTraceInFastThrow -Djava.awt.headless=true \
+DAEMON_ARGS=" -Dlogback.configurationFile=logback.xml -Xms1024m -Xmx1024m \
+              -XX:-OmitStackTraceInFastThrow -Djava.awt.headless=true \
               -cp .:$JAR_FILE com.buddycloud.mediaserver.Main"
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/buddycloud-media-server
