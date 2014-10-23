@@ -328,13 +328,13 @@ property will be used (default is *org.postgresql.Driver*).
 
 The buddycloud media server relies on [logback](http://logback.qos.ch/manual/configuration.html) for writing logs out. In order to configure itself, Logback will: 
 
-* try to find a file called logback.groovy in the classpath.
+1. try to find a file called logback.groovy in the classpath.
 
-* If no such file is found, it tries to find a file called logback-test.xml in the classpath.
+1. If no such file is found, it tries to find a file called logback-test.xml in the classpath.
 
-* If no such file is found, it checks for the file logback.xml in the classpath..
+1. If no such file is found, it checks for the file logback.xml in the classpath..
 
-* If neither file is found, logback configures itself automatically using the BasicConfigurator which will cause logging output to be directed to the console.
+1. If neither file is found, logback configures itself automatically using the BasicConfigurator which will cause logging output to be directed to the console.
  
 A logback.xml with two appenders (```STDOUT``` writing in the console and ```FILE``` writing on a file) and with the root logger using the ```FILE```  appender looks like this:
 
