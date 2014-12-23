@@ -15,12 +15,13 @@
  */
 package com.buddycloud.mediaserver;
 
-import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
-import com.buddycloud.mediaserver.web.MediaServerApplication;
-import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
-import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
-import org.jivesoftware.smack.*;
+import java.util.Properties;
+
+import org.jivesoftware.smack.ConnectionConfiguration;
 import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackConfiguration;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
@@ -33,12 +34,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.component.ComponentException;
 
-import java.util.Properties;
+import com.buddycloud.mediaserver.commons.MediaServerConfiguration;
+import com.buddycloud.mediaserver.web.MediaServerApplication;
+import com.buddycloud.mediaserver.xmpp.MediaServerComponent;
+import com.buddycloud.mediaserver.xmpp.XMPPToolBox;
 
 public class Main {
 	private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		Properties configuration = MediaServerConfiguration.getInstance()
 				.getConfiguration();
 
@@ -49,14 +53,7 @@ public class Main {
 			System.exit(1);
 		}
 
-        try {
-            while (!startXMPPToolBox(configuration)) {
-                Thread.sleep(5000);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error while starting XMPP client / component", e);
-        }
-
+		startXMPPToolBox(configuration);
         keepAlive();
     }
 
@@ -117,26 +114,39 @@ public class Main {
         		MediaServerConfiguration.XMPP_REPLY_TIMEOUT));
         SmackConfiguration.setPacketReplyTimeout(xmppReplyTimeout);
     }
-
-	private static boolean startXMPPToolBox(Properties configuration) {
+    
+	private static void startXMPPToolBox(Properties configuration) 
+			throws InterruptedException {
         setXMPPReplyTimeout(configuration);
 
-		XMPPConnection connection = createAndStartConnection(configuration);
-		addTraceListeners(connection);
-        LOGGER.info("Buddycloud Media Server XMPP client connection started!");
-
-        MediaServerComponent component;
-        try {
-            component = createXMPPComponent(configuration);
-        } catch (ComponentException e) {
-            return false;
-        }
-
+        XMPPConnection connection = null;
+        
+        while (true) {
+			try {
+				connection = createAndStartConnection(configuration);
+				addTraceListeners(connection);
+		        LOGGER.info("Buddycloud Media Server XMPP client connection started!");
+		        break;
+			} catch (Exception e) {
+				LOGGER.error("Error while starting XMPP client", e);
+			}
+			Thread.sleep(30000);
+		}
+        
+        MediaServerComponent component = null;
+        
+        while (true) {
+			try {
+				component = createXMPPComponent(configuration);
+				LOGGER.info("Buddycloud Media Server XMPP component started!");
+		        break;
+			} catch (Exception e) {
+				LOGGER.error("Error while starting XMPP component", e);
+			}
+			Thread.sleep(30000);
+		}
+        
 		XMPPToolBox.getInstance().start(component, connection, configuration);
-		
-		LOGGER.info("Buddycloud Media Server XMPP component started!");
-
-        return true;
 	}
 
 	private static MediaServerComponent createXMPPComponent(
@@ -211,6 +221,11 @@ public class Main {
 					configuration.getProperty(MediaServerConfiguration.XMPP_CONNECTION_PASSWORD));
 		} catch (org.jivesoftware.smack.XMPPException e) {
 			LOGGER.error("XMPP connection coudn't be started", e);
+			try {
+				connection.disconnect();
+			} catch (Exception e2) {
+				// Do nothing, best effort
+			}
 			throw new com.buddycloud.mediaserver.commons.exception.XMPPException(e.getMessage(), e);
 		}
 
