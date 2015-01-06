@@ -323,3 +323,38 @@ property will be used (default is *org.postgresql.Driver*).
 - **media.storage.root** (Required): root path where the media server will store the media files.
 - **media.sizelimit** (Optional): the tolerated file content size which the media server will store (default is *104857600* - 100 MB).
 - **media.todisk.threshold** (Optional): the tolerated file size in bytes (default is *1048576* - 1 MB) which beyond are directly stored on disk.
+
+### Logging
+
+The buddycloud media server relies on [logback](http://logback.qos.ch/manual/configuration.html) for writing logs out. In order to configure itself, Logback will: 
+
+1. try to find a file called logback.groovy in the classpath.
+
+1. If no such file is found, it tries to find a file called logback-test.xml in the classpath.
+
+1. If no such file is found, it checks for the file logback.xml in the classpath..
+
+1. If neither file is found, logback configures itself automatically using the BasicConfigurator which will cause logging output to be directed to the console.
+ 
+A logback.xml with two appenders (```STDOUT``` writing in the console and ```FILE``` writing on a file) and with the root logger using the ```FILE```  appender looks like this:
+
+```xml
+<configuration>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>/var/log/buddycloud-media-server/mediaserver.log</file>
+        <encoder>
+            <pattern>%-5relative %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-5relative %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
+```

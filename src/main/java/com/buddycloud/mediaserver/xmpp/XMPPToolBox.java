@@ -15,8 +15,11 @@
  */
 package com.buddycloud.mediaserver.xmpp;
 
+import java.util.Properties;
+
 import com.buddycloud.mediaserver.commons.exception.XMPPException;
 import com.buddycloud.mediaserver.xmpp.pubsub.PubSubClient;
+
 import org.jivesoftware.smack.XMPPConnection;
 
 public class XMPPToolBox {
@@ -36,10 +39,10 @@ public class XMPPToolBox {
 	}
 
 	public void start(MediaServerComponent component,
-			XMPPConnection connection) {
+			XMPPConnection connection, Properties configuration) {
 		if (!started) {
 			authClient = new AuthVerifier(component);
-			pubSubClient = new PubSubClient(connection);
+			pubSubClient = new PubSubClient(connection, configuration);
 
 			started = true;
 		}

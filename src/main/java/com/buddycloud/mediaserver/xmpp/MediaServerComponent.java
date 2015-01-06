@@ -124,4 +124,14 @@ public class MediaServerComponent extends AbstractComponent {
 		fieldEl.addAttribute("type", type);
 		fieldEl.addElement("value").setText(value);
 	}
+	
+	@Override
+	public void postComponentShutdown() {
+		LOGGER.debug("Buddycloud Media XMPP component was disconnected.");
+	}
+	
+	@Override
+	public void postComponentStart() {
+		LOGGER.debug("Buddycloud Media XMPP component is connected and ready to accept packets.");
+	}
 }
