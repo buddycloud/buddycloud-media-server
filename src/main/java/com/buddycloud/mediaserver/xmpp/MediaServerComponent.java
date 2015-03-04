@@ -107,12 +107,12 @@ public class MediaServerComponent extends AbstractComponent {
 		if (endPoint != null) {
 
 			Element queryEl = disco.getElement().element("query");
-			addIdentity(queryEl, "component", getName(), "generic");
-
-			addFeature(queryEl, NAMESPACE_DISCO_INFO);
-			addFeature(queryEl, NAMESPACE_XMPP_PING);
-			addFeature(queryEl, NAMESPACE_LAST_ACTIVITY);
-			addFeature(queryEl, NAMESPACE_ENTITY_TIME);
+//			addIdentity(queryEl, "component", getName(), "generic");
+//
+//			addFeature(queryEl, NAMESPACE_DISCO_INFO);
+//			addFeature(queryEl, NAMESPACE_XMPP_PING);
+//			addFeature(queryEl, NAMESPACE_LAST_ACTIVITY);
+//			addFeature(queryEl, NAMESPACE_ENTITY_TIME);
 
 			Element xEl = queryEl.addElement("x", "jabber:x:data");
 			xEl.addAttribute("type", "result");
@@ -143,6 +143,21 @@ public class MediaServerComponent extends AbstractComponent {
 		fieldEl.addAttribute("var", var);
 		fieldEl.addAttribute("type", type);
 		fieldEl.addElement("value").setText(value);
+	}
+	
+	@Override
+	protected String[] discoInfoFeatureNamespaces() {
+		return new String[]{NAMESPACE_DISCO_INFO, NAMESPACE_XMPP_PING, NAMESPACE_LAST_ACTIVITY, NAMESPACE_ENTITY_TIME};
+	}
+	
+	@Override
+	protected String discoInfoIdentityCategory() {
+		return "component";
+	}
+	
+	@Override
+	protected String discoInfoIdentityCategoryType() {
+		return "generic";
 	}
 	
 	@Override
