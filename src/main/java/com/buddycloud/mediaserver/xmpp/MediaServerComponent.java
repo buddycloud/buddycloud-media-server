@@ -107,12 +107,12 @@ public class MediaServerComponent extends AbstractComponent {
 		if (endPoint != null) {
 
 			Element queryEl = disco.getElement().element("query");
-//			addIdentity(queryEl, "component", getName(), "generic");
-//
-//			addFeature(queryEl, NAMESPACE_DISCO_INFO);
-//			addFeature(queryEl, NAMESPACE_XMPP_PING);
-//			addFeature(queryEl, NAMESPACE_LAST_ACTIVITY);
-//			addFeature(queryEl, NAMESPACE_ENTITY_TIME);
+			addIdentity(queryEl, "component", getName(), "generic");
+
+			addFeature(queryEl, NAMESPACE_DISCO_INFO);
+			addFeature(queryEl, NAMESPACE_XMPP_PING);
+			addFeature(queryEl, NAMESPACE_LAST_ACTIVITY);
+			addFeature(queryEl, NAMESPACE_ENTITY_TIME);
 
 			Element xEl = queryEl.addElement("x", "jabber:x:data");
 			xEl.addAttribute("type", "result");
