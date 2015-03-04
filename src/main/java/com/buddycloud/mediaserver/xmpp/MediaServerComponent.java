@@ -105,7 +105,15 @@ public class MediaServerComponent extends AbstractComponent {
     	IQ disco = super.handleDiscoInfo(iq);
     	String endPoint = configuration.getProperty(MediaServerConfiguration.HTTP_ENDPOINT);
 		if (endPoint != null) {
+
 			Element queryEl = disco.getElement().element("query");
+			addIdentity(queryEl, "component", getName(), "generic");
+
+			addFeature(queryEl, NAMESPACE_DISCO_INFO);
+			addFeature(queryEl, NAMESPACE_XMPP_PING);
+			addFeature(queryEl, NAMESPACE_LAST_ACTIVITY);
+			addFeature(queryEl, NAMESPACE_ENTITY_TIME);
+
 			Element xEl = queryEl.addElement("x", "jabber:x:data");
 			xEl.addAttribute("type", "result");
 			
@@ -116,6 +124,18 @@ public class MediaServerComponent extends AbstractComponent {
 		}
 		return disco;
 	}
+
+    private void addIdentity(Element e, String category, String name, String type) {
+		Element identity = e.addElement("identity");
+		identity.addAttribute("category", category);
+		identity.addAttribute("name", name);
+		identity.addAttribute("type", type);
+    }
+
+    private void addFeature(Element e, String var) {
+        Element feature = e.addElement("feature");
+        feature.addAttribute("var", var);
+    }
 
 	private void addField(Element xEl, String var, String type,
 			String value) {
