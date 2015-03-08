@@ -160,6 +160,8 @@ public class Main {
 				.getProperty(MediaServerConfiguration.XMPP_COMPONENT_SUBDOMAIN);
 		componentManager.setSecretKey(subdomain,
 				configuration.getProperty(MediaServerConfiguration.XMPP_COMPONENT_SECRETKEY));
+		componentManager.setServerName(configuration
+                                .getProperty(MediaServerConfiguration.XMPP_COMPONENT_SERVERNAME));
 
 		MediaServerComponent mediaServer = new MediaServerComponent(configuration);
 

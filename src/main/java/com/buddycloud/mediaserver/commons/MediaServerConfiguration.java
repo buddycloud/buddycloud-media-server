@@ -44,6 +44,7 @@ public class MediaServerConfiguration {
   public static final String XMPP_COMPONENT_PORT = "xmpp.component.port";
   public static final String XMPP_COMPONENT_SUBDOMAIN = "xmpp.component.subdomain";
   public static final String XMPP_COMPONENT_SECRETKEY = "xmpp.component.secretkey";
+  public static final String XMPP_COMPONENT_SERVERNAME = "xmpp.component.servername";
 
   public static final String XMPP_CONNECTION_USERNAME = "xmpp.connection.username";
   public static final String XMPP_CONNECTION_PASSWORD = "xmpp.connection.password";
@@ -202,6 +203,10 @@ public class MediaServerConfiguration {
 
     if (configuration.get(XMPP_COMPONENT_SUBDOMAIN) == null) {
       missingProperties.add(XMPP_COMPONENT_SUBDOMAIN);
+    }
+
+    if (configuration.get(XMPP_COMPONENT_SERVERNAME) == null) {
+      missingProperties.add(XMPP_COMPONENT_SERVERNAME);
     }
 
     if (configuration.get(XMPP_COMPONENT_SECRETKEY) == null) {

@@ -250,7 +250,8 @@ This file has multiple properties definitions:
         # XMPP
         xmpp.component.host=localhost
         xmpp.component.port=5275
-        xmpp.component.subdomain=mediaserver.example.com
+        xmpp.component.subdomain=mediaserver
+        xmpp.component.servername=example.com
         xmpp.component.secretkey=secret
         
         xmpp.connection.username=mediaserver-test
@@ -302,6 +303,7 @@ XMPP related:
 - **xmpp.component.host** (Required): the XMPP server location where the media server's component will connect. 
 - **xmpp.component.port** (Required): the XMPP server components connection listening port.
 - **xmpp.component.subdomain** (Required): the *subdomain* that will be used by the component.
+- **xmpp.component.servername** (Required): the *servername* (server domain).
 - **xmpp.component.secretkey** (Required): the *secretkey* defined at the XMPP server for components connections.
 	
 In addition of the component, the media server also have a simple client that handles pubsub queries: 
