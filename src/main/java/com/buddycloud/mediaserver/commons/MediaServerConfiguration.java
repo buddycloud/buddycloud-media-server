@@ -206,7 +206,18 @@ public class MediaServerConfiguration {
     }
 
     if (configuration.get(XMPP_COMPONENT_SERVERNAME) == null) {
-      missingProperties.add(XMPP_COMPONENT_SERVERNAME);
+      if (configuration.get(XMPP_COMPONENT_SUBDOMAIN) == null) {
+        missingProperties.add(XMPP_COMPONENT_SERVERNAME);
+      } else {
+        String subdomain = configuration.get(XMPP_COMPONENT_SUBDOMAIN).toString();
+        int pos = subdomain.indexOf(".");
+        if (pos < 0) {
+          missingProperties.add(XMPP_COMPONENT_SERVERNAME);
+        } else {
+          configuration.put(XMPP_COMPONENT_SUBDOMAIN, subdomain.substring(0, pos));
+          configuration.put(XMPP_COMPONENT_SERVERNAME, subdomain.substring(pos + 1));
+        }
+      }
     }
 
     if (configuration.get(XMPP_COMPONENT_SECRETKEY) == null) {
