@@ -54,7 +54,7 @@
 
     "files":
         [
-        {"includePattern": "target/buddycloud-media-server-(.*).jar"}
+        {"includePattern": "target/buddycloud-media-server-(.*).jar", "uploadPattern": "buddycloud-media-server.jar"}
         ],
     "publish": true
 }
