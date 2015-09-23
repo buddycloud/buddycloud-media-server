@@ -28,6 +28,8 @@ download media from public channels - any client has access.
 
 # Deployment
 
+[ ![Download](https://api.bintray.com/packages/buddycloud/builds/buddycloud-media-server/images/download.svg) ](https://bintray.com/buddycloud/builds/buddycloud-media-server/_latestVersion)
+
 __Note:__ Always ensure that you have a database/XMPP server set up and running first.
 
 ## Running manually
