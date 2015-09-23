@@ -54,8 +54,7 @@
 
     "files":
         [
-        {"includePattern": "build/bin(.*)*/(.*\.gem)", "excludePattern": ".*/do-not-deploy/.*", "uploadPattern": "gems/$2"},
-        {"includePattern": "build/docs/(.*)", "uploadPattern": "docs/$1"}
+        {"includePattern": "/target/buddycloud-media-server-(.*).jar"}
         ],
     "publish": true
 }
