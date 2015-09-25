@@ -17,6 +17,7 @@ install:
   - sudo ln -s /usr/local/apache-maven-3.0.5 /usr/local/maven
 
 before_deploy: 
+ - "mvn -Dmaven.test.skip=true package"
  - "tar cvfz buddycloud-media-server.tgz README.md postgres target/buddycloud-media-server-*-jar-with-dependencies.jar"
  - "shasum -a 256 budducloud-media-server.tgz  > file.hashes"
 
