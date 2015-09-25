@@ -19,7 +19,7 @@ install:
 before_deploy: 
  - "mvn -Dmaven.test.skip=true package"
  - "tar cvfz buddycloud-media-server.tgz README.md postgres target/buddycloud-media-server-*-jar-with-dependencies.jar"
- - "shasum -a 256 budducloud-media-server.tgz  > file.hashes"
+ - "shasum -a 256 buddycloud-media-server.tgz  > file.hashes"
 
 deploy:
 - provider: bintray
