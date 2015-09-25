@@ -9,26 +9,25 @@
         "vcs_url": "https://github.com/buddycloud/buddycloud-media-server.git",
         "github_use_tag_release_notes": true,
         "github_release_notes_file": "RELEASE.txt",
-        "licenses": [
-            "Apache 2.0"
-        ],
-        "labels": [
-            "buddycloud"
-        ],
+        "licenses": ["Apache 2.0"],
         "public_download_numbers": false,
         "public_stats": false
     },
     "version": {
         "name": "latest",
-        "desc": "latest build from master",
-        "released": "2015-01-04",
-        "vcs_tag": "0.5",
+        "desc": "Latest Travis-CI build",
         "gpgSign": false
     },
     "files": [
         {
-            "includePattern": "target/buddycloud-media-server-(.*).jar",
-            "uploadPattern": "buddycloud-media-server.jar"
+            "includePattern": "budducloud-media-server.tgz",
+            "uploadPattern":  "budducloud-media-server.tgz",
+            "matrixParams": { "override": 1 } 
+        }, 
+        {
+            "includePattern": "file.hashes",
+            "uploadPattern":  "file.hashes",
+            "matrixParams": { "override": 1 }
         }
     ],
     "publish": true
