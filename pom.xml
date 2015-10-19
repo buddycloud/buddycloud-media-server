@@ -278,6 +278,7 @@
 					<appendAssemblyId>${assembly-append-assembly-id}</appendAssemblyId>
 				</configuration>
 			</plugin>
+			<!-- 
 			<plugin>
 				<groupId>com.github.goldin</groupId>
 				<artifactId>copy-maven-plugin</artifactId>
@@ -307,6 +308,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			-->
 			<!-- Jetty -->
 			<plugin>
 				<groupId>org.mortbay.jetty</groupId>
