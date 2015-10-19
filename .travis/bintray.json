@@ -3,7 +3,7 @@
         "name": "buddycloud-media-server",
         "repo": "builds",
         "subject": "buddycloud",
-        "desc": "built by Travis-CI",
+        "desc": "built by Travis-CI from master branch",
         "website_url": "https://github.com/buddycloud/buddycloud-media-server",
         "issue_tracker_url": "https://github.com/buddycloud/buddycloud-media-server/issues",
         "vcs_url": "https://github.com/buddycloud/buddycloud-media-server.git",
@@ -23,7 +23,7 @@
             "includePattern": "buddycloud-media-server.tgz",
             "uploadPattern":  "buddycloud-media-server.tgz",
             "matrixParams": { "override": 1 } 
-        }, 
+        },
         {
             "includePattern": "file.hashes",
             "uploadPattern":  "file.hashes",
