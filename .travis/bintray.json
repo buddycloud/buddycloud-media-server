@@ -20,8 +20,8 @@
     },
     "files": [
         {
-            "includePattern": "budducloud-media-server.tgz",
-            "uploadPattern":  "budducloud-media-server.tgz",
+            "includePattern": "buddycloud-media-server.tgz",
+            "uploadPattern":  "buddycloud-media-server.tgz",
             "matrixParams": { "override": 1 } 
         }, 
         {
