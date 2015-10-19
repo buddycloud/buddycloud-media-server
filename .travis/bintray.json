@@ -1,7 +1,7 @@
 {
     "package": {
-        "name": "buddycloud-media-server",
-        "repo": "builds",
+        "name": "builds",
+        "repo": "buddycloud-media-server",
         "subject": "buddycloud",
         "desc": "built by Travis-CI from master branch",
         "website_url": "https://github.com/buddycloud/buddycloud-media-server",
